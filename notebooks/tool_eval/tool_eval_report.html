@@ -24,8 +24,8 @@
   <thead><tr><th>실험</th><th>arm</th><th>gpt-5-nano<br><span class="legend">(강함)</span></th><th>gpt-4.1-nano<br><span class="legend">(약함)</span></th></tr></thead>
   <tbody>
         <tr><td class="exp" rowspan="1">① 기본 도구 eval (목 저장소 탐색)</td><td class="arm">single</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">12/12 · 14,011 tok</div></td><td class="acc" style="background:hsl(60,68%,42%)">50%<div class="sub">6/12 · 5,112 tok</div></td></tr>
-    <tr><td class="exp" rowspan="2">② 도구 통합 (분리 2도구 vs 통합 1도구·3파라미터)</td><td class="arm">분리</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">18/18 · 3,845 tok</div></td><td class="acc" style="background:hsl(20,68%,42%)">17%<div class="sub">2/12 · 891 tok</div></td></tr>
-    <tr><td class="arm">통합</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">18/18 · 1,853 tok</div></td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">12/12 · 730 tok</div></td></tr>
+    <tr><td class="exp" rowspan="2">② 도구 통합 (분리 2도구 vs 통합 1도구·3파라미터)</td><td class="arm">분리</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">18/18 · 3,209 tok</div></td><td class="acc" style="background:hsl(46,68%,42%)">39%<div class="sub">7/18 · 942 tok</div></td></tr>
+    <tr><td class="arm">통합</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">18/18 · 1,882 tok</div></td><td class="acc" style="background:hsl(113,68%,42%)">94%<div class="sub">17/18 · 610 tok</div></td></tr>
     <tr><td class="exp" rowspan="2">③ 체인 깊이 (프리미티브 8 vs calc 1)</td><td class="arm">분리</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">12/12 · 15,276 tok</div></td><td class="acc" style="background:hsl(30,68%,42%)">25%<div class="sub">3/12 · 4,038 tok</div></td></tr>
     <tr><td class="arm">통합</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">12/12 · 1,592 tok</div></td><td class="acc" style="background:hsl(90,68%,42%)">75%<div class="sub">9/12 · 1,686 tok</div></td></tr>
     <tr><td class="exp" rowspan="2">④ 큰 네임스페이스 (full 20 vs clean 5, 방해 15)</td><td class="arm">full</td><td class="acc" style="background:hsl(120,68%,42%)">100%<div class="sub">20/20 · 20,952 tok</div></td><td class="acc" style="background:hsl(90,68%,42%)">75%<div class="sub">15/20 · 23,570 tok · 오호출 5</div></td></tr>
@@ -40,7 +40,7 @@
 통합·clean이 분리·full 대비 입력토큰이 2~6배 적다(매 요청에 스키마가 실리므로).</div>
 <div class="key"><b>2. 정확도는 약한 모델에서만 극적으로 갈린다.</b>
 gpt-5-nano는 거의 모든 arm에서 100% — 통합이든 분리든, 20개든 5개든 견고. 반면 gpt-4.1-nano는
-<b>통합/clean이 아니면 무너진다</b>: 통합 ② 100% vs 분리 17%, 통합 ③ 75% vs 분리 25%.</div>
+<b>통합/clean이 아니면 무너진다</b>: 통합 ② 94% vs 분리 39%, 통합 ③ 75% vs 분리 25%.</div>
 <div class="key"><b>3. 혼동/함정은 약한 모델을 실제로 오작동시킨다.</b>
 ⑤ 혼동에서 gpt-4.1-nano는 함정 도구(<code>get_payment_summary</code> 등)를 여러 번 호출(함정·오호출 발생),
 gpt-5-nano는 0. 큰 네임스페이스 ④는 정확도 영향은 작지만 <b>오호출 + 토큰 5.7배</b> 비용.</div>
