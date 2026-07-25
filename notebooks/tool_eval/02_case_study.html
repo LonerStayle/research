@@ -1,0 +1,70 @@
+<style>
+ :root { color-scheme: light dark; }
+ body { font-family:-apple-system,"Segoe UI",system-ui,sans-serif; max-width:860px; margin:2rem auto; padding:0 1rem; line-height:1.6; }
+ h1 { font-size:1.45rem; } h2 { font-size:1.12rem; margin-top:1.8rem; border-bottom:2px solid #8884; padding-bottom:.3rem; }
+ table { border-collapse:collapse; width:100%; margin:.8rem 0; }
+ th,td { border:1px solid #8886; padding:.45rem .6rem; text-align:left; } th { background:#8882; }
+ .tldr { background:#f5b31118; border-left:4px solid #f5b311; padding:.7rem 1rem; border-radius:5px; }
+ code { background:#8882; padding:.1rem .3rem; border-radius:3px; }
+ .big { font-size:1.1rem; }
+</style>
+
+<h1>🔍 02 케이스 스터디 — "약한 모델 분리 17%" 는 왜 그렇게 낮았나</h1>
+<p>노트북 <code>02_tool_consolidation_eval.ipynb</code> 의 gpt-4.1-nano <b>분리안 17%</b> 가 너무 낮아 보여, 원인을 추적하고 교란을 제거해 다시 측정한 기록. (원인 → 과정 → 결과)</p>
+
+<div class="tldr"><b>TL;DR</b> — 17% 는 <b>과장</b>이었다. 실패 12건 중 순수 도구설계 신호(threading)는 4건뿐, 나머지는 태스크 교란(구분자 4 + 전사/무답 2). 교란 제거 후 분리 <b>17% → 39%</b>, 통합 <b>94%</b> — 남은 실패는 거의 전부 threading.</div>
+
+<h2>1. 원인 — 왜 17% 였나 (confounded, 해시 도메인)</h2>
+<p>두 교란이 섞였다: ① <b>구분자 « » 혼입</b>(약한 모델이 <code>«...»</code> 기호를 문자열에 복사) ② <b>64자 hex 전사</b>(복사 중 깨짐/무답). gpt-4.1-nano 분리 12건 원인 분해:</p>
+<div style="display:flex;border-radius:5px;overflow:hidden;margin:.4rem 0"><div style="flex:2;background:#2e9e5b;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">정답 2</div><div style="flex:4;background:#c0392b;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">threading실패 4</div><div style="flex:4;background:#e67e22;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">구분자혼입 4</div><div style="flex:1;background:#8e44ad;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">전사오류/환각 1</div><div style="flex:1;background:#7f8c8d;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">answer에 hex 없음 1</div></div>
+<table><tr><th>원인</th><th>건수</th><th>성격</th></tr>
+<tr><td>정답</td><td>2</td><td>✅ 정답</td></tr>
+<tr><td>threading실패</td><td>4</td><td>🎯 진짜 도구설계 신호</td></tr>
+<tr><td>구분자혼입</td><td>4</td><td>⚠ 태스크 교란</td></tr>
+<tr><td>전사오류/환각</td><td>1</td><td>⚠ 태스크 교란</td></tr>
+<tr><td>answer에 hex 없음</td><td>1</td><td>⚠ 태스크 교란</td></tr>
+</table>
+<p>→ 진짜 threading 실패는 <b>4/12</b> 뿐, 나머지 절반이 교란.</p>
+
+<h2>2. 과정 — 교란 제거 재설계</h2>
+<p>구조(2도구·각1파라미터 vs 1도구·3파라미터)는 그대로, 교란만 제거:</p>
+<table>
+<tr><th>항목</th><th>원래(confounded)</th><th>클린</th></tr>
+<tr><td>문자열 전달</td><td><code>«Hello World»</code></td><td><code>문자열: Hello World</code> (구분자 없음)</td></tr>
+<tr><td>최종 답</td><td>64자 hex</td><td><b>짧은 정수 체크섬</b> (≤5자리)</td></tr>
+<tr><td>분리 도구</td><td>normalize + hash_all</td><td>normalize + checksum_all</td></tr>
+<tr><td>통합 도구</td><td>digest(text,normalize,algo)</td><td>compute(text,normalize,algo)</td></tr>
+</table>
+<p>두 모델 × 2설계 × 6과제 × 3회 = 72루프 재실행.</p>
+
+<h2>3. 결과 — 클린 A/B</h2>
+<table>
+<tr><th>모델</th><th>분리 (2도구·체이닝)</th><th>통합 (1도구·3파라미터)</th></tr>
+<tr><td>gpt-5-nano</td><td class="big"><span style="background:hsl(120,68%,42%);color:#fff;padding:.15rem .5rem;border-radius:4px;font-weight:700">100%</span> <span style="opacity:.7;font-size:.85rem">(18/18)</span></td><td class="big"><span style="background:hsl(120,68%,42%);color:#fff;padding:.15rem .5rem;border-radius:4px;font-weight:700">100%</span> <span style="opacity:.7;font-size:.85rem">(18/18)</span></td></tr>
+<tr><td>gpt-4.1-nano</td><td class="big"><span style="background:hsl(46,68%,42%);color:#fff;padding:.15rem .5rem;border-radius:4px;font-weight:700">39%</span> <span style="opacity:.7;font-size:.85rem">(7/18)</span></td><td class="big"><span style="background:hsl(113,68%,42%);color:#fff;padding:.15rem .5rem;border-radius:4px;font-weight:700">94%</span> <span style="opacity:.7;font-size:.85rem">(17/18)</span></td></tr>
+</table>
+<p>클린 gpt-4.1-nano 분리 실패 원인 (구분자 confound 는 구조적으로 불가능):</p>
+<div style="display:flex;border-radius:5px;overflow:hidden;margin:.4rem 0"><div style="flex:7;background:#2e9e5b;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">정답 7</div><div style="flex:10;background:#c0392b;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">threading실패 10</div><div style="flex:1;background:#8e44ad;color:#fff;padding:.35rem .2rem;font-size:.72rem;text-align:center;white-space:nowrap">전사오류/환각 1</div></div>
+<p>→ <b>구분자혼입 0건</b>. 분리 정확도 <b>17% → 39%</b> 로 상승, 남은 격차는 순수 threading.</p>
+
+<h2>3.5 왜 그래도 39% 인가 — 분리 실패의 실제 행동 (핵심)</h2>
+<p>교란을 다 없앴는데도 분리가 39% 밖에 안 되는 이유는 <b>약한 모델이 한 도구의 출력을 다음 도구의 입력으로 이어붙이지(pipe) 못하기 때문</b>이다. 클린 gpt-4.1-nano 분리 18건 실제 행동:</p>
+<table><tr><th>행동</th><th>건수</th></tr>
+<tr><td>정답</td><td>7</td></tr>
+<tr><td>normalize 부르고도 원본을 checksum</td><td>10</td></tr>
+<tr><td>기타(전사/algo)</td><td>1</td></tr>
+</table>
+<p>가장 흔한 실패(<b>10건</b>): <b>normalize 를 호출은 하는데, 그 결과를 버리고 원본을 다시 checksum 에 넣는다.</b></p>
+<ul>
+<li><b>K1</b>: <code>normalize('Hello World') → checksum_all('Hello World')</code> → 답 <b>1052</b>(원본), 정답 1116. normalize 로 <code>hello world</code> 받아놓고 checksum 엔 원본 <code>Hello World</code> 를 다시 넣음.</li>
+<li><b>K2</b>: <code>normalize('OrderHub Team') → checksum_all('OrderHub Team') → checksum_all('orderhub team')</code> → 원본·정규화를 <b>둘 다 계산해놓고 원본 결과(53659)를 최종답으로 보고</b>(정답 10173) — 어느 중간결과가 최종답인지 못 고름.</li>
+</ul>
+<p>즉 약한 모델은 ① 스텝은 알지만(normalize 부름) ② <b>출력을 다음 입력으로 파이프하지 못하고</b> 원본을 다시 읽으며 ③ 때로 <b>틀린 중간결과를 최종답으로 고른다</b>. 반면 정규화 불필요한 raw 과제(K3·K5)는 거의 다 정답 → 실패는 <b>체이닝이 필요한 과제에서만</b> 난다. 이게 통합 <code>compute()</code> 가 도구 안에서 대신 해주는 composition 이라 — 통합 94% vs 분리 39%.</p>
+
+<h2>4. 결론</h2>
+<ul>
+<li><b>측정 코드·검증기는 정상</b>이었고(거짓통과/실패 0), 문제는 <b>해시 태스크의 교란</b>이 실패율을 부풀린 것.</li>
+<li>교란 제거 후에도 <b>통합 &gt; 분리 정확도 격차는 진짜</b>(94% vs 39%), 원인은 <b>약한 모델의 normalize→checksum threading 실패</b>. 통합은 체이닝을 도구 안에서 없애 정확도를 지킴.</li>
+<li>gpt-5-nano 는 교란 유무 무관 100%/100% — divergence 는 <b>약한 모델 전용</b>.</li>
+<li><b>교훈</b>: 도구설계 A/B 는 최종답을 짧게·입력을 구분자 없이 둬야 도구 효과가 태스크 노이즈와 안 섞인다. 집계만 믿지 말고 실패를 원인별로 분해하라.</li>
+</ul>
