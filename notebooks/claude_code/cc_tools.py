@@ -384,7 +384,7 @@ class BaseSession:
     def _after_round(self):
         pass
 
-    def ask(self, question, max_rounds=16):
+    def ask(self, question, max_rounds=200):
         print(f"💬 {question}\n")
         self.input_list.append({"role": "user", "content": question})
         for _ in range(max_rounds):
