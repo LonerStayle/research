@@ -387,14 +387,19 @@ class BaseSession:
     def ask(self, question, max_rounds=200):
         print(f"💬 {question}\n")
         self.input_list.append({"role": "user", "content": question})
+        cycle = 0
         for _ in range(max_rounds):
+            cycle += 1
             response = get_client().responses.create(
                 model=self.model, input=self.input_list, tools=self.tools)
             self.input_list += response.output
             calls = [item for item in response.output if item.type == "function_call"]
             if not calls:
+                print(f"═══ 사이클 {cycle} (모델 호출 #{cycle}) ═══  function_call 0개 → 최종 답변")
                 print(f"\n🤖 {response.output_text}")
                 return response.output_text
+            print(f"═══ 사이클 {cycle} (모델 호출 #{cycle}) ═══  "
+                  f"function_call {len(calls)}개{' 병렬' if len(calls) > 1 else ''}")
             for call in calls:  # 받은 순서대로 순차 실행
                 args = json.loads(call.arguments)
                 label, output = self._execute(call.name, args)
