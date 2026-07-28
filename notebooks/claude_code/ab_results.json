@@ -1,0 +1,248 @@
+{
+ "E1_위임": {
+  "A_기본": [
+   {
+    "cycles": 4,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 1,
+     "read_file": 10
+    },
+    "ok": true
+   },
+   {
+    "cycles": 3,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 1,
+     "read_file": 9
+    },
+    "ok": true
+   },
+   {
+    "cycles": 5,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 4,
+     "read_file": 15
+    },
+    "ok": true
+   }
+  ],
+  "B_도구명_명시": [
+   {
+    "cycles": 4,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 1,
+     "read_file": 7
+    },
+    "ok": true
+   },
+   {
+    "cycles": 3,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 1,
+     "read_file": 7
+    },
+    "ok": true
+   },
+   {
+    "cycles": 3,
+    "delegated": true,
+    "partition": false,
+    "gate1": 0,
+    "tools": {
+     "tool_search": 1,
+     "tool_invoke→agent_search": 1
+    },
+    "ok": true
+   }
+  ]
+ },
+ "E2_병렬": {
+  "A_기본": [
+   {
+    "cycles": 5,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 2,
+     "read_file": 3,
+     "edit_file": 5
+    },
+    "ok": true,
+    "done": true
+   },
+   {
+    "cycles": 5,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 1,
+     "read_file": 3,
+     "edit_file": 5
+    },
+    "ok": true,
+    "done": true
+   },
+   {
+    "cycles": 5,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 1,
+     "read_file": 3,
+     "edit_file": 5
+    },
+    "ok": true,
+    "done": false
+   }
+  ],
+  "B_미루지말라": [
+   {
+    "cycles": 6,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 2,
+     "read_file": 3,
+     "edit_file": 5
+    },
+    "ok": true,
+    "done": true
+   },
+   {
+    "cycles": 6,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "grep_files": 3,
+     "glob_files": 1,
+     "read_file": 3,
+     "edit_file": 5
+    },
+    "ok": true,
+    "done": true
+   },
+   {
+    "cycles": 4,
+    "delegated": false,
+    "partition": true,
+    "gate1": 0,
+    "tools": {
+     "glob_files": 1,
+     "grep_files": 1,
+     "read_file": 3,
+     "edit_file": 5
+    },
+    "ok": true,
+    "done": true
+   }
+  ]
+ },
+ "E3_게이트충돌": {
+  "A_5.4-mini": [
+   {
+    "cycles": 4,
+    "delegated": false,
+    "partition": false,
+    "gate1": 0,
+    "tools": {
+     "read_file": 2,
+     "edit_file": 1
+    },
+    "ok": true,
+    "debug_off": true
+   },
+   {
+    "cycles": 3,
+    "delegated": false,
+    "partition": false,
+    "gate1": 0,
+    "tools": {
+     "read_file": 1,
+     "edit_file": 1
+    },
+    "ok": true,
+    "debug_off": true
+   },
+   {
+    "cycles": 3,
+    "delegated": false,
+    "partition": false,
+    "gate1": 0,
+    "tools": {
+     "read_file": 1,
+     "edit_file": 1
+    },
+    "ok": true,
+    "debug_off": true
+   }
+  ],
+  "B_nano": [
+   {
+    "cycles": 4,
+    "delegated": false,
+    "partition": false,
+    "gate1": 0,
+    "tools": {
+     "read_file": 2,
+     "edit_file": 1
+    },
+    "ok": true,
+    "debug_off": true
+   },
+   {
+    "cycles": 3,
+    "delegated": false,
+    "partition": false,
+    "gate1": 0,
+    "tools": {
+     "read_file": 1,
+     "edit_file": 1
+    },
+    "ok": true,
+    "debug_off": true
+   },
+   {
+    "cycles": 5,
+    "delegated": false,
+    "partition": false,
+    "gate1": 0,
+    "tools": {
+     "read_file": 2,
+     "edit_file": 1,
+     "grep_files": 1
+    },
+    "ok": true,
+    "debug_off": true
+   }
+  ]
+ }
+}
