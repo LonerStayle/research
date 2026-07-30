@@ -1,0 +1,20 @@
+{
+  "provider": "openai",
+  "model": "gpt-5.4-mini",
+  "cache_mode": "automatic-prefix",
+  "target_tokens": 20000,
+  "prompt_tokens": 16292,
+  "n_repeat": 3,
+  "ttft_miss_ms": 917.9875143260384,
+  "ttft_hit_ms": 713.0653889616951,
+  "ttft_improve_pct": 22.32297522203137,
+  "total_miss_ms": 1165.3644586525236,
+  "total_hit_ms": 913.0416802751521,
+  "total_improve_pct": 21.651834025307824,
+  "cached_tokens_hit": 16128,
+  "cached_tokens_miss": 0,
+  "hit_rate": 0.989933709796219,
+  "cost_miss_usd": 0.0123745,
+  "cost_hit_usd": 0.0014766,
+  "cost_save_pct": 88.06739666249142
+}

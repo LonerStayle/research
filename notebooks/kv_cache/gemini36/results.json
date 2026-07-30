@@ -1,0 +1,28 @@
+{
+  "provider": "google",
+  "model": "gemini-3.6-flash",
+  "cache_mode": "implicit",
+  "target_tokens": 20000,
+  "prompt_tokens": 19455,
+  "n_repeat": 3,
+  "ttft_miss_ms": 2490.1051113847643,
+  "ttft_hit_ms": 1729.7446663336207,
+  "ttft_improve_pct": 30.535275060268518,
+  "total_miss_ms": 2490.408597358813,
+  "total_hit_ms": 1730.542444003125,
+  "total_improve_pct": 30.511706157839292,
+  "cached_tokens_hit": 16357,
+  "cached_tokens_miss": 0,
+  "hit_rate": 0.8407607298894886,
+  "cost_miss_usd": 0.005849633333333333,
+  "cost_hit_usd": 0.0014217766666666666,
+  "cost_save_pct": 75.6946019408624,
+  "gemini_first_hit_at_warmup": 2,
+  "gemini_hit_calls_of_n": 3,
+  "gemini_warmup_rates": [
+    0.0,
+    0.8407607298894886,
+    0.0,
+    0.0
+  ]
+}

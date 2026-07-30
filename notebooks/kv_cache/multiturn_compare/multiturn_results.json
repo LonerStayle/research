@@ -1,0 +1,481 @@
+{
+  "n_turns": 10,
+  "max_output_tokens": 96,
+  "models": {
+    "gpt-5.6-luna": {
+      "provider": "openai",
+      "cache_mode": "automatic-prefix",
+      "price_note": "공식 pricing 확인값",
+      "rows": [
+        {
+          "turn": 1,
+          "prompt_tokens": 2906,
+          "cached": 0,
+          "write": 2903,
+          "output_tokens": 96,
+          "ttft": 2.6611661659553647,
+          "total": 2.6839160829549655,
+          "cost": 0.00420775,
+          "cost_nocache": 0.003482
+        },
+        {
+          "turn": 2,
+          "prompt_tokens": 3788,
+          "cached": 2903,
+          "write": 882,
+          "output_tokens": 79,
+          "ttft": 1.3502520420588553,
+          "total": 1.5446785000385717,
+          "cost": 0.0018698,
+          "cost_nocache": 0.004262
+        },
+        {
+          "turn": 3,
+          "prompt_tokens": 4687,
+          "cached": 3785,
+          "write": 899,
+          "output_tokens": 35,
+          "ttft": 0.861907041980885,
+          "total": 1.0638845840003341,
+          "cost": 0.00171525,
+          "cost_nocache": 0.004897
+        },
+        {
+          "turn": 4,
+          "prompt_tokens": 5588,
+          "cached": 4684,
+          "write": 901,
+          "output_tokens": 34,
+          "ttft": 0.9951279580127448,
+          "total": 1.1618913750862703,
+          "cost": 0.0018016500000000001,
+          "cost_nocache": 0.005792
+        },
+        {
+          "turn": 5,
+          "prompt_tokens": 6484,
+          "cached": 5585,
+          "write": 896,
+          "output_tokens": 36,
+          "ttft": 2.192084833048284,
+          "total": 2.4363103330833837,
+          "cost": 0.0018975,
+          "cost_nocache": 0.0067
+        },
+        {
+          "turn": 6,
+          "prompt_tokens": 7385,
+          "cached": 6481,
+          "write": 901,
+          "output_tokens": 25,
+          "ttft": 0.6792728750733659,
+          "total": 0.8330811670748517,
+          "cost": 0.00192735,
+          "cost_nocache": 0.007535
+        },
+        {
+          "turn": 7,
+          "prompt_tokens": 8273,
+          "cached": 7382,
+          "write": 888,
+          "output_tokens": 30,
+          "ttft": 0.7591087500331923,
+          "total": 0.8936753750313073,
+          "cost": 0.0020312,
+          "cost_nocache": 0.008453
+        },
+        {
+          "turn": 8,
+          "prompt_tokens": 9169,
+          "cached": 8270,
+          "write": 896,
+          "output_tokens": 56,
+          "ttft": 0.9244400419993326,
+          "total": 1.1017441670410335,
+          "cost": 0.002286,
+          "cost_nocache": 0.009505
+        },
+        {
+          "turn": 9,
+          "prompt_tokens": 10067,
+          "cached": 9166,
+          "write": 898,
+          "output_tokens": 94,
+          "ttft": 1.4821769580012187,
+          "total": 1.8146527080098167,
+          "cost": 0.0026061,
+          "cost_nocache": 0.010631
+        },
+        {
+          "turn": 10,
+          "prompt_tokens": 10990,
+          "cached": 10064,
+          "write": 923,
+          "output_tokens": 96,
+          "ttft": 1.8308391659520566,
+          "total": 2.127741082920693,
+          "cost": 0.00273915,
+          "cost_nocache": 0.011566
+        }
+      ],
+      "avg_hit_rate_turn2plus": 0.8635088328619512,
+      "cost_actual_usd": 0.023081749999999998,
+      "cost_nocache_usd": 0.072823,
+      "cost_save_pct": 68.30431319775346
+    },
+    "gpt-5.4-mini": {
+      "provider": "openai",
+      "cache_mode": "automatic-prefix",
+      "price_note": "공식 pricing 확인값 (쓰기 무료)",
+      "rows": [
+        {
+          "turn": 1,
+          "prompt_tokens": 2906,
+          "cached": 0,
+          "write": 0,
+          "output_tokens": 73,
+          "ttft": 0.8318690420128405,
+          "total": 1.2983072499046102,
+          "cost": 0.002508,
+          "cost_nocache": 0.002508
+        },
+        {
+          "turn": 2,
+          "prompt_tokens": 3853,
+          "cached": 2816,
+          "write": 0,
+          "output_tokens": 49,
+          "ttft": 0.6225399159593508,
+          "total": 1.0722507910104468,
+          "cost": 0.0012094500000000002,
+          "cost_nocache": 0.00311025
+        },
+        {
+          "turn": 3,
+          "prompt_tokens": 4765,
+          "cached": 3328,
+          "write": 0,
+          "output_tokens": 34,
+          "ttft": 1.3368494579335675,
+          "total": 1.875951207941398,
+          "cost": 0.0014803499999999999,
+          "cost_nocache": 0.00372675
+        },
+        {
+          "turn": 4,
+          "prompt_tokens": 5665,
+          "cached": 4352,
+          "write": 0,
+          "output_tokens": 62,
+          "ttft": 0.9821595830144361,
+          "total": 1.360900874948129,
+          "cost": 0.00159015,
+          "cost_nocache": 0.00452775
+        },
+        {
+          "turn": 5,
+          "prompt_tokens": 6589,
+          "cached": 5376,
+          "write": 0,
+          "output_tokens": 36,
+          "ttft": 0.94386045797728,
+          "total": 1.122134790988639,
+          "cost": 0.00147495,
+          "cost_nocache": 0.00510375
+        },
+        {
+          "turn": 6,
+          "prompt_tokens": 7490,
+          "cached": 6400,
+          "write": 0,
+          "output_tokens": 41,
+          "ttft": 0.8348603330086917,
+          "total": 1.045733749982901,
+          "cost": 0.001482,
+          "cost_nocache": 0.005802
+        },
+        {
+          "turn": 7,
+          "prompt_tokens": 8394,
+          "cached": 7424,
+          "write": 0,
+          "output_tokens": 51,
+          "ttft": 0.6704436669824645,
+          "total": 0.9989489580038935,
+          "cost": 0.0015138,
+          "cost_nocache": 0.006525
+        },
+        {
+          "turn": 8,
+          "prompt_tokens": 9311,
+          "cached": 7936,
+          "write": 0,
+          "output_tokens": 71,
+          "ttft": 1.0432784999720752,
+          "total": 1.472693584044464,
+          "cost": 0.00194595,
+          "cost_nocache": 0.00730275
+        },
+        {
+          "turn": 9,
+          "prompt_tokens": 10247,
+          "cached": 8960,
+          "write": 0,
+          "output_tokens": 55,
+          "ttft": 0.6997594169806689,
+          "total": 1.0370462919818237,
+          "cost": 0.00188475,
+          "cost_nocache": 0.00793275
+        },
+        {
+          "turn": 10,
+          "prompt_tokens": 11182,
+          "cached": 9984,
+          "write": 0,
+          "output_tokens": 85,
+          "ttft": 0.9776598339667544,
+          "total": 1.445372209069319,
+          "cost": 0.0020298,
+          "cost_nocache": 0.008769
+        }
+      ],
+      "avg_hit_rate_turn2plus": 0.8191023598551022,
+      "cost_actual_usd": 0.0171192,
+      "cost_nocache_usd": 0.055308,
+      "cost_save_pct": 69.0475157300933
+    },
+    "claude-opus-4-8": {
+      "provider": "anthropic",
+      "cache_mode": "explicit-cache_control",
+      "price_note": "입력가 기존 기준 / 출력가 플레이스홀더",
+      "rows": [
+        {
+          "turn": 1,
+          "prompt_tokens": 4811,
+          "cached": 0,
+          "output_tokens": 96,
+          "ttft": 1.6114701250335202,
+          "total": 4.164375792024657,
+          "cost": 0.03246625,
+          "cost_nocache": 0.026455,
+          "write": 4809
+        },
+        {
+          "turn": 2,
+          "prompt_tokens": 6324,
+          "cached": 4809,
+          "output_tokens": 95,
+          "ttft": 1.1387840419774875,
+          "total": 3.40813029196579,
+          "cost": 0.01424575,
+          "cost_nocache": 0.033995,
+          "write": 1513
+        },
+        {
+          "turn": 3,
+          "prompt_tokens": 7816,
+          "cached": 6322,
+          "output_tokens": 61,
+          "ttft": 1.2170552919851616,
+          "total": 2.426816000021063,
+          "cost": 0.014021,
+          "cost_nocache": 0.040605,
+          "write": 1492
+        },
+        {
+          "turn": 4,
+          "prompt_tokens": 9277,
+          "cached": 7814,
+          "output_tokens": 96,
+          "ttft": 1.2202998329885304,
+          "total": 3.166259874938987,
+          "cost": 0.01544825,
+          "cost_nocache": 0.048785,
+          "write": 1461
+        },
+        {
+          "turn": 5,
+          "prompt_tokens": 10771,
+          "cached": 9275,
+          "output_tokens": 51,
+          "ttft": 1.123342957929708,
+          "total": 2.297835874953307,
+          "cost": 0.01526,
+          "cost_nocache": 0.05513,
+          "write": 1494
+        },
+        {
+          "turn": 6,
+          "prompt_tokens": 12221,
+          "cached": 10769,
+          "output_tokens": 46,
+          "ttft": 1.4892428340390325,
+          "total": 2.0379253340652213,
+          "cost": 0.015607,
+          "cost_nocache": 0.062255,
+          "write": 1450
+        },
+        {
+          "turn": 7,
+          "prompt_tokens": 13659,
+          "cached": 12219,
+          "output_tokens": 66,
+          "ttft": 1.1683698749402538,
+          "total": 2.1204054169356823,
+          "cost": 0.016757,
+          "cost_nocache": 0.069945,
+          "write": 1438
+        },
+        {
+          "turn": 8,
+          "prompt_tokens": 15122,
+          "cached": 13657,
+          "output_tokens": 43,
+          "ttft": 1.2316777079831809,
+          "total": 2.2070539579726756,
+          "cost": 0.01705725,
+          "cost_nocache": 0.076685,
+          "write": 1463
+        },
+        {
+          "turn": 9,
+          "prompt_tokens": 16566,
+          "cached": 15120,
+          "output_tokens": 96,
+          "ttft": 1.1360340000828728,
+          "total": 3.0257423750590533,
+          "cost": 0.018995,
+          "cost_nocache": 0.08523,
+          "write": 1444
+        },
+        {
+          "turn": 10,
+          "prompt_tokens": 18075,
+          "cached": 16564,
+          "output_tokens": 96,
+          "ttft": 1.2022766249720007,
+          "total": 3.656655416940339,
+          "cost": 0.02012325,
+          "cost_nocache": 0.092775,
+          "write": 1509
+        }
+      ],
+      "avg_hit_rate_turn2plus": 0.8645219797381127,
+      "cost_actual_usd": 0.17998075,
+      "cost_nocache_usd": 0.5918599999999999,
+      "cost_save_pct": 69.5906548846011
+    },
+    "gemini-3.6-flash": {
+      "provider": "google",
+      "cache_mode": "implicit",
+      "price_note": "플레이스홀더",
+      "rows": [
+        {
+          "turn": 1,
+          "prompt_tokens": 3249,
+          "cached": 0,
+          "output_tokens": 0,
+          "ttft": 1.6871973340166733,
+          "total": 1.6871973340166733,
+          "cost": 0.0009746999999999999,
+          "cost_nocache": 0.0009746999999999999
+        },
+        {
+          "turn": 2,
+          "prompt_tokens": 4426,
+          "cached": 0,
+          "output_tokens": 3,
+          "ttft": 1.5406214160611853,
+          "total": 1.5502041660947725,
+          "cost": 0.0013353,
+          "cost_nocache": 0.0013353
+        },
+        {
+          "turn": 3,
+          "prompt_tokens": 5593,
+          "cached": 0,
+          "output_tokens": 2,
+          "ttft": 1.4302367090713233,
+          "total": 1.4350326670100912,
+          "cost": 0.0016828999999999998,
+          "cost_nocache": 0.0016828999999999998
+        },
+        {
+          "turn": 4,
+          "prompt_tokens": 6759,
+          "cached": 0,
+          "output_tokens": 0,
+          "ttft": 1.6963530420325696,
+          "total": 1.6963530420325696,
+          "cost": 0.0020277,
+          "cost_nocache": 0.0020277
+        },
+        {
+          "turn": 5,
+          "prompt_tokens": 7926,
+          "cached": 0,
+          "output_tokens": 1,
+          "ttft": 1.6350939580006525,
+          "total": 1.6361467079259455,
+          "cost": 0.0023802999999999997,
+          "cost_nocache": 0.0023802999999999997
+        },
+        {
+          "turn": 6,
+          "prompt_tokens": 9090,
+          "cached": 0,
+          "output_tokens": 3,
+          "ttft": 1.8739570420002565,
+          "total": 1.874695000005886,
+          "cost": 0.0027345,
+          "cost_nocache": 0.0027345
+        },
+        {
+          "turn": 7,
+          "prompt_tokens": 10255,
+          "cached": 0,
+          "output_tokens": 3,
+          "ttft": 1.7220345409587026,
+          "total": 1.7224862079601735,
+          "cost": 0.003084,
+          "cost_nocache": 0.003084
+        },
+        {
+          "turn": 8,
+          "prompt_tokens": 11421,
+          "cached": 0,
+          "output_tokens": 2,
+          "ttft": 2.052587665966712,
+          "total": 2.052896208013408,
+          "cost": 0.0034312999999999995,
+          "cost_nocache": 0.0034312999999999995
+        },
+        {
+          "turn": 9,
+          "prompt_tokens": 12586,
+          "cached": 0,
+          "output_tokens": 4,
+          "ttft": 1.898085542023182,
+          "total": 1.8984067919664085,
+          "cost": 0.0037857999999999998,
+          "cost_nocache": 0.0037857999999999998
+        },
+        {
+          "turn": 10,
+          "prompt_tokens": 13789,
+          "cached": 8128,
+          "output_tokens": 4,
+          "ttft": 1.821240417077206,
+          "total": 1.8216564590111375,
+          "cost": 0.0019521399999999998,
+          "cost_nocache": 0.0041467
+        }
+      ],
+      "avg_hit_rate_turn2plus": 0.06549504033005375,
+      "cost_actual_usd": 0.02338864,
+      "cost_nocache_usd": 0.025583199999999997,
+      "cost_save_pct": 8.578129397417044
+    }
+  },
+  "failed": {}
+}

@@ -1,0 +1,48 @@
+{
+  "provider": "anthropic",
+  "model": "claude-opus-4-8",
+  "cache_mode": "explicit-cache_control",
+  "target_tokens": 20000,
+  "prompt_tokens": 30614,
+  "n_repeat": 3,
+  "ttft_miss_ms": 1478.432305700456,
+  "ttft_hit_ms": 1592.4344443483278,
+  "ttft_improve_pct": -7.711015121105569,
+  "total_miss_ms": 1852.5129723905895,
+  "total_hit_ms": 2007.1170833349847,
+  "total_improve_pct": -8.345642554118538,
+  "cached_tokens_hit": 30572,
+  "cached_tokens_miss": 0,
+  "hit_rate": 0.9986280786568237,
+  "cost_miss_usd": 0.15387,
+  "cost_hit_usd": 0.016296,
+  "cost_save_pct": 89.40924156755703,
+  "anthropic_write_ttft_ms": 1475.3008746386815,
+  "anthropic_cost_write_usd": 0.19226000000000001,
+  "anthropic_min_cache_probe": [
+    {
+      "tokens": 857,
+      "write": 0,
+      "read": 0,
+      "cached": false
+    },
+    {
+      "tokens": 1907,
+      "write": 1901,
+      "read": 1901,
+      "cached": true
+    },
+    {
+      "tokens": 2327,
+      "write": 2321,
+      "read": 2321,
+      "cached": true
+    },
+    {
+      "tokens": 4637,
+      "write": 4631,
+      "read": 4631,
+      "cached": true
+    }
+  ]
+}

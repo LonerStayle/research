@@ -1,0 +1,20 @@
+{
+  "provider": "openai",
+  "model": "gpt-5.6-luna",
+  "cache_mode": "automatic-prefix",
+  "target_tokens": 20000,
+  "prompt_tokens": 16292,
+  "n_repeat": 3,
+  "ttft_miss_ms": 1289.7901109730203,
+  "ttft_hit_ms": 1195.9799863398075,
+  "ttft_improve_pct": 7.273286082372133,
+  "total_miss_ms": 1582.3545833506312,
+  "total_hit_ms": 1605.5407359963283,
+  "total_improve_pct": -1.4652943714170918,
+  "cached_tokens_hit": 16289,
+  "cached_tokens_miss": 0,
+  "hit_rate": 0.9998158605450528,
+  "cost_miss_usd": 0.02071125,
+  "cost_hit_usd": 0.0023365416666666665,
+  "cost_save_pct": 88.71849035347135
+}
