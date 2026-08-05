@@ -1,0 +1,101 @@
+{
+  "source": "/Users/seobi/jinsup_space/research/memory/data/conv-02.txt",
+  "probes": [
+    {
+      "id": "conv-02-p01",
+      "category": "사실결정",
+      "question": "클로드코드 스킬 디스크립션 '8000자 제한'의 정확한 실체는 무엇으로 확정됐나? (고정값인지, 개당인지 총량인지, 초과 시 스킬이 목록에서 빠지는지)",
+      "gold_answer": "고정 8000자가 아니라 '컨텍스트 윈도우의 1%'가 예산이고, 8000자는 200K 윈도우 기준값이자 폴백(DEFAULT_CHAR_BUDGET). 개당이 아닌 목록 전체 총량 제한이며(개당은 별도 250자 상한), 초과해도 스킬 이름은 절대 목록에서 누락되지 않고 설명만 균등 절단되다가 최악엔 이름만 남는다.",
+      "evidence": "\"정확히는 '고정 8000자'가 아니라 '컨텍스트 윈도우의 1%'이고, 8000자는 200K 윈도우 기준값이자 폴백입니다... 스킬 이름 자체가 목록에서 누락되는 일은 없고\" / \"총량입니다. 두 제한이 따로 있어요\""
+    },
+    {
+      "id": "conv-02-p02",
+      "category": "사실결정",
+      "question": "클로드코드에서 스킬 목록의 lost-in-the-middle 문제를 해결하려는 코드는 무엇으로 확인됐나?",
+      "gold_answer": "EXPERIMENTAL_SKILL_SEARCH 피처 플래그 아래의 skill discovery(스킬 검색) 시스템. 구성 3개: getTurnZeroSkillDiscovery(턴별 관련 스킬만 재주입), filterToBundledAndMcp(turn-0 정적 목록을 bundled+MCP만으로 다이어트, 30개 초과 시 bundled만), stripReinjectedAttachments(컴팩션 시 낡은 목록 제거). 현재는 내부(ant) 게이트 뒤 실험 기능이고 일반 빌드 기본 동작은 여전히 turn 0 1회 주입.",
+      "evidence": "\"EXPERIMENTAL_SKILL_SEARCH 피처 플래그 아래의 skill discovery(스킬 검색) 시스템입니다... 정적 주입(skill_listing) → 검색 기반 동적 재주입(skill_discovery)으로의 전환이 lost-in-the-middle 해결책\""
+    },
+    {
+      "id": "conv-02-p03",
+      "category": "사실결정",
+      "question": "클로드코드 메모리 회상(recall)은 임베딩 대신 어떤 방식으로 관련 메모리를 고르는 것으로 확인됐나?",
+      "gold_answer": "임베딩·벡터DB 없이 LLM 셀렉터를 쓴다. 매 사용자 질문마다 백그라운드 프리페치로 메모리 파일들의 제목+한줄설명 manifest를 만들어 Sonnet에게 사이드쿼리(sideQuery)로 통째로 보여주고 '도움될 것만 최대 5개' 고르게 한 뒤, 뽑힌 파일만 읽어 relevant_memories attachment(system-reminder)로 대화에 주입한다. 파이프라인에서 LLM 호출은 4단계(셀렉터) 딱 1회뿐이고 나머지는 일반 코드다.",
+      "evidence": "\"메모리 회상 → 임베딩이 아니라 LLM 셀렉터... Sonnet에게 사이드 쿼리로 던진다\" / \"④ 셀렉터 | ⭐ 유일한 LLM 호출 (Sonnet 1회)\""
+    },
+    {
+      "id": "conv-02-p04",
+      "category": "사실결정",
+      "question": ".claude/commands/의 커스텀 커맨드와 스킬의 관계, 그리고 커맨드 본문/설명의 컨텍스트 진입 시점은 어떻게 결론 났나?",
+      "gold_answer": "커맨드와 스킬은 내부적으로 같은 Command 타입으로 통합됐고(.claude/commands/는 loadedFrom='commands_DEPRECATED'로 레거시 취급), 공식 문서도 'Custom commands have been merged into skills'로 확인. 이름+설명은 세션 시작부터 skill_listing으로 상주하며 8000자 예산을 스킬과 같이 소비하고, 본문 전체는 invoke 순간에만 들어간다. frontmatter에 disable-model-invocation: true를 넣어야만 이름조차 목록에서 빠진다.",
+      "evidence": "\"본문은 절대 안 들어가고, 이름+설명은 처음부터 들어간다\" / \"Custom commands have been merged into skills.\" / \"disable-model-invocation: true ... 이름조차 목록에 안 들어갑니다\""
+    },
+    {
+      "id": "conv-02-p05",
+      "category": "기술디테일",
+      "question": "메모리 셀렉터(Sonnet 사이드쿼리)의 주요 수치 안전장치들은? (출력 토큰 상한, 턴당 선택 개수, 파일당 한도, 세션 누적 스로틀, 스캔 상한)",
+      "gold_answer": "출력 max_tokens 256 (findRelevantMemories.ts:108 하드코딩), 턴당 최대 5개 선택, 파일당 4KB(MAX_MEMORY_BYTES=4096)/200줄(MAX_MEMORY_LINES=200), 세션 누적 주입 60KB 스로틀(MAX_SESSION_BYTES, prod에서 세션당 ~26K토큰 관측이 도입 배경), 스캔 최대 200파일. 비용은 호출당 약 3센트, 200개 메모리×100턴 이론 상한 약 $2.9, 현실적으로는 $1 미만.",
+      "evidence": "\"findRelevantMemories.ts:108에 max_tokens: 256으로 하드코딩\" / \"턴당 5개, 파일당 4KB/200줄, 세션 누적 60KB 스로틀... 스캔 200파일, 출력 256토큰\" / \"100턴 이론 상한: 약 $2.9\""
+    },
+    {
+      "id": "conv-02-p06",
+      "category": "기술디테일",
+      "question": "메모리가 '이미 보여줬다'로 제외되는 판단 기준과 필터 조건식은 정확히 무엇인가?",
+      "gold_answer": "별도 장부 없이 매 턴 대화 메시지 배열을 스캔해(collectSurfacedMemories, attachments.ts:2250-2265) 과거 relevant_memories 첨부의 path들을 일회용 Set으로 모은다. 필터는 attachments.ts:2230의 .filter(m => !readFileState.has(m.path) && !alreadySurfaced.has(m.path)) — 살아남으려면 '주입된 적 없음 AND 모델이 Read로 직접 읽은 적 없음' 둘 다 만족해야 한다. 컴팩션으로 첨부가 대화에서 사라지면 기준이 자동 리셋되어 재주입 가능해지며, 후보가 0개면 Sonnet 호출 없이 조기 종료한다(findRelevantMemories.ts:46-51).",
+      "evidence": "\".filter(m => !readFileState.has(m.path) && !alreadySurfaced.has(m.path))\" / \"compact naturally resets both\" / \"후보가 0개면 ④(Sonnet)로 안 가고 그 자리에서 종료\""
+    },
+    {
+      "id": "conv-02-p07",
+      "category": "기술디테일",
+      "question": "공식 문서 대조에서 로컬 소스 스냅샷과 다르다고 확인된 수치/동작 2가지는?",
+      "gold_answer": "1) 항목당 설명 컷: 소스 스냅샷은 250자(MAX_LISTING_DESC_CHARS)인데 현행 공식 문서는 1,536자(skillListingMaxDescChars 설정으로 변경 가능) — 최신 기준으로는 1,536자로 말해야 함. 2) 예산 초과 시 깎는 순서: 소스는 bundled 보호+나머지 균등 절단인데 현행은 '가장 덜 invoke한 스킬부터' 설명 제거(사용 빈도 기반). '스킬 이름은 전부 항상 포함'은 양쪽 동일.",
+      "evidence": "\"항목당 설명 컷 | 250자 (MAX_LISTING_DESC_CHARS) | 1,536자 (skillListingMaxDescChars...)\" / \"초과 시 깎는 순서 | 균등 절단 | '가장 덜 invoke한 스킬부터'\" / \"개당 컷 수치는 최신 버전 기준 250자가 아니라 1,536자로 말하는 게 맞겠습니다\""
+    },
+    {
+      "id": "conv-02-p08",
+      "category": "기술디테일",
+      "question": "hermes-agent에서 도구 실행 중 에러가 나면 배치(예: 도구 10개)가 어떻게 처리되는가? 배치를 실제로 끊는 예외 2가지는?",
+      "gold_answer": "에러가 나도 배치는 멈추지 않고 전부 실행된다. 도구 예외는 _run_tool(run_agent.py:9956-9967)의 try/except가 삼켜 f\"Error executing tool '{name}': {error}\" 문자열 결과로 변환하고, _detect_tool_failure(display.py:804)가 is_error 태그만 붙여 정상 tool 메시지처럼 append한다(짝 유지, 판단은 모델이 다음 턴에). 배치를 실제로 끊는 건 2가지뿐: 유저 인터럽트(남은 도구를 취소 메시지로 채워 스킵)와 가드레일 halt(루프 break).",
+      "evidence": "\"에러가 나도 배치는 안 멈춥니다. 도구 10개면 10개 다 돕니다\" / \"result = f\\\"Error executing tool '{function_name}': {tool_error}\\\"\" / \"유저 인터럽트... 가드레일 halt... 이 둘만 의도적 중단\""
+    },
+    {
+      "id": "conv-02-p09",
+      "category": "의도선호",
+      "question": "이 사용자에게 기술 내용을 설명할 때 어떤 방식을 선호하는가?",
+      "gold_answer": "어려운 설명에 반복적으로 '너무 어렵다', '무슨 말이야'라고 하며 쉬운 재설명을 요구한다. 비유 중심 설명(Promise=카페 진동벨, 임베딩=바코드 기계 vs LLM 셀렉터=비서에게 물어보기, 메모리=도서관/장서각)과 단계별 총정리·표 형태를 잘 받아들였다. 전문용어(프리페치, 프로미즈, 캐시 등)는 등장할 때마다 풀어서 설명해야 한다.",
+      "evidence": "\"무슨말이야.. 어렵네...\" / \"너무어렵다.. 메모리를 호출하는 과정에대한.. 내용 총정리좀\" / \"프로미즈가 뭔말이야\""
+    },
+    {
+      "id": "conv-02-p10",
+      "category": "의도선호",
+      "question": "사용자가 주장 검증과 산출물 관리에 대해 밝힌 요구/작업 방식은?",
+      "gold_answer": "주장은 실제 소스 코드(grep/Read)로 검증하는 것을 기본으로 하되, 사용자가 '공식문서 기준으로도 파악해봐'라고 명시해 공식 문서 대조까지 요구했다. 산출물은 md+html 쌍으로 유지하며, 대화에서 새로 밝혀진 내용은 '위에 추가된 내용들 다 md랑 html에 반영해줘', '저 조건표도 업데이트해줘'처럼 두 파일 모두에 동기화 반영하라고 지시했다.",
+      "evidence": "\"공식문서 기준으로도 파악해봐\" / \"위에 추가된 내용들다 md랑 html에 반영해줘\" / \"저 조건표도 업데이트해줘\""
+    },
+    {
+      "id": "conv-02-p11",
+      "category": "미결다음",
+      "question": "산출물 문서(스킬예산-로스트인더미들.html, 메모리-회상-파이프라인-총정리.md/html)에 대해 제안됐지만 아직 실행되지 않은 후속 작업은?",
+      "gold_answer": "1) 스킬예산 HTML: 이 세션 실제 truncation 사례 재현 추가, 라이트 테마 버전, SkillTool.md에 링크 추가 — 제안만 되고 미결. 2) 두 문서의 md_group/·html_group_v2/ 복사본 반영 — 제안만 되고 미결. 3) 공식 문서 대조로 확인된 250자→1,536자 및 절단 순서 변경(균등→덜 invoke한 것부터)이 기존 md/html 산출물에는 아직 반영되지 않음(문서는 250자 기준으로 작성됨).",
+      "evidence": "\"수정 원하시면 말씀해 주세요 — 예: 섹션 03에 이 세션 실제 truncation 사례... 라이트 테마 버전, SkillTool.md 문서에 이 HTML 링크 추가 등\" / \"원하시면 md_group/·html_group_v2/에 복사본을 넣거나\""
+    },
+    {
+      "id": "conv-02-p12",
+      "category": "미결다음",
+      "question": "툴 호출 순서('도구 2 → 1'로 은은하게 유도) 논의에서 답변자가 사용자에게 되물었지만 답을 못 받은 미해결 질문은?",
+      "gold_answer": "추천안(① description에 의존성 심기 + ② 스키마 required 인자로 강제 조합)까지 제시한 뒤, '1과 2가 실제로는 데이터 의존이 없는데 순서만 지키고 싶은 경우면 ②를 못 쓰니 방법이 달라진다 — 어떤 상황인지 알려달라'고 되물었으나 사용자가 답하지 않고 다른 질문(멀티펑션콜링)으로 넘어가 미해결로 남았다.",
+      "evidence": "\"혹시 1, 2가 실제로는 서로 데이터 의존이 없는데 그냥 순서만 지키고 싶은 건가요? 그거면 ②를 못 쓰니 방법이 좀 달라집니다 — 어떤 상황인지 알려주시면\" 직후 사용자: \"다른 두 API는 멀티펑션콜링 어떻게 활성화 시켜?\""
+    }
+  ],
+  "korean_terms": [
+    "스킬 목록 예산 (8,000자 / 윈도우 1%)",
+    "로스트 인 더 미들 (lost-in-the-middle)",
+    "스킬 디스커버리 (skill_discovery)",
+    "메모리 회상 파이프라인",
+    "Sonnet 셀렉터 (사이드쿼리)",
+    "컴팩션",
+    "프리페치 (진동벨 비유)",
+    "커맨드-스킬 통합 (commands_DEPRECATED)",
+    "허미스 에이전트 (hermes-agent)",
+    "클로드코드 (CC 레포)"
+  ]
+}

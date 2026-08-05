@@ -1,0 +1,100 @@
+{
+  "probes": [
+    {
+      "id": "conv-03-p01",
+      "category": "사실결정",
+      "question": "root CLAUDE.md에 있던 GPT 미니 하네스 규약은 Anthropic 권장 대조 후 어디로 옮기기로 결정했고, root는 어떻게 바뀌었나?",
+      "gold_answer": "하위 CLAUDE.md 방식으로 확정 — 규약 본문을 notebooks/claude_code/CLAUDE.md(신규)로 이동해 그 폴더 작업 시에만 온디맨드 로드되게 하고, root CLAUDE.md는 레포 소개 + 폴더별 컨텍스트 포인터만 남겨 60줄에서 8줄로 슬림화했다.",
+      "evidence": "\"폴더 한정 내용(GPT 미니 하네스 규약)을 권장 스코프대로 옮길까요?\"=\"하위 CLAUDE.md로 이동\" ... \"레포 소개 + 폴더별 컨텍스트 포인터만 남김 (60줄 → 8줄)\""
+    },
+    {
+      "id": "conv-03-p02",
+      "category": "사실결정",
+      "question": "cc_frontend_plan.md v2 개정 후 사용자 지시로 승인/HITL을 걷어낸 결과, 상태머신·툴 파이프라인·명령어 레퍼런스는 각각 어떻게 확정됐나?",
+      "gold_answer": "상태머신은 AWAITING_APPROVAL을 삭제해 IDLE/THINKING/TOOL_RUNNING 3종, 툴 파이프라인은 6단계(권한 게이트)를 빼고 1형식→2값→7실행→8변환만 남김, 명령어는 /status·/log·/mcp 셋만 유지(/stop·/queue·/clear·/model 제거). 툴 실행 중 일반 텍스트 입력이 큐에 적재되는 동작 자체는 유지.",
+      "evidence": "\"상태머신 `AWAITING_APPROVAL` 삭제 → 3종(IDLE/THINKING/TOOL_RUNNING) ... 6단계(권한 게이트) 제거 → 1형식 → 2값 → 7실행 → 8변환 ... 셋만 남김: `/status`, `/log`, `/mcp`\""
+    },
+    {
+      "id": "conv-03-p03",
+      "category": "사실결정",
+      "question": "tool_eval 산출물의 최종 위치와 형태는 무엇으로 확정됐나? (처음 만들었다 삭제한 것 포함)",
+      "gold_answer": "처음엔 notebooks/claude_code/tool_eval/에 .py 파일들로 만들었다가 사용자 지적으로 rm -rf 삭제. 최종적으로 notebooks/tool_eval/ 폴더(claude/·claude_code/와 같은 레벨)에 자체완결 주피터 노트북(.ipynb)들로 확정 — 최종 5개: tool_eval, tool_consolidation_eval, tool_chain_depth_eval, tool_namespace_eval, tool_confusable_eval.",
+      "evidence": "\"tool_eval 노트북을 어디에 두면 될까요?\"=\"notebooks/tool_eval/\" ... \"주피터 노트북 1개: notebooks/tool_eval/tool_eval.ipynb (claude_code 안 아님)\" ... \"노트북 5개: tool_eval · tool_consolidation_eval · tool_chain_depth_eval · tool_namespace_eval · tool_confusable_eval\""
+    },
+    {
+      "id": "conv-03-p04",
+      "category": "사실결정",
+      "question": "5개 tool_eval 실험을 관통해 확정된 최종 결론은 무엇인가?",
+      "gold_answer": "효율(토큰·호출·지연)은 항상 적은/좁은/통합된 도구가 구조적으로 유리하고, 정확도는 gpt-5-nano 기준으로 잘 안 갈린다 — 과제가 명확하고 도구 설명이 정직하면 통합/분리·20개/5개·함정 혼합 모두 100%. 정확도를 갈리게 하려면 더 약한 모델, 정말 애매한 과제, 또는 설명이 거짓말하는 함정이 필요하다.",
+      "evidence": "\"효율(토큰·호출·지연)은 항상 '적은/좁은/통합된 도구'가 유리 — 구조적·일관됨 ... 정확도는 이 모델에선 잘 안 갈린다 ... 정확도를 실제로 무너뜨리려면 더 약한 모델, 정말 애매한 과제, 또는 설명이 거짓말하는 함정이 필요\""
+    },
+    {
+      "id": "conv-03-p05",
+      "category": "기술디테일",
+      "question": "도구 통합 A/B(tool_consolidation_eval)의 교란 제거 후(«» 경계 + TRIALS=3, 36루프) 최종 수치는? 그리고 1차 실행의 67% vs 100% 격차의 진짜 원인은?",
+      "gold_answer": "분리(2도구): 정확도 100%(18/18)·평균 호출 1.72·평균 토큰 6,447 / 통합(digest 1도구·3파라미터): 100%(18/18)·호출 1.00(−42%)·토큰 3,473(−46%). 1차의 정확도 격차(67% vs 100%)는 에이전트가 프롬프트의 작은따옴표를 text 인자에 그대로 복사한 따옴표 파싱 교란이었고, 제거하니 정확도는 동등.",
+      "evidence": "\"분리 ... 100% (18/18) 1.72 6,447 / 통합 ... 100% (18/18) 1.00 3,473 ... 호출 −42% ... 토큰 −46%\" ... \"그 격차는 순전히 따옴표 복사 교란이었음이 확증\""
+    },
+    {
+      "id": "conv-03-p06",
+      "category": "기술디테일",
+      "question": "플랜 v2에서 정정된 '미드턴 유저 입력 주입'의 오리지널 CC 실제 메커니즘은 무엇인가? (초안의 잘못된 방식과 대비해서)",
+      "gold_answer": "초안은 text 블록 + '[작업 중 사용자 추가 입력]' 접두어였지만, 실제 CC는 <system-reminder>로 래핑하고 지정 문구('The user sent a new message while you were working... you MUST address')를 붙이며, isMeta 없이 화면에는 표시한다.",
+      "evidence": "\"미드턴 유저 주입 | `text` 블록 + `[작업 중 사용자 추가 입력]` 접두어 | `<system-reminder>` 래핑 + 지정 문구('The user sent a new message while you were working... you MUST address'), isMeta 없이 화면 표시\""
+    },
+    {
+      "id": "conv-03-p07",
+      "category": "기술디테일",
+      "question": "5개 eval 실행(01_~05_)에 사용된 모델은 무엇이고, 이후 divergence 확인용으로 하네스 호환이 검증된 더 약한 모델 3개는?",
+      "gold_answer": "전부 gpt-5-nano(각 노트북 셋업 셀의 MODEL 기본값). 약한 모델 후보로 gpt-4o-mini, gpt-4.1-nano, gpt-3.5-turbo 셋 다 Responses API 하네스에서 정상 툴콜됨을 1콜 테스트로 확인했다. (gpt-5-mini는 gpt-5-nano보다 오히려 강해서 부적합)",
+      "evidence": "\"네, 전부 `gpt-5-nano` 로 돌렸습니다\" ... \"gpt-4o-mini OK · function_call 1건 / gpt-4.1-nano OK / gpt-3.5-turbo OK\" ... \"`gpt-5-mini`는 ... 오히려 더 좋은 모델\""
+    },
+    {
+      "id": "conv-03-p08",
+      "category": "기술디테일",
+      "question": "네임스페이스 실험(tool_namespace_eval, full 20 vs clean 5)에서 방해 도구 15개가 만든 토큰 비용 격차는 구체적으로 얼마였나?",
+      "gold_answer": "평균 입력토큰 full 24,510 vs clean 6,850으로 약 3.6배. 멀티턴 과제 N3(5스텝·8턴)에서는 52,065 vs 17,097로 더 벌어짐. 오호출은 0이었지만 안 쓰는 15개 스키마가 매 턴 실리는 것이 큰 네임스페이스의 구조적 비용 — ToolSearch/deferred가 존재하는 이유.",
+      "evidence": "\"평균 입력토큰 24,510 vs 6,850 ≈ 3.6배 ... N3(5스텝, 8턴)에서 52,065 vs 17,097 ... 정확히 ToolSearch/deferred tools가 존재하는 이유\""
+    },
+    {
+      "id": "conv-03-p09",
+      "category": "의도선호",
+      "question": "사용자가 미니 클로드코드의 범위에 대해 밝힌 제약은? 특히 MCP를 어느 수준까지 구현하길 원했나?",
+      "gold_answer": "강의용이므로 디테일 기능(Ctrl+C 세분화, 스킬 추가 등)은 불필요하고, MCP는 실제 프로토콜 없이 시뮬레이션만 — '~가 등록되었습니다' 고지 + 가짜 도구설명서·파라미터·MCP서버설명을 넘겨주는 수준. 이후 승인/HITL·/stop 등 구현 부담 있는 것도 전부 빼달라고 함. 플랜 수정의 중점은 '로그로 어떤 걸 상세하게 찍을지'.",
+      "evidence": "\"이건 그저 강의용이라 막 디테일한 기능 (컨트롤C,스킬추가) 같은거 없어도돼 mcp 추가기능도 넣긴할건데 그것도 결국 mcp 머머가 등록되었습니다 하고 가짜 도구설명서와 파라미터와 mcp서버설명을 넘겨줄뿐 ... 로그로 어떤걸 상세하게 찍을지를 중점으로 플랜을 수정해줫으면해\""
+    },
+    {
+      "id": "conv-03-p10",
+      "category": "의도선호",
+      "question": "tool_eval 산출물 형식/위치에 대해 사용자가 질책하며 밝힌 선호는 무엇인가?",
+      "gold_answer": "산출물은 .py 파일 묶음이 아니라 주피터 노트북(.ipynb)으로 만들길 원했고, claude_code 폴더 안에 폴더를 만들라고 한 적이 없다고 지적 — 이후 위치를 물어 notebooks/tool_eval/로 확정. 임의 위치·형식 결정 없이 노트북 형태를 유지해야 함.",
+      "evidence": "\"아니... 주피터노트북으로 만들길 원했고 claude_code 폴더 안에 폴더만들라고 한적이없는데..\""
+    },
+    {
+      "id": "conv-03-p11",
+      "category": "미결다음",
+      "question": "대화 종료 시점에 제안돼 있던(아직 실행 안 된) 다음 실험은 무엇인가?",
+      "gold_answer": "더 약한 모델(gpt-4o-mini, gpt-4.1-nano, gpt-3.5-turbo)로 04 네임스페이스·05 혼동 노트북을 재실행해 정확도 divergence가 실제로 나는지 확인하는 것 — AskUserQuestion으로 묻던 중 대화가 끊겨 미확정. (부수 제안: 고친 #4를 TRIALS=3으로 재실행해 75% vs 100% 재검증, 5개 실험 한 장 요약)",
+      "evidence": "\"가장 divergence 잘 나는 노트북(04 네임스페이스 · 05 혼동)을 약한 모델로 재실행해볼까요?\" (직후 AskUserQuestion 도중 대화 절단)"
+    },
+    {
+      "id": "conv-03-p12",
+      "category": "미결다음",
+      "question": "notebooks/tool_eval/results/ 파일명 정리는 어떻게 됐고, 다음 실행 결과가 생기면 어떤 규칙을 따르기로 했나?",
+      "gold_answer": "오래된 순으로 01_(consolidation-full)~05_(confusable) 접두사를 붙였고 각 실행의 jsonl·summary 쌍은 같은 번호 공유. 정리 스크립트는 이미 번호 붙은 파일은 건너뛰므로, 다음 새 실행 결과부터는 06_부터 이어 붙이면 된다.",
+      "evidence": "\"오래된 순으로 `01_`~`05_` ... 이미 번호가 붙은 파일은 건너뛰도록 해놔서 다음에 새 실행 결과가 생기면 `06_`부터 이어 붙이면 됩니다\""
+    }
+  ],
+  "korean_terms": [
+    "미니 클로드코드 (강의용)",
+    "GPT 미니 하네스",
+    "cc_frontend_plan.md",
+    "tool_eval 노트북",
+    "orderhub (목 파일시스템)",
+    "gpt-5-nano",
+    "도구 통합(consolidation) A/B",
+    "혼동 유발(confusable) 도구",
+    "함정 도구 (과환불·중복숨김·stale)",
+    "휴먼인더루프(HITL) 제거"
+  ]
+}

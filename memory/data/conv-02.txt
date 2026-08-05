@@ -1,0 +1,2037 @@
+[USER] 스킬이  디스크립션 총량이 8000자라서 계속 넣으면 좀 짤리는걸로 알고있긴합니다
+
+[ASSISTANT] 주장 검증부터 하겠습니다 — 이 프로젝트 원칙대로 `md_group/` 분석 문서와 소스에서 "스킬 디스크립션 총량 제한"이 실제로 8000자인지 확인해볼게요.
+
+[도구호출 Bash] {"command": "ls /Users/seobi/jinsup_space/CC", "description": "List repo root structure"}
+
+[도구결과] 2026-07-11-시스템프롬프트및도구내용-최신본.html
+2026-07-11-시스템프롬프트및도구내용-최신본.md
+CLAUDE.md
+html_group_v2
+md_group
+src
+toolsearch-생애주기-소스분석.html
+toolsearch-생애주기-소스분석.md
+workflow-도구로직-시각설명.html
+큐웨이크-엔터없는-진입-소스분석.md
+클로드코드-기술부채-대장-전체287건.json
+클로드코드-기술부채-대장.html
+클로드코드-기술부채-대장.md
+시스템리마인더-isMeta-신분증-총정리.html
+시스템리마인더-isMeta
+
+[도구호출 Bash] {"command": "grep -rn -iE \"8000|15000|char.?budget|CHAR_BUDGET|truncat|짤림|잘림|글자.?수|문자.?제한\" /Users/seobi/jinsup_space/CC/md_group --include=\"*.md\" -l 2>/dev/null | head -20", "description": "Search
+
+[도구결과] /Users/seobi/jinsup_space/CC/md_group/prod/02_기둥2_도구설계_ToolDesign.md
+/Users/seobi/jinsup_space/CC/md_group/prod/04_기둥4_컨텍스트엔지니어링_ContextEngineering.md
+/Users/seobi/jinsup_space/CC/md_group/prod/09_비용_지연시간_최적화.md
+/Users/seobi/jinsup_space/CC/md_group/prod/06_기둥5_안전성_Safety.md
+/Users/seobi/jinsup_spac
+
+[도구호출 Bash] {"command": "grep -n -iE \"8000|15000|budget|truncat|짤림|잘림\" /Users/seobi/jinsup_space/CC/md_group/tools_info/tools_detail/SkillTool.md | head -30", "description": "Check SkillTool analysis doc for bu
+
+[도구결과] 181:- **예산 비율**: 컨텍스트 윈도우의 1% (`SKILL_BUDGET_CONTEXT_PERCENT = 0.01`)
+185:- **환경변수 오버라이드**: `SLASH_COMMAND_TOOL_CHAR_BUDGET`
+187:`formatCommandsWithinBudget()` 함수가 예산 내에서 스킬 설명을 조정:
+
+[도구호출 Bash] {"command": "ls /Users/seobi/jinsup_space/CC/src 2>/dev/null | head; find /Users/seobi/jinsup_space/CC/src -maxdepth 2 -name \"*.js\" -o -maxdepth 2 -name \"*.mjs\" 2>/dev/null | head -10", "descripti
+
+[도구결과] QueryEngine.ts
+Task.ts
+Tool.ts
+assistant
+bootstrap
+bridge
+buddy
+cli
+commands
+commands.ts
+
+[도구호출 Bash] {"command": "sed -n 165,230p /Users/seobi/jinsup_space/CC/md_group/tools_info/tools_detail/SkillTool.md", "description": "Read budget section of SkillTool analysis doc"}
+
+[도구결과] 7. `type !== 'prompt'`이면 에러코드 5 반환
+
+### 에러 코드
+
+| 코드 | 의미 |
+|------|------|
+| 1 | 잘못된 스킬 형식 (빈 문자열) |
+| 2 | 알 수 없는 스킬 |
+| 4 | `disableModelInvocation`으로 인해 모델 호출 불가 |
+| 5 | 프롬프트 기반 스킬이 아님 |
+| 6 | 원격 스킬이 이 세션에서 발견되지 않음 |
+
+### 스킬 목록 예산 관리 (prompt.ts)
+
+스킬 목록이 시스템 프롬프트에서 차지하는 공간을 관리하는 예산 시스템:
+
+- **예산 비율*
+
+[도구호출 Bash] {"command": "grep -rn -E \"SKILL_BUDGET_CONTEXT_PERCENT|SLASH_COMMAND_TOOL_CHAR_BUDGET|formatCommandsWithinBudget\" /Users/seobi/jinsup_space/CC/src 2>/dev/null | head -20", "description": "Find budge
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/tools/SkillTool/prompt.ts:21:export const SKILL_BUDGET_CONTEXT_PERCENT = 0.01
+/Users/seobi/jinsup_space/CC/src/tools/SkillTool/prompt.ts:32:  if (Number(process.env.SLASH_COMMAND_TOOL_CHAR_BUDGET)) {
+/Users/seobi/jinsup_space/CC/src/tools/SkillTool/prompt.ts:33:    r
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/tools/SkillTool/prompt.ts"}
+
+[도구결과] 1	import { memoize } from 'lodash-es'
+2	import type { Command } from 'src/commands.js'
+3	import {
+4	  getCommandName,
+5	  getSkillToolCommands,
+6	  getSlashCommandToolSkills,
+7	} from 'src/commands.js'
+8	import { COMMAND_NAME_TAG } from '../../constants/xml.js'
+9	import { stringWidth } from '../../i
+
+[ASSISTANT] 네, **대체로 맞는데 정확히는 "고정 8000자"가 아니라 "컨텍스트 윈도우의 1%"이고, 8000자는 200K 윈도우 기준값이자 폴백입니다.** 그리고 "짤린다"는 것도 스킬이 목록에서 빠지는 게 아니라 **설명(description)만 깎이는** 방식입니다. `src/tools/SkillTool/prompt.ts`에서 직접 확인했습니다.
+
+## 예산 산정 (`getCharBudget`, prompt.ts:31-41)
+
+우선순위대로:
+1. 환경변수 `SLASH_COMMAND_TOOL_CHAR_BUDGET`이 있으면 그 값
+2. 컨텍스트 윈도우 크기를 알면 `윈도우 토큰 × 4자/토큰 × 1%` — 200K 윈도우면 딱 8,000자, 1M 윈도우면 40,000자로 늘어남
+3. 둘 다 없을 때만 폴백 `DEFAULT_CHAR_BUDGET = 8_000` (prompt.ts:23, 주석에도 "Fallback: 1% of 200k × 4"라고 명시)
+
+## 초과 시 실제 동작 (`formatCommandsWithinBudget`, prompt.ts:70-171)
+
+- **전체가 예산 내** → 그대로 전부 삽입
+- **초과** → 번들 내장(bundled) 스킬은 설명 전체 보존, 나머지(플러그인·유저 스킬)는 남은 예산을 스킬 수로 나눈 `maxDescLen`으로 설명을 균등 절단
+- **극단적 초과** (계산된 설명 길이가 20자 미만) → 번들 아닌 스킬은 `- 이름`만 표시
+
+핵심은 prompt.ts:211 주석 그대로 — *"All commands are always included (descriptions may be truncated to fit budget)"*. 즉 **스킬 이름 자체가 목록에서 누락되는 일은 없고, 설명이 점점 짧아지다 최악엔 이름만 남는** 구조입니다.
+
+## 추가로 있는 별도 상한
+
+예산과 무관하게 **항목당 설명 250자 상한**(`MAX_LISTING_DESC_CHARS`, prompt.ts:29)이 항상 걸립니다. `description - whenToUse`를 합친 문자열이 250자를 넘으면 249자 + `…`로 자르고, 이건 번들 스킬에도 적용됩니다. 주석에 이유도 적혀 있는데, 목록은 발견(discovery)용일 뿐 전체 내용은 invoke 시 로드되므로 장황한 whenToUse는 턴-1 캐시 생성 토큰만 낭비한다는 겁니다.
+
+참고로 지금 이 세션이 실제 사례입니다 — 스킬이 100개 이상 붙어 있어서 목록 뒷부분(`vercel:vercel-cli`, `figma:*`, `document-skills:*` 등)이 이름만 남은 상태로 잘려 들어와 있어요. 예산 초과 시 균등 절단 → 이름만 표시 경로가 그대로 발동한 모습입니다.
+
+[USER] 1개당?아니면 총?
+
+[ASSISTANT] **총량입니다.** 두 제한이 따로 있어요:
+
+- **8,000자 (= 윈도우의 1%)** → 스킬 **목록 전체**의 총 예산. `formatCommandsWithinBudget()`이 모든 스킬 항목을 합친 문자열(`stringWidth` 합계 + 줄바꿈)을 이 예산과 비교합니다 (prompt.ts:84-88)
+- **250자** → **개당** 설명 상한 (`MAX_LISTING_DESC_CHARS`, prompt.ts:29). 예산이 남아돌아도 스킬 하나의 설명(`description - whenToUse` 합친 것)은 250자를 넘으면 무조건 `…`로 잘립니다
+
+그러니까 "계속 넣으면 짤린다"는 총량 8,000자 쪽 얘기가 맞고, 스킬 개수가 늘수록 개당 허용 설명 길이가 균등하게 줄어들다가(총예산 ÷ 스킬 수) 20자 미만이 되는 순간부터는 이름만 남는 구조입니다.
+
+[USER] 그 스킬스 로스트인더미들 문제 해결하려는 코드가 뭐였지?
+
+[ASSISTANT] `src/`에서 lost-in-the-middle 관련 코드를 찾아보겠습니다.
+
+[도구호출 Bash] {"command": "grep -rn -iE \"lost.?in.?the.?middle|lost-in|middle\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | grep -viE \"middleware\" | head -20", "description": "Search source for lost-in
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/ink/render-node-to-output.ts:963:            //   2. Clean children BELOW a middle-growth point — when a dirty
+/Users/seobi/jinsup_space/CC/src/ink/render-node-to-output.ts:986:              // to zero before reaching the clean block. Middle-growth
+/Users/seobi/jinsu
+
+[도구호출 Bash] {"command": "sed -n 2690,2780p /Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "description": "Read skill attachment injection code around line 2741"}
+
+[도구결과] // discovery. feature() first for DCE — the property-access string leaks
+  // otherwise even with ?. on null.
+  if (
+    feature('EXPERIMENTAL_SKILL_SEARCH') &&
+    skillSearchModules?.featureCheck.isSkillSearchEnabled()
+  ) {
+    allCommands = filterToBundledAndMcp(allCommands)
+  }
+
+  const agentKe
+
+[도구호출 Bash] {"command": "grep -rn -iE \"로스트|lost.?in|중간에 묻|묻히\" /Users/seobi/jinsup_space/CC/md_group --include=\"*.md\" | head -10", "description": "Search analysis docs for lost-in-the-middle discussion"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/md_group/prod/05_보충_RAG_엔지니어링.md:114:### "Lost in the Middle" 현상 분석
+/Users/seobi/jinsup_space/CC/md_group/prod/05_보충_RAG_엔지니어링.md:116:RAG에서 가장 흔한 함정은 **"Lost in the Middle"** 입니다:
+/Users/seobi/jinsup_space/CC/md_group/prod/05_보충_RAG_엔지니어링.md
+
+[도구호출 Bash] {"command": "grep -rn -E \"skill_listing|sentSkillNames|suppressNext\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l | head; grep -rn \"skill_listing\" /Users/seobi/jinsup_space/CC/src/utils/
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts
+/Users/seobi/jinsup_space/CC/src/utils/conversationRecovery.ts
+/Users/seobi/jinsup_space/CC/src/services/compact/postCompactCleanup.t
+
+[도구호출 Bash] {"command": "grep -n -B3 -A10 \"skill_listing\\|sentSkillNames\\|suppressNext\" /Users/seobi/jinsup_space/CC/src/services/compact/postCompactCleanup.ts /Users/seobi/jinsup_space/CC/src/services/compac
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/services/compact/postCompactCleanup.ts-63-  clearClassifierApprovals()
+/Users/seobi/jinsup_space/CC/src/services/compact/postCompactCleanup.ts-64-  clearSpeculativeChecks()
+/Users/seobi/jinsup_space/CC/src/services/compact/postCompactCleanup.ts-65-  // Intentionally 
+
+[도구호출 Bash] {"command": "sed -n 2600,2690p /Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "description": "Read skill listing attachment design comments"}
+
+[도구결과] return attachments
+}
+
+// Track which skills have been sent to avoid re-sending. Keyed by agentId
+// (empty string = main thread) so subagents get their own turn-0 listing —
+// without per-agent scoping, the main thread populating this Set would cause
+// every subagent's filterToBundledAndMcp result 
+
+[도구호출 Bash] {"command": "find /Users/seobi/jinsup_space/CC/src -path \"*skillSearch*\" -name \"*.ts\" | head; grep -rn -iE \"lost|buried|drift|middle|stale|attention\" /Users/seobi/jinsup_space/CC/src/services/sk
+
+[도구결과] (eval):1: no matches found: /Users/seobi/jinsup_space/CC/src/services/skillSearch/*.ts
+
+[도구호출 Bash] {"command": "grep -rn -l \"skillSearch\\|skill_discovery\\|getTurnZeroSkillDiscovery\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | head; echo ---; grep -rn -iE \"re-inject|re-surface|resurfa
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/Tool.ts
+/Users/seobi/jinsup_space/CC/src/commands.ts
+/Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts
+/Users/seobi/jinsup_space/CC/src/constants/prompts.ts
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts
+/Users/seobi/jinsup_space/CC/src/utils/attachme
+
+[도구호출 Bash] {"command": "sed -n 2480,2540p /Users/seobi/jinsup_space/CC/src/utils/attachments.ts; echo ===; grep -n -B2 -A8 \"skill_discovery\\|getTurnZeroSkillDiscovery\\|skillSearchModules\" /Users/seobi/jinsup
+
+[도구결과] Exit code 1
+      m.type === 'user' &&
+      'message' in m &&
+      Array.isArray(m.message.content)
+    ) {
+      for (const block of m.message.content) {
+        if (isToolResultBlock(block)) {
+          resultByUseId.set(block.tool_use_id, block.is_error === true)
+        }
+      }
+    }
+  }
+  c
+
+[도구호출 Bash] {"command": "grep -n -B2 -A10 \"skill_discovery\\|getTurnZeroSkillDiscovery\\|skillSearchModules\" /Users/seobi/jinsup_space/CC/src/query.ts | head -60", "description": "Find skill discovery hook in m
+
+[도구결과] (Bash completed with no output)
+
+[도구호출 Bash] {"command": "grep -rn -B3 -A15 \"getTurnZeroSkillDiscovery\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | head -70", "description": "Find turn-zero skill discovery implementation and callers"
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/attachments.ts-803-        !options?.skipSkillDiscovery
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts-804-          ? [
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts-805-              maybe('skill_discovery', () =>
+/Users/seobi/jinsup_space/CC/s
+
+[ASSISTANT] 찾았습니다. **`EXPERIMENTAL_SKILL_SEARCH` 피처 플래그 아래의 skill discovery(스킬 검색) 시스템**입니다. "turn 0에 거대한 목록 한 번 주입 → 대화가 길어지면 중간에 묻힘" 문제를 "매 턴 관련 스킬만 검색해서 현재 턴 근처에 재주입"으로 바꾸는 구조예요. 소스에서 확인된 구성 요소는 3개입니다:
+
+**1. `getTurnZeroSkillDiscovery` — 턴별 검색 주입** (`src/utils/attachments.ts:803-813`)
+
+사용자 입력이 들어올 때마다 `skill_discovery` attachment를 생성하는 훅입니다. 메인 스레드는 turn 0에 blocking으로 검색하고, 서브에이전트는 비동기 `subagent_spawn` 신호로 받습니다(attachments.ts:2686-2688 주석). 정적 목록 대신 **현재 쿼리에 맞는 스킬만 그 턴 위치에** 꽂히니까, 항상 컨텍스트 최신부에 있게 됩니다. 다만 실제 구현체인 `skillSearch/prefetch.ts` 파일 자체는 이 src에 없습니다 — attachments.ts:2753-2755 주석에 "feature-gated 모듈로 옮겨서 외부 빌드에 문자열이 새지 않게 했다"고 되어 있어서, 외부 빌드 기준 소스에서는 호출부만 확인 가능합니다.
+
+**2. `filterToBundledAndMcp` — 정적 목록 다이어트** (`attachments.ts:2662-2674`)
+
+skill search가 켜지면 turn-0 `skill_listing`에서 user/project/plugin 스킬(주석 표현으로 "the long tail — 200+")을 아예 빼고 **bundled + MCP만** 남깁니다. 그마저 30개(`FILTERED_LISTING_MAX`)를 넘으면 bundled만. 긴 꼬리는 전부 discovery 검색 경로로 넘기는 거죠. 어제 얘기한 8,000자 truncation도 이걸로 같이 회피됩니다.
+
+**3. `stripReinjectedAttachments` — compact 시 낡은 목록 제거** (`src/services/compact/compact.ts:211-223`)
+
+컴팩션 요약기에 들어가는 메시지에서 기존 `skill_discovery`/`skill_listing`을 걸러냅니다. 주석 그대로 — "다음 턴의 discovery 신호가 다시 띄워주므로, 요약기에 먹이면 토큰 낭비 + 낡은 스킬 제안으로 요약 오염"(compact.ts:204-206).
+
+정리하면 정적 주입(`skill_listing`) → 검색 기반 동적 재주입(`skill_discovery`)으로의 전환이 lost-in-the-middle 해결책이고, 현재는 `feature('EXPERIMENTAL_SKILL_SEARCH')` + 내부(ant) 게이트 뒤에 있는 실험 기능입니다. 반대로 일반 빌드의 기본 동작은 여전히 "turn 0에 한 번 주입하고 끝"이라, compact 후에도 재주입을 일부러 안 합니다(compact.ts:524-529 — "~4K 토큰 순수 cache_creation 비용 대비 이득이 미미").
+
+[USER] <command-message>visual-explainer</command-message>
+<command-name>/visual-explainer</command-name>
+
+[ASSISTANT] `/visual-explainer` 스킬로 방금 검증한 내용 — 스킬 목록 예산(8,000자/250자)과 lost-in-the-middle 해법(skill_discovery) — 을 시각화한 단일 HTML을 만들겠습니다. 근거는 이미 이 세션에서 소스로 확인한 `prompt.ts` / `attachments.ts` / `compact.ts` 라인들을 그대로 사용합니다.
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/스킬예산-로스트인더미들.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width,
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/스킬예산-로스트인더미들.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/스킬예산-로스트인더미들.html", "old_string": "        <rect x=\"370\" y=\"318\" width=\"140\" height=\"30\" rx=\"6\" fill=\"#1e2733\" stroke=\"#3
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/스킬예산-로스트인더미들.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/스킬예산-로스트인더미들.html\"", "description": "Open the visual explainer HTML in browser"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 브라우저로 열었습니다 — `스킬예산-로스트인더미들.html` (작업 디렉토리 루트에 저장).
+
+## 구성 요약
+
+| 섹션 | 내용 | 시각 형태 | 근거 |
+|---|---|---|---|
+| 01 예산 산정 | 환경변수 → 윈도우×4×1% → 폴백 8,000자 | 3단 결정 흐름도 (SVG) | prompt.ts:21-41 |
+| 02 두 겹 제한 | 총량 8,000자 vs 개당 250자 | 이중 게이지 (공용 예산 바 + 250자 컷 라인) | prompt.ts:29, 43-50, 84-88 |
+| 03 열화 3단계 | 예산 내 → 균등 절단 → 이름만 (bundled 는 보존) | 모의 스킬 목록 3패널 + 취소선/⋯ 강조 | prompt.ts:68-171 |
+| 04 문제 | turn 0 목록이 대화가 자라며 중간에 묻힘 | 좌우 컨텍스트 지층 스트립 + U자 주의력 곡선 | attachments.ts:2603-2612, compact.ts:524-529 |
+| 05 해법 | skill_discovery 3단 구조 (다이어트 → 턴별 주입 → compact 청소) | 3칼럼 파이프라인 카드 | attachments.ts:803-813, 2662-2674, compact.ts:203-223 |
+
+- **미학 컨셉**: 다크 잉크 배경 + "컨텍스트 지층" 메타포. 앰버(예산/경고) vs 시안(해법/discovery) 2색 대비, Black Han Sans 헤드라인 + Gothic A1 본문 + IBM Plex Mono 코드. 스크롤 진입 시 staggered reveal.
+- **검증 표기**: 섹션마다 `› source 파일:line` 명시. 소스로 확인 못한 것 2건은 별도 표기 — 주의력 곡선은 "개념도(CC 소스 아님)", `skillSearch/prefetch.ts`는 "외부 빌드에 파일 없음, 호출부·주석으로만 확인" 노트 박스.
+
+수정 원하시면 말씀해 주세요 — 예: 섹션 03에 이 세션 실제 truncation 사례(names-only로 들어온 `vercel:vercel-cli` 등) 스크린샷 스타일 재현 추가, 라이트 테마 버전, `md_group/tools_info/tools_detail/SkillTool.md` 문서에 이 HTML 링크 추가 등.
+
+[USER] 임베딩 검색 없음
+BM25 없음
+의도 분류 없음
+고정된 에이전트 워크플로우 없음
+RAG 파이프라인(rerank, retrieval, vector DB) 없음
+
+클로드코드에 위와같이 유명한 기술들 안들어가지? 또 안들어가는 유명한기술이 뭐있지? 리플렉션도 안들어가는거 같던데? 맞아?
+
+[ASSISTANT] 좋은 질문이라 소스로 하나씩 검증해보겠습니다. `src/` 전체를 키워드별로 grep 해서 실제 부재 여부를 확인할게요.
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC/src && for kw in \"embedding\" \"bm25\\|tf.?idf\\|okapi\" \"vector\" \"rerank\" \"retrieval\" \"faiss\\|chroma\\|pinecone\\|qdrant\\|weaviate\" \"cosine\";
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC/src && for kw in \"reflect\" \"critique\\|self.?correct\" \"classif\" \"speculat\" \"tree.?of.?thought\\|beam|mcts\\|self.?consistency\" \"knowledge.?graph
+
+[도구결과] === embedding ===
+./ink/bidi.ts:67:  const { levels } = bidi.getEmbeddingLevels(plainText, 'auto')
+./utils/bash/ast.ts:706:    // string-embedding (`echo "item: $i"`) stays simple. This reverts some
+=== bm25\|tf.?idf\|okapi ===
+=== vector ===
+./tools/PowerShellTool/gitSafety.ts:2: * Git can be weapo
+
+[도구결과] === reflect ===
+./ink/render-node-to-output.ts:564:        // node already reflects the constrained Exactly pass, so clamping
+./ink/selection.ts:447:  // shiftSelection clamp) no longer reflects intent. Anchor stays put so
+./ink/get-max-width.ts:12: * height. getComputedWidth() reflects the wider At
+
+[도구호출 Bash] {"command": "grep -rn -B2 -A8 \"ClassifierResult\\b\" tools/BashTool/bashPermissions.ts | head -30; echo \"---transcript-classifier---\"; grep -rn -iE \"TRANSCRIPT_CLASSIFIER\" . --include=\"*.ts\" | 
+
+[도구결과] tools/BashTool/bashPermissions.ts-32-import type {
+tools/BashTool/bashPermissions.ts-33-  ClassifierBehavior,
+tools/BashTool/bashPermissions.ts:34:  ClassifierResult,
+tools/BashTool/bashPermissions.ts-35-} from '../../utils/permissions/bashClassifier.js'
+tools/BashTool/bashPermissions.ts-36-import {
+
+[도구호출 Bash] {"command": "for kw in \"tree.?sitter\" \"judge\\|voting\\|ensemble\\|debate\" \"semantic\" \"moderation\" \"readMemoriesForSurfacing\" \"index.*codebase\\|codebase.*index\"; do echo \"=== $kw ===\"; 
+
+[도구결과] === tree.?sitter ===
+./tools/BashTool/bashCommandHelpers.ts:217:  const tsAnalysis = parsed.getTreeSitterAnalysis()
+./tools/BashTool/bashSecurity.ts:9:import type { TreeSitterAnalysis } from '../../utils/bash/treeSitterAnalysis.js'
+./tools/BashTool/bashSecurity.ts:114:  /** Tree-sitter analysis data
+
+[ASSISTANT] 분류기의 정체와 메모리 회상 방식만 마저 확인하겠습니다.
+
+[도구호출 Bash] {"command": "sed -n 1,60p utils/permissions/bashClassifier.ts 2>/dev/null || find . -name \"bashClassifier*\"; echo \"---memory-surfacing---\"; sed -n 2200,2240p utils/attachments.ts", "description": 
+
+[도구결과] // Stub for external builds - classifier permissions feature is ANT-ONLY
+
+export const PROMPT_PREFIX = 'prompt:'
+
+export type ClassifierResult = {
+  matches: boolean
+  matchedDescription?: string
+  confidence: 'high' | 'medium' | 'low'
+  reason: string
+}
+
+export type ClassifierBehavior = 'deny' | 'a
+
+[ASSISTANT] 맞습니다 — 전부 소스로 재확인했고, 말씀하신 5개 모두 부재 확인. **리플렉션도 없는 게 맞습니다.** 다만 "의도 분류"에는 뉘앙스가 하나 있어요. 정리하면:
+
+## 말씀하신 것들 검증 결과
+
+| 기술 | 판정 | 소스 근거 |
+|---|---|---|
+| 임베딩 검색 | ❌ 없음 | `embedding`/`cosine` 히트 0 (bidi 텍스트 렌더링 등 무관한 것뿐) |
+| BM25 / TF-IDF | ❌ 없음 | 히트 0 |
+| 벡터 DB | ❌ 없음 | faiss/chroma/pinecone/qdrant/weaviate 히트 0 |
+| RAG (retrieval/rerank/chunking) | ❌ 없음 | `rerank` 유일 히트가 git 플래그 `--no-rerank` 허용목록 |
+| 고정 워크플로우 그래프 | ❌ 없음 | LangGraph식 상태머신 없음. 메인 루프는 단일 while 루프, Workflow 도구도 모델이 그때그때 스크립트를 쓰는 방식이지 하드코딩 파이프라인 아님 |
+| 리플렉션 (self-critique 루프) | ❌ 없음 | `critique`/`self-correct`/`judge`/`voting`/`ensemble`/`debate` 전부 히트 0. 하네스가 모델 출력을 별도 호출로 재검토시키는 단계가 없음 |
+
+**의도 분류의 뉘앙스**: 사용자 요청을 라우팅하는 의도 분류는 없는 게 맞는데, **권한/보안용 분류기는 개념적으로 존재**합니다 (`classifyBashCommand`, `Tool.ts:551`의 "security classifier"). 단, `utils/permissions/bashClassifier.ts` 첫 줄이 "Stub for external builds - classifier permissions feature is ANT-ONLY" — 즉 **Anthropic 내부 전용이고 배포 빌드에서는 항상 disabled를 반환하는 스텁**입니다. 외부 사용자 기준으로는 "없음"이 맞아요.
+
+## 추가로 안 들어간 유명 기술 (grep 검증)
+
+- **Tree-of-Thoughts / MCTS / beam search / self-consistency(다수결 샘플링)** — 히트 0. 항상 단일 경로 생성
+- **멀티에이전트 debate / judge 패널** — 코어 엔진에 없음. Workflow 도구 설명서에 "adversarial verify" 패턴이 제안되긴 하지만 그건 모델에게 주는 요리책이지 엔진 로직이 아님
+- **코드베이스 사전 인덱싱** (Cursor식 임베딩 인덱스, 심볼 DB) — 인덱스 빌드 단계 자체가 없음. 검색은 온디맨드 grep/glob, 심볼은 LSP 도구로 외부 언어서버에 위임
+- **시맨틱 캐싱** — 없음 (API 프롬프트 캐싱만 사용)
+- **프롬프트 압축 (LLMLingua류)** — 없음. 컨텍스트 축소는 LLM 요약(컴팩션) 한 가지
+- **파인튜닝 / 학습된 라우터 / DSPy식 프롬프트 최적화** — `fine-tun` 히트 0. 프롬프트는 전부 손으로 쓴 정적 문자열
+- **moderation/guardrails 별도 엔드포인트** — 히트 0
+
+## 대신 쓰는 것들 (이게 더 흥미로운 부분)
+
+- **검색** → 에이전틱 검색: 모델이 ripgrep/glob을 반복 호출하며 스스로 좁혀감
+- **메모리 회상** → 임베딩이 아니라 **LLM 셀렉터**: 주석에 "Sonnet spends its 5-slot budget on fresh candidates" (`attachments.ts:2228-2234`) — Sonnet이 메모리 description을 읽고 최대 5개 골라줌
+- **의미 매칭** → 유일한 정적 분석다운 정적 분석이 **tree-sitter인데, 용도가 코드 인덱싱이 아니라 bash 명령 보안 파싱** (`bashSecurity.ts:114`)
+- **리플렉션 대신** → hooks(결정적 외부 피드백), 컴팩션(요약), 코드리뷰는 코어가 아닌 스킬(/code-review)로 분리
+
+**확인 못한 것 하나**: 어제 본 `EXPERIMENTAL_SKILL_SEARCH`의 검색 구현체(`skillSearch/prefetch.ts`)는 외부 빌드에서 제외돼 있어서, Anthropic 내부적으로 거기에 임베딩을 쓰는지는 소스에서 확인 불가입니다.
+
+요약하면 클로드코드의 설계 철학은 일관됩니다 — **ML 인프라를 겹겹이 쌓는 대신, 모델 지능 + 파일시스템 + 결정적 도구(grep, tree-sitter, hooks)로 해결하고, 유일하게 "똑똑함"이 필요한 자리(메모리 선택, 권한 판단)에도 임베딩이 아닌 LLM 호출을 씁니다.**
+
+[USER] 엥 메모리 회상 부분은 무슨말이야??
+
+[ASSISTANT] 방금 그 부분 소스를 조금 더 정확히 읽고 설명드릴게요.
+
+[도구호출 Bash] {"command": "grep -rn \"findRelevantMemories\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l; grep -rn -n \"export.*findRelevantMemories\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\""
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/memdir/memoryScan.ts
+/Users/seobi/jinsup_space/CC/src/memdir/findRelevantMemories.ts
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts
+/Users/seobi/jinsup_space/CC/src/utils/claudemd.ts
+/Users/seobi/jinsup_space/CC/src/services/extractMemories/extractMemories.ts
+
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/memdir/findRelevantMemories.ts"}
+
+[도구결과] 1	import { feature } from 'bun:bundle'
+2	import { logForDebugging } from '../utils/debug.js'
+3	import { errorMessage } from '../utils/errors.js'
+4	import { getDefaultSonnetModel } from '../utils/model/model.js'
+5	import { sideQuery } from '../utils/sideQuery.js'
+6	import { jsonParse } from '../utils
+
+[ASSISTANT] 아, 제 시스템 프롬프트에도 있는 클로드코드의 **자동 메모리(auto-memory) 시스템**이 회상(recall)을 어떻게 하느냐 얘기입니다. 방금 `src/memdir/findRelevantMemories.ts` 전체를 읽었으니 정확히 설명할게요.
+
+## 배경
+
+클로드코드는 세션이 끝나도 남는 메모리를 마크다운 파일로 저장합니다 (`~/.claude/projects/<프로젝트>/memory/` 아래, 파일 하나 = 사실 하나, frontmatter에 `name`/`description` 포함). 문제는 **매 턴마다 "지금 질문에 어떤 메모리가 관련 있지?"를 골라내야** 한다는 것 — 전부 다 넣으면 컨텍스트 낭비니까요.
+
+보통의 메모리 시스템(mem0, ChatGPT 메모리류)이라면 여기서 임베딩을 씁니다: 메모리를 벡터로 저장 → 쿼리도 벡터화 → 코사인 유사도 top-k. 클로드코드는 그걸 안 하고 이렇게 합니다:
+
+## 실제 동작 (findRelevantMemories.ts:39-141)
+
+1. 사용자 입력이 들어올 때마다 메모리 디렉토리를 스캔해서 **파일명 + description만 뽑은 목록(manifest)** 을 만든다
+2. 그 목록과 사용자 쿼리를 통째로 **Sonnet에게 사이드 쿼리**로 던진다 (`sideQuery`, `getDefaultSonnetModel()`, max_tokens 256)
+3. 시스템 프롬프트가 그대로 소스에 있는데 — *"Return a list of filenames for the memories that will clearly be useful... (up to 5). Be selective and discerning. ... feel free to return an empty list"* (18-24행)
+4. Sonnet이 JSON으로 파일명 배열을 반환 → 그 파일들만 전체 내용을 읽어 `relevant_memories` attachment(system-reminder)로 대화에 주입
+5. 한 번 보여준 건 `alreadySurfaced`로 걸러서 다음 턴에 5개 슬롯을 새 후보에 쓰게 함
+
+디테일도 재밌습니다. 지금 쓰고 있는 도구의 사용법 메모리는 뽑지 말라는 규칙이 있는데(23행), 이유가 주석에 있어요 — 키워드 겹침("spawn"이 쿼리에도 있고 메모리 설명에도 있음)으로 생기는 오탐 방지, 단 그 도구의 **함정/주의사항 메모리는 오히려 지금이 필요한 순간이니 뽑아라**. 이런 조건부 판단이 코사인 유사도로는 안 되고 LLM이라서 되는 부분이죠.
+
+## 그래서 제가 말한 요지
+
+"의미 기반 검색이 필요한 자리"에서조차 임베딩 인프라(벡터 저장, 인덱스 갱신, 유사도 계산)를 안 깔고, **그냥 목록을 LLM한테 보여주고 골라달라고 시킨다**는 겁니다. 메모리는 수십 개 수준이라 목록 전체가 프롬프트에 들어가니 가능한 방식이고 — 수백만 문서를 다루는 RAG와 달리 이 규모에서는 LLM 셀렉터가 더 정확하면서 인프라 비용이 0입니다. 대가는 턴마다 Sonnet 호출 1회(출력 256토큰 제한이라 저렴).
+
+지난 답변에서 인용한 "Sonnet spends its 5-slot budget" 주석(attachments.ts)이 바로 이 셀렉터 얘기였습니다.
+
+[USER] 무슨말이야.. 어렵네...
+
+[ASSISTANT] 쉽게 다시 설명할게요. 비유 하나면 됩니다.
+
+## 상황
+
+클로드코드는 예전 세션에서 알게 된 것들을 **메모지**로 보관해요. 예를 들면:
+
+- "이 사용자는 문서 경로를 ~로 쓰길 원함"
+- "이 프로젝트는 pnpm 씀, npm 아님"
+
+이런 메모가 수십 장 쌓여 있는데, 새 질문이 들어올 때마다 **"이 중에 지금 필요한 메모만"** 골라서 대화에 끼워넣어야 합니다. 전부 넣으면 낭비니까요.
+
+## 고르는 방법 두 가지
+
+**보통 방법 (임베딩)** = 바코드 기계
+메모마다 미리 바코드(숫자 좌표)를 붙여두고, 질문도 바코드로 바꿔서 기계로 "가장 비슷한 바코드" 찾기. 설치할 것도 많고 관리도 필요함.
+
+**클로드코드 방법** = 비서에게 물어보기
+그냥 작은 AI(Sonnet)한테 메모지 **제목 목록**을 통째로 보여주면서 이렇게 물어봅니다:
+
+> "지금 사용자가 이런 질문을 했어. 이 메모 목록 중에 도움될 것만 골라줘. 최대 5장. 애매하면 고르지 마."
+
+AI가 "3번, 7번이요" 하고 답하면 그 메모만 꺼내서 대화에 넣습니다. 끝.
+
+## 왜 이래도 되냐
+
+메모가 **몇 십 장밖에 안 되니까** 목록 전체를 AI가 한눈에 읽을 수 있어요. 책 100만 권짜리 도서관이면 바코드 시스템(임베딩)이 필요하지만, 메모 30장이면 사람이 직접 훑어보고 고르는 게 더 정확하죠. 심지어 "지금 쓰는 중인 도구의 사용법 메모는 빼고, 주의사항 메모는 넣어줘" 같은 미묘한 판단도 되고요 — 바코드 매칭으론 불가능한 일입니다.
+
+제가 전에 한 말은 결국 이거예요: **클로드코드는 "비슷한 것 찾기"가 필요한 자리에서도 수학(임베딩) 대신 그냥 AI한테 골라달라고 시킨다.**
+
+[USER] 이해가 안되는게 그러면 사용자가 질문할때마다 소넷이 호출한다는소린가
+
+[ASSISTANT] 네 맞아요. 정확히 확인해서 답할게요 — 호출 지점과 조건을 잠깐 볼게요.
+
+[도구호출 Bash] {"command": "grep -n \"relevant_memories\\|getRelevantMemories\\|findRelevantMemories\" /Users/seobi/jinsup_space/CC/src/utils/attachments.ts | head; echo \"---sideQuery---\"; sed -n 1,40p /Users/seob
+
+[도구결과] 232:import { findRelevantMemories } from '../memdir/findRelevantMemories.js'
+500:      type: 'relevant_memories'
+873:    // relevant_memories moved to async prefetch (startRelevantMemoryPrefetch)
+2217:      findRelevantMemories(
+2241:  return [{ type: 'relevant_memories' as const, memories }]
+2245: 
+
+[도구호출 Bash] {"command": "grep -rn \"startRelevantMemoryPrefetch\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | head -5; echo ---; grep -rn -B8 -A20 \"export function startRelevantMemoryPrefetch\\|export 
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/attachments.ts:873:    // relevant_memories moved to async prefetch (startRelevantMemoryPrefetch)
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2361:export function startRelevantMemoryPrefetch(
+/Users/seobi/jinsup_space/CC/src/query.ts:63:  startRelevan
+
+[ASSISTANT] 네, 정확히 이해하셨어요. **자동 메모리 기능이 켜져 있으면, 사용자가 질문할 때마다 뒤에서 Sonnet이 한 번씩 추가로 호출됩니다.** 방금 소스로 조건까지 확인했습니다.
+
+## 매번 호출되나? — 거의 그렇지만 건너뛰는 조건이 있음
+
+`query.ts:299`에서 매 턴 시작할 때 실행되는데, 다음 경우엔 호출 자체를 안 합니다 (`attachments.ts:2361-2381`):
+
+- 자동 메모리 기능이 꺼져 있으면 (기능 플래그 포함)
+- 질문이 **한 단어**면 — 주석 왈 "단어 하나로는 뭐가 관련 있는지 판단할 근거가 부족"
+- 메모리 파일이 아예 없거나, 있는 걸 전부 이미 보여줬으면 (Sonnet 부르기 전에 목록이 비면 그냥 종료)
+
+## "매번 API 호출이면 느리고 비싸지 않나?"에 대한 답
+
+- **느림 X**: 이름부터 `prefetch`(미리 가져오기)예요. 메인 모델 호출과 **동시에** 뒤에서 돌아서, 사용자가 체감하는 대기시간에 안 얹힙니다
+- **비쌈 X**: 입력은 메모 제목 목록 몇 줄, 출력은 최대 256토큰으로 묶어놨어요. 파일명 몇 개만 뱉는 호출이라 껌값입니다
+
+## 더 큰 그림
+
+이게 클로드코드의 특징인데, 이런 "곁다리 LLM 호출"(`sideQuery`)이 메모리 말고도 여기저기 있습니다. 대화 요약(컴팩션)도 LLM 호출이고, 앞서 본 권한 분류기(내부 전용)도 LLM 호출이에요. 설계 철학이 **"작은 LLM 호출은 이제 DB 쿼리만큼 싸다 — 인프라 깔지 말고 그냥 물어봐라"**에 가깝습니다. 임베딩 검색 같은 전통 ML 인프라가 없는 이유가 결국 이거고요.
+
+[USER] 있는걸 이미 전부 보여줬으면..은 무슨말이야 그걸 어떤기준으로 판단해?
+
+[ASSISTANT] 좋은 포인트예요 — "이미 보여줬다"의 판단 기준이 소스에 정확히 있으니 그 부분(`attachments.ts:2245` 근처)을 읽어볼게요.
+
+[도구호출 Bash] {"command": "sed -n 2243,2300p /Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "description": "Read how alreadySurfaced set is built from conversation messages"}
+
+[도구결과] /**
+ * Scan messages for past relevant_memories attachments.  Returns both the
+ * set of surfaced paths (for selector de-dup) and cumulative byte count
+ * (for session-total throttle).  Scanning messages rather than tracking
+ * in toolUseContext means compact naturally resets both — old attachments
+
+
+[ASSISTANT] 확인했습니다. 기준이 꽤 영리해요 — **따로 장부를 만들지 않고, 지금 대화 내용 자체를 검사합니다.**
+
+## 판단 기준 (`collectSurfacedMemories`, attachments.ts:2250-2265)
+
+매 턴마다 현재 대화의 메시지들을 쭉 훑어서, **과거에 끼워넣었던 `relevant_memories` 첨부가 대화 안에 있는지** 봅니다. 거기 등장했던 메모리 파일 경로들을 전부 모으면 그게 "이미 보여준 목록"이에요.
+
+한 줄로: **"그 메모 내용이 지금 대화 어딘가에 이미 들어가 있나?"** — 들어가 있으면 보여준 것, 없으면 안 보여준 것.
+
+추가로 한 가지 더 — 모델이 Read 도구로 그 메모리 파일을 **직접 읽은 적**이 있어도 "이미 컨텍스트에 있음"으로 쳐서 제외합니다 (attachments.ts:2230).
+
+## 왜 장부 대신 대화를 스캔하나
+
+주석에 이유가 그대로 적혀 있습니다:
+
+> "Scanning messages rather than tracking in toolUseContext means **compact naturally resets both** — old attachments are gone from the compacted transcript, so re-surfacing is valid again."
+
+대화가 길어져서 컴팩션(요약)이 일어나면, 옛날에 끼워넣었던 메모 첨부도 요약되면서 대화에서 **사라지죠**. 장부를 따로 뒀다면 "보여줬음"으로 남아서 다시는 안 보여줄 텐데, 대화 스캔 방식이면 **모델이 잊는 순간 기준도 자동으로 리셋**돼서 같은 메모를 다시 보여줄 수 있게 됩니다.
+
+즉 "보여줬다"의 진짜 의미가 "과거에 한 번이라도 보여줬다"가 아니라 **"모델이 지금 기억하고 있다"**인 거예요. 별도 상태 관리 코드 없이 이게 공짜로 따라오는 설계입니다.
+
+(덤: 같은 함수가 첨부된 메모들의 바이트 총량도 세는데, 세션 전체에서 메모리 주입량이 과해지지 않게 하는 스로틀용입니다.)
+
+[USER] 너무어렵다.. 메모리를 호출하는 과정에대한.. 내용 총정리좀
+
+[ASSISTANT] 간단하게, 처음부터 끝까지 한 번에 정리할게요.
+
+## 클로드코드 메모리 회상 — 전체 흐름
+
+**전제: 메모리는 그냥 마크다운 파일들입니다.** `~/.claude/projects/<프로젝트>/memory/` 폴더에 파일 하나 = 사실 하나, 각 파일 맨 위에 제목과 한 줄 설명이 붙어 있어요. 목차 파일(MEMORY.md)만 항상 시스템 프롬프트에 실리고, 나머지는 필요할 때만 꺼내옵니다.
+
+사용자가 질문하면 이 7단계가 돌아갑니다:
+
+```
+① 질문 입력
+      ↓
+② 회상 프로세스가 백그라운드에서 시작  (메인 답변 생성과 동시 — 안 느려짐)
+      ↓
+③ 메모 파일들의 "제목 + 한 줄 설명"만 스캔해서 목록 작성
+      ↓
+④ 이미 대화에 들어가 있는 메모는 목록에서 제외
+      ↓
+⑤ Sonnet에게 질문 + 목록을 주고 "도움될 것만 골라줘, 최대 5개" (JSON 응답)
+      ↓
+⑥ 뽑힌 파일만 실제 내용을 읽음 (너무 길면 앞부분만)
+      ↓
+⑦ system-reminder 형태로 대화에 끼워넣음 → 메인 모델이 참고
+```
+
+**건너뛰는 경우** (②에서 아예 시작 안 함): 기능이 꺼져 있거나, 질문이 한 단어뿐이거나, 메모가 하나도 없거나, 전부 이미 대화에 들어가 있을 때.
+
+## 기억할 핵심 3가지
+
+1. **임베딩·벡터DB 없음.** "관련 메모 찾기"를 수학이 아니라 그냥 작은 AI(Sonnet) 호출 한 번으로 해결. 메모가 수십 개뿐이라 목록 전체를 AI가 읽고 고르는 게 더 정확하고 인프라가 필요 없음.
+
+2. **매 질문마다 Sonnet이 추가 호출됨.** 대신 백그라운드라 안 느리고, 출력을 256토큰으로 묶어놔서 아주 저렴.
+
+3. **"이미 보여줬나"는 장부가 아니라 대화 자체로 판단.** 대화 안에 그 메모가 있으면 스킵, 없으면 후보. 그래서 컴팩션(요약)으로 대화에서 메모가 사라지면 = 모델이 잊으면 → 자동으로 다시 보여줄 수 있는 상태가 됨. 별도 상태 관리 코드 없이 공짜로 얻는 동작.
+
+이게 전부예요. **"파일로 저장 → 질문마다 AI가 목차 보고 골라줌 → 대화에 끼워넣음"** 세 마디로 요약됩니다.
+
+[USER] 7단계를 근처 컨텍스트를 다 같이 살펴보고 최종적 이전대화 내용도 다살펴보고 관련되어있는것들 모두 md로 만들어줘
+
+[ASSISTANT] 좋습니다. MD로 정리하기 전에, 7단계 각각의 소스 근처 컨텍스트를 마저 확인해서 빠진 디테일(프리페치 생애주기, 스캔 방식, 용량 제한, 주입 형태)을 채우겠습니다.
+
+[도구호출 Bash] {"command": "sed -n 285,345p /Users/seobi/jinsup_space/CC/src/query.ts", "description": "Read prefetch lifecycle in main query loop"}
+
+[도구결과] // compact 이후 서버는 요약만 보게 되어 사용량을 과소 계산합니다; remaining은 요약으로
+  // 사라진 compact 이전의 최종 윈도우를 알려줍니다. 여러 compact에 걸쳐 누적됨:
+  // 각각 해당 compact 트리거 시점의 최종 컨텍스트를 차감합니다. 7개의 continue 지점을
+  // 건드리지 않기 위해 루프 로컬(State에 포함하지 않음)입니다.
+  let taskBudgetRemaining: number | undefined = undefined
+
+  // 진입 시 불변 env/statsig
+
+[도구호출 Bash] {"command": "sed -n 2381,2470p /Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "description": "Read rest of startRelevantMemoryPrefetch and prefetch consumption"}
+
+[도구결과] }
+
+  const surfaced = collectSurfacedMemories(messages)
+  if (surfaced.totalBytes >= RELEVANT_MEMORIES_CONFIG.MAX_SESSION_BYTES) {
+    return undefined
+  }
+
+  // Chained to the turn-level abort so user Escape cancels the sideQuery
+  // immediately, not just on [Symbol.dispose] when queryLoop exits.
+
+
+[도구호출 Bash] {"command": "grep -n \"MAX_MEMORY_LINES\\|MAX_MEMORY_BYTES\\|collectSurfacedMemories\\|MEMORY_SESSION\\|totalBytes\" /Users/seobi/jinsup_space/CC/src/utils/attachments.ts | head -15; echo ---; sed -n 
+
+[도구결과] 269:const MAX_MEMORY_LINES = 200
+277:const MAX_MEMORY_BYTES = 4096
+2251:export function collectSurfacedMemories(messages: ReadonlyArray<Message>): {
+2253:  totalBytes: number
+2256:  let totalBytes = 0
+2261:        totalBytes += mem.content.length
+2265:  return { paths, totalBytes }
+2270: * <system-r
+
+[도구호출 Bash] {"command": "grep -rn -B3 -A12 \"RELEVANT_MEMORIES_CONFIG\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | grep -A15 \"const RELEVANT_MEMORIES_CONFIG\\|export const RELEVANT_MEMORIES_CONFIG\" |
+
+[도구호출 Bash] {"command": "sed -n 1,80p /Users/seobi/jinsup_space/CC/src/memdir/memoryScan.ts", "description": "Read memory file scanning and manifest formatting"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/attachments.ts:279:export const RELEVANT_MEMORIES_CONFIG = {
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts-280-  // Per-turn cap (5 × 4KB = 20KB) bounds a single injection, but over a
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts-281-  // long s
+
+[도구결과] /**
+ * Memory-directory scanning primitives. Split out of findRelevantMemories.ts
+ * so extractMemories can import the scan without pulling in sideQuery and
+ * the API-client chain (which closed a cycle through memdir.ts — #25372).
+ */
+
+import { readdir } from 'fs/promises'
+import { basename, join }
+
+[도구호출 Bash] {"command": "grep -rn -B2 -A10 \"memoryFreshnessText\\|function memoryAge\" /Users/seobi/jinsup_space/CC/src/memdir/memoryAge.ts | head -40; echo \"---render---\"; grep -rn -B2 -A12 \"relevant_memorie
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/memdir/memoryAge.ts-4- * clamp to 0.
+/Users/seobi/jinsup_space/CC/src/memdir/memoryAge.ts-5- */
+/Users/seobi/jinsup_space/CC/src/memdir/memoryAge.ts:6:export function memoryAgeDays(mtimeMs: number): number {
+/Users/seobi/jinsup_space/CC/src/memdir/memoryAge.ts-7-  re
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "content": "# 클로드코드 메모리 회상(Recall) 파이프라인 — 소스 총정리\n\n> 작성일: 2026-07-17 · 근거: 로컬 재구성 소스 `src/` (경로는 전부 레포 상대경로, `파일:line`)\n> 한 줄 요약: *
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md (file state is current in your context — no need to Read it back)
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-wi
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html\"", "description": "Open memory recall pipeline HTML in browser"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 완료했습니다. 레포 루트에 **md + html 쌍**으로 저장했고(기존 `toolsearch-생애주기-소스분석` 등과 같은 관례), HTML은 브라우저로 열어뒀습니다.
+
+## 산출물 2개
+
+**`메모리-회상-파이프라인-총정리.md`** — 상세 텍스트판
+- §0 저장 구조 (파일=사실, frontmatter, MEMORY.md 제외)
+- §1 7단계 흐름도 + §2 단계별 상세 — 이번에 새로 확인한 디테일 포함: 발동 게이트 4조건, ESC 시 abort 체이닝, frontmatter 30줄만 읽는 single-pass 스캔, Sonnet 셀렉터 프롬프트 원문과 환각 가드, "성공한 도구만" recentTools 집계, 나이 헤더를 1회만 계산하는 이유(**재계산하면 "3 days ago"→"4 days ago"로 바이트가 바뀌어 프롬프트 캐시가 깨짐**), 메인 루프의 논블로킹 픽업(`settledAt` 폴링)
+- §3 숫자 안전장치 표 — 턴당 5개, 파일당 4KB/200줄, **세션 누적 60KB 스로틀**(prod에서 세션당 ~26K토큰 관측이 도입 배경), 스캔 200파일, 출력 256토큰
+- §4 왜 임베딩이 아닌가 + §5 인접 시스템(extractMemories, agent 메모리 격리) + §6 검증 한계 명시
+
+**`메모리-회상-파이프라인-총정리.html`** — visual-explainer판
+- 컨셉: **"장서각(기록 보관소)" 메타포의 종이 질감 라이트 테마** (Gowun Batang 세리프 + 도장 모티프, 이전 스킬예산 다크 페이지와 대비)
+- 구성: 서고 구조(폴더 트리 + 메모 카드의 스캔 영역 표시) → 게이트+7단계 세로 파이프라인 → 사서 말풍선(Sonnet 프롬프트 규칙) → "장부가 아니라 대화" 컴팩션 리셋 다이어그램 → 한계값 도장 8개 → 임베딩 vs LLM 셀렉터 비교
+- 모든 섹션 하단에 `파일:line` 출처 표기
+
+이전 대화에서 다룬 맥락(임베딩/RAG 부재 철학, 스킬 discovery와의 쌍둥이 구조)도 양쪽 문서의 마지막 섹션에 연결해뒀습니다. 원하시면 `md_group/`·`html_group_v2/`에 복사본을 넣거나, 섹션 추가/수정 바로 해드릴게요.
+
+[USER] 프리패치는 LLM으로하는건가? 2단계
+
+[ASSISTANT] 아니요 — **2단계(서고 스캔)는 LLM이 아니라 그냥 일반 코드**입니다. 전체 파이프라인에서 LLM 호출은 **4단계 딱 한 번**뿐이에요.
+
+단계별로 "누가 하는 일인지" 구분하면:
+
+| 단계 | 하는 일 | 정체 |
+|---|---|---|
+| 게이트 | 발동 조건 검사 | 일반 코드 (if문) |
+| ① 백그라운드 발사 | promise 시작 | 일반 코드 |
+| **② 서고 스캔** | 폴더 읽고 각 파일 앞 30줄에서 제목·설명 추출 | **일반 코드** (`readdir` + 파일 읽기 — 파일시스템 작업) |
+| ③ 중복 제외 | 대화 메시지 배열 훑기 | 일반 코드 (for문) |
+| **④ 셀렉터** | "이 중 뭐가 관련 있어?" | **⭐ 유일한 LLM 호출 (Sonnet 1회)** |
+| ⑤ 파일 읽기 | 뽑힌 파일 내용 읽기 | 일반 코드 |
+| ⑥ 라벨 부착 | 나이 문자열 계산 | 일반 코드 |
+| ⑦ 주입 | 대화에 메시지 삽입 | 일반 코드 |
+
+"프리페치"라는 단어 때문에 헷갈리셨을 수 있는데, 프리페치(prefetch)는 특정 기술이 아니라 그냥 **"메인 작업(답변 생성)이 도는 동안 뒤에서 미리 해두기"**라는 뜻입니다. 그 "미리 해두는 작업" 안에 코드 6단계 + LLM 호출 1번이 들어있는 거예요.
+
+그래서 비용 구조도 단순합니다 — 턴당 추가되는 건 **파일 몇 개 읽기(공짜 수준) + Sonnet 호출 1번(≤256토큰)**이 전부입니다.
+
+[USER] 그리고 발동하는게 툴콜링 흐름에서도  발동하는건가? 도구결과 를 api 로쏠때말야
+
+[ASSISTANT] 좋은 질문이에요. **발사와 주입을 나눠서** 봐야 합니다 — 둘의 답이 다릅니다.
+
+## 발사(Sonnet 호출)는 툴콜 반복마다 안 함 — 턴당 1회
+
+`startRelevantMemoryPrefetch`는 while 루프(툴콜링 루프) **바깥**, 사용자 메시지가 도착한 시점에 한 번만 실행됩니다. 소스 주석이 이유까지 말해줘요 (query.ts:299):
+
+> "사용자 턴당 한 번 실행됨 — 프롬프트는 루프 반복 간에 불변이므로, **반복마다 실행하면 sideQuery에 같은 질문을 N번 하게 됩니다.**"
+
+셀렉터의 입력은 "사용자 질문 + 메모 목록"인데, 툴콜을 몇 번 돌아도 사용자 질문은 그대로니까 다시 물어볼 이유가 없다는 거죠.
+
+## 하지만 주입은 툴콜링 흐름 안에서 일어남 — 말씀하신 "도구 결과를 API로 쏠 때"가 맞습니다
+
+타임라인으로 보면:
+
+```
+유저 메시지 도착
+ ├─ 메인 모델 API 호출 시작 (스트리밍)
+ └─ 동시에: 메모리 프리페치 발사 ──▶ Sonnet 응답 도착 → settledAt 기록
+                                        (모델이 말하고 도구 도는 사이에 조용히 완료)
+메인 모델이 도구 호출 → 도구 실행
+ └─ 반복 끝에서 체크: "프리페치 끝났고 아직 안 넣었나?"
+      → 도구 결과 메시지들 뒤에 메모리 attachment를 끼워서
+      → 다음 API 요청에 함께 실려 나감  ← 여기!
+      → consumedOnIteration 마킹 (한 번 넣으면 끝)
+```
+
+소비 지점이 정확히 도구 실행 직후입니다 (query.ts:1587-1602). 그래서 Sonnet이 첫 API 응답보다 빨리 끝나면 첫 반복에 바로 실리고(텔레메트리 필드명이 그대로 `hidden_by_first_iteration` — "첫 반복 안에 숨겨졌나"), 늦게 끝나면 그다음 툴콜 반복 때 실립니다. 어느 쪽이든 기다리지 않아요 — "끝났으면 줍고, 아니면 다음에" 방식(`settledAt` 폴링).
+
+## 참고: 스킬 discovery는 반대
+
+바로 아래 있는 스킬 discovery 프리페치는 **반복마다** 발사됩니다 (query.ts 주석: "스킬 디스커버리 프리페치 — 반복마다 실행"). 도구 결과에 따라 필요한 스킬이 달라질 수 있어서죠. 메모리는 질문 기준이라 1회, 스킬은 진행 상황 기준이라 매 반복 — 같은 프리페치 패턴인데 발사 주기만 다르게 설계돼 있습니다.
+
+[USER] 프로미즈가 뭔말이야
+
+[ASSISTANT] 자바스크립트 문법 용어인데, 개념은 간단해요. **"나중에 결과가 도착할 예약증"**입니다.
+
+## 진동벨 비유
+
+카페에서 커피를 주문하면 진동벨을 주죠. 그 순간:
+
+- 커피는 **아직 없음** (만드는 중)
+- 하지만 나는 **자리로 가서 딴짓 가능**
+- 진동벨이 울리면 **그때 가서 받으면 됨**
+
+Promise가 정확히 이 **진동벨**입니다. "시간이 걸리는 작업을 시켜놓고, 결과 대신 일단 예약증만 받아서 계속 진행"하는 장치예요.
+
+## 메모리 프리페치에 대입하면
+
+```
+startRelevantMemoryPrefetch()
+  = "Sonnet아, 관련 메모 골라줘" 주문 넣기
+  → 즉시 진동벨(promise)만 받고 리턴     ← 안 기다림!
+
+메인 루프
+  = 자리로 돌아가서 하던 일 (답변 생성, 도구 실행)
+
+도구 실행 끝날 때마다
+  = 진동벨 흘끗 보기 (settledAt 체크 — "울렸나?")
+  → 울렸으면: 커피 수령 (메모리를 대화에 주입)
+  → 아직이면: 다음에 또 흘끗 (계속 딴짓)
+```
+
+지난 답변에서 "promise를 쏘고 핸들만 쥔다", "논블로킹 픽업"이라고 한 게 전부 이 얘기였습니다:
+
+- **"promise 발사"** = 주문 넣고 진동벨 받기
+- **"논블로킹"** = 카운터 앞에서 안 기다리고 자리로 감
+- **"settledAt 폴링"** = 진동벨 울렸는지 이따금 확인
+- **"ESC로 abort"** = 주문 취소 버튼
+
+반대 개념이 "블로킹"인데, 그건 카운터 앞에 서서 커피 나올 때까지 아무것도 안 하고 기다리는 거예요. 메모리 회상이 블로킹이었다면 매 질문마다 Sonnet 응답(수백 ms)만큼 답변이 늦어졌겠지만, 진동벨 방식이라 체감 지연이 0인 겁니다.
+
+[USER] frontmatter 를 어떤로직으로 읽는거야?
+
+[ASSISTANT] `src/utils/frontmatterParser.ts`를 직접 읽어서 정확히 설명드릴게요.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/frontmatterParser.ts"}
+
+[도구결과] 1	/**
+2	 * Frontmatter parser for markdown files
+3	 * Extracts and parses YAML frontmatter between --- delimiters
+4	 */
+5	
+6	import { logForDebugging } from './debug.js'
+7	import type { HooksSettings } from './settings/types.js'
+8	import { parseYaml } from './yaml.js'
+9	
+10	export type FrontmatterDa
+
+[ASSISTANT] 방금 파서 전체(`src/utils/frontmatterParser.ts`)를 읽었습니다. 로직은 3단 구조인데, 핵심은 **"정규식 한 방 + YAML 파서 + 실패해도 절대 안 죽는 보정"**입니다.
+
+## 1단계 — 파일 앞부분만 잘라오기 (memoryScan.ts:49-55)
+
+파일 전체를 읽지 않고 **앞 30줄만** 읽습니다. frontmatter는 파일 맨 위에 있다는 약속이니까요.
+
+## 2단계 — 정규식으로 `--- ~ ---` 사이 추출 (frontmatterParser.ts:123)
+
+```
+/^---\s*\n([\s\S]*?)---\s*\n?/
+```
+
+풀어 쓰면: **"파일이 `---`로 시작하고, 그다음 `---`가 나올 때까지의 사이 텍스트를 잡아라"**.
+
+- `^` — 파일 **맨 처음**이어야 함 (본문 중간의 `---` 구분선은 무시됨)
+- `([\s\S]*?)` — 사이 내용 캡처 (`*?` = 최소 매칭이라 **첫 번째** 닫는 `---`에서 멈춤)
+- 매치 실패 시(= frontmatter 없는 파일) → 빈 객체 `{}` 반환하고 전체를 본문 취급. 에러 아님
+
+## 3단계 — YAML 파싱 + 실패 시 자동 보정 재시도 (frontmatterParser.ts:147-169)
+
+잡아낸 텍스트를 YAML 파서에 넣는데, 여기가 재밌는 부분입니다:
+
+```
+1차 시도: 그대로 YAML 파싱
+   └─ 실패하면 ↓
+2차 시도: "문제 문자 자동 따옴표 처리" 후 재파싱
+   └─ 그래도 실패하면 ↓
+포기: 경고 로그만 남기고 빈 {} 반환 (절대 crash 안 함)
+```
+
+2차 시도의 보정(`quoteProblematicValues`, 85-121행)이 뭐냐면 — YAML에서 특수문자인 `{ } [ ] * & # !` 등이 값에 섞여 있으면 파싱이 터지는데, 사람들이 frontmatter에 `paths: **/*.{ts,tsx}` 같은 glob 패턴을 그냥 쓰곤 하거든요. 그런 값을 발견하면 **자동으로 큰따옴표를 씌워서** 다시 파싱합니다. "사용자가 YAML 문법을 틀려도 최대한 살려내는" 관용 설계예요.
+
+## 마지막 — 필요한 필드만 꺼냄 (memoryScan.ts:57-63)
+
+파싱된 객체에서 메모리 스캔이 쓰는 건 딱 2개입니다:
+
+- `description` — 없으면 null (셀렉터가 볼 한 줄 설명)
+- `type` — `parseMemoryType()`으로 검증해서 `user/feedback/project/reference` 4개 중 하나만 인정, 아니면 undefined
+
+## 설계 포인트 정리
+
+- **관용적(lenient)**: frontmatter 없음 → OK, YAML 깨짐 → 보정 재시도, 그래도 깨짐 → 빈 값. 메모 한 장이 망가져도 스캔 전체가 안 죽음 (스캐너 쪽도 `Promise.allSettled`라 파일 단위로 실패 격리)
+- **범용 파서 공유**: 이 파서는 메모리 전용이 아니라 스킬/커맨드/에이전트 정의 파일도 같이 씁니다 — 타입 정의(10-59행)에 `allowed-tools`, `model`, `hooks` 같은 스킬용 필드가 잔뜩 있는 이유
+- 참고로 외부 라이브러리(gray-matter 같은 것) 안 쓰고 직접 구현했습니다 — 정규식 1개 + YAML 파서면 충분한 일이라서요
+
+[USER] 위에 추가된 내용들다 md랑 html에 반영해줘 그러면 궁금한게 게이트는 항상 3단계까지는 가는거야? 3단계에서 꺼내둔책 제외를 다해보니 0이되면 다음단계로 안가고 끝날거같긴해서
+
+[ASSISTANT] 좋은 추론이고, **정확히 맞습니다.** 소스에서 그 조기 종료가 그대로 보여요 (`findRelevantMemories.ts:46-51`):
+
+```ts
+const memories = (await scanMemoryFiles(memoryDir, signal)).filter(
+  m => !alreadySurfaced.has(m.filePath),
+)
+if (memories.length === 0) {
+  return []   // ← Sonnet 호출 없이 여기서 끝
+}
+```
+
+스캔 결과에서 "이미 보여준 것"을 뺀 후보가 0이면 **4단계(Sonnet)로 안 가고 빈손 반환**합니다. 추가로 종료 경로가 두 개 더 있어요 — ④에서 Sonnet이 "도움될 것 없음"으로 빈 목록을 반환해도 끝, API 호출이 실패/취소돼도 조용히 끝. 셋 다 에러가 아니라 정상 경로입니다.
+
+이제 이 내용 + 그간 추가된 것들(LLM은 4단계 1회뿐, 발사 vs 주입 타이밍, 진동벨 비유, frontmatter 파싱 로직)을 MD와 HTML에 반영하겠습니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "③ 이미 대화에 있는 메모 제외 (대화 스캔 + readFileState)\n   ▼\n④ Sonnet 셀렉터 호출 (\"도움될 것만, 최대 5개, 애매하면 빈 목록\")\n
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "```\n사용자 질문\n   │", "new_string": "**LLM이 개입하는 지점은 ④ 딱 한 곳**이고 나머지는 전부 일반 코드다:\n\n| 단계 | 정체 |\n|-
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "### ① 백그라운드 프리페치 — `MemoryPrefetch` 핸들 (attachments.ts:2388-2424)\n\n- 즉시 promise를 발사하고 핸들 `{prom
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "즉 \"보여줬다\" = \"모델이 지금 기억하고 있다\". 컴팩션으로 대화에서 사라지면 기준도 자동 리셋.", "new_string": "즉 \"보여줬다\" = \"모델이 지
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "- **환각 가드**: 응답 파일명을 실제 목록과 대조해 없는 이름은 버림 (`filter(f => validFilenames.has(f))`, 130행)\n- 실패/abor
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "- `filterDuplicateMemoryAttachments` (attachments.ts:2519-2543): 프리페치 도는 사이 모델이 Read로 읽어버린\n  파일 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] Frontmatter 파싱 부록을 MD에 추가합니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "---\n\n## 3. 숫자로 보는 안전장치", "new_string": "---\n\n## 2.5 부록 — frontmatter는 어떤 로직으로 읽나 (src/utils/f
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "  .gatecard{margin-top:10px;display:flex;gap:8px;flex-wrap:wrap}\n  .gatecard span{font-size:11
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "        <div class=\"step\">\n          <div class=\"dot\">1</div>\n          <h3>백그라운드 발사</h3>
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "        <div class=\"step\">\n          <div class=\"dot\">5</div>\n          <h3>뽑힌 책만 펼침 <spa
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "        <div class=\"step\">\n          <div class=\"dot\">6</div>\n          <h3>서지 라벨 부착</h3>
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "        <div class=\"step\">\n          <div class=\"dot\">7</div>\n          <h3>논블로킹 픽업 → 대화에
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 마지막으로 섹션 01에 frontmatter 파싱 플로우 패널을 추가합니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "        <p style=\"font-size:12px;color:var(--mut);margin-top:12px\">스캔 시엔 <span style=\"backgr
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html\"", "description": "Reopen updated HTML in browser"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 반영 완료했고, 브라우저에서 새로고침된 버전을 열어뒀습니다.
+
+## 질문에 대한 답 (다시 요약)
+
+네, 정확한 추론입니다. **③에서 "이미 꺼내둔 책"을 빼고 나서 후보가 0개면 ④(Sonnet)로 안 가고 그 자리에서 종료**합니다 (`findRelevantMemories.ts:46-51`). 종료 경로는 총 3곳 — ③후보 0개, ④Sonnet이 빈 목록 반환, ④호출 실패/ESC 취소 — 전부 에러가 아닌 정상 경로예요.
+
+## MD에 추가된 내용
+
+- §1 흐름도에 조기 종료 분기 2개 표시 (③후보 0개 → 종료, ④빈 목록/실패 → 종료)
+- §1에 **"LLM은 ④ 딱 한 곳" 표** (나머지 7단계 = 일반 코드/파일시스템)
+- §2-①에 promise = 진동벨 비유
+- §2-③에 조기 종료 + 필터가 Sonnet 전/후 2회 걸리는 구조(벨트-앤-서스펜더스)
+- §2-⑦ 뒤에 **"발사 vs 주입" 절 신설** — 발사는 턴당 1회(루프 밖), 주입은 툴콜 루프 안에서 도구 결과와 함께 다음 API 요청에 실림, 스킬 discovery(매 반복 발사)와의 대비
+- **§2.5 부록 신설** — frontmatter 파싱 로직 (정규식 → YAML 1차 → 자동 따옴표 보정 2차 → 빈 {} 폴백, 파서 공유 사실)
+
+## HTML에 추가된 내용
+
+- 파이프라인 각 단계에 **[코드]/[LLM] 태그** + 하단 범례 ("코드 ×7, LLM 딱 1번")
+- ③ 단계에 빨간 점선 **조기 종료 칩** ("후보 0개 → 여기서 종료, Sonnet 생략")
+- ④ 단계에 "⭐ 유일한 LLM 호출" 배지 + 빈 목록도 정상 종료 문구
+- 섹션 02에 **발사/주입 2레인 타임라인 SVG** 신설 (메인 루프 레인 vs 프리페치 레인, "API 호출 ② = 도구 결과 + 메모리 attachment" 강조)
+- 섹션 01에 **frontmatter 파싱 3단 폴백 플로우 SVG** 신설
+
+[USER] 서고 스캔이 사용자 질문 기반으로 제목 +한줄설명 목록을 만드는거야/
+
+[ASSISTANT] 아니요 — **스캔은 질문과 무관하게, 무조건 전부 훑습니다.** 함수 시그니처부터 그래요:
+
+```ts
+scanMemoryFiles(memoryDir, signal)   // ← 질문(query)이 아예 안 들어감
+```
+
+받는 건 디렉토리 경로뿐입니다. 그래서 ② 스캔은 "검색"이 아니라 **재고 조사**예요 — 질문이 뭐든 상관없이 폴더 안 모든 메모 파일(.md)의 제목+한줄설명을 다 긁어서 목록을 만듭니다 (최신순 정렬, 최대 200개 컷만 있음).
+
+사용자 질문이 처음 등장하는 곳은 **④ 셀렉터**입니다 (`findRelevantMemories.ts:53-58`):
+
+```
+② 스캔:      질문 무관 — 전체 목록 작성          (재고 조사)
+③ 필터:      질문 무관 — 이미 보여준 것만 제거    (기계적 빼기)
+④ 셀렉터:    질문 등장! — "Query: <질문> + 전체 목록" 을 Sonnet에게 전달
+```
+
+즉 "질문에 맞는 걸 고르는 지능"은 100% ④의 Sonnet에게 몰아줬고, 그 앞 단계들은 Sonnet에게 보여줄 **후보 목록을 준비하는 단순 작업**입니다. 키워드 매칭이나 사전 필터링 같은 것도 없어요 — 목록 전체(최대 200줄)를 통째로 Sonnet 프롬프트에 넣습니다.
+
+이게 가능한 이유도 앞서 본 규모 논리와 같습니다. 메모가 수백 장 수준이라 "전부 보여주고 고르게 하기"가 통하는 거고, 만약 수만 장이었다면 이 지점에서 임베딩 같은 사전 검색이 필요해졌겠죠.
+
+[USER] 3단계 이미 꺼내둔 책 제외에서 이미꺼냇는지 여부는 어떻게알아
+
+[ASSISTANT] 간단합니다 — **주입된 메모 메시지에는 "파일 경로 꼬리표"가 달려 있어서, 대화를 for문으로 돌면서 그 꼬리표를 주우면 됩니다.**
+
+## 구체적인 동작
+
+전제: 대화는 내부적으로 **메시지 배열**입니다. 그리고 ⑦단계에서 메모를 끼워넣을 때 그냥 텍스트로 넣는 게 아니라, 이런 **구조화된 데이터가 붙은 특수 메시지**로 넣어요:
+
+```
+{ type: 'attachment',
+  attachment: {
+    type: 'relevant_memories',
+    memories: [
+      { path: '~/.claude/.../pnpm-not-npm.md', content: "...", ... },  ← 꼬리표!
+      { path: '~/.claude/.../repo-shared.md',  content: "...", ... }
+    ]
+  }
+}
+```
+
+그러면 ③단계는 이렇게 합니다 (`collectSurfacedMemories`, attachments.ts:2250-2265 — 실제로 코드가 이게 전부):
+
+```
+빈 주머니(Set) 준비
+for (대화의 모든 메시지) {
+  if (이 메시지가 relevant_memories 첨부라면) {
+    안에 든 path들을 전부 주머니에 넣기
+  }
+}
+→ 주머니 완성 = "이미 꺼내둔 책 목록"
+```
+
+이후 ② 스캔이 만든 후보 목록에서 **경로가 주머니에 있는 파일을 빼면** 끝. 텍스트를 파싱하거나 추측하는 게 아니라 경로 문자열 대조라서 100% 정확합니다.
+
+## 보조 체크 하나 더
+
+`readFileState`라는 게 따로 있는데, 모델이 Read/Write/Edit 도구로 만진 파일들을 하네스가 기록해두는 장부예요. 메모리 파일을 모델이 **직접 Read로 읽은 적**이 있으면 — 주입된 적은 없어도 — 이미 컨텍스트에 내용이 있는 거니까 이것도 제외합니다 (attachments.ts:2230).
+
+## 도서관 비유로 정리
+
+대출 장부를 쓰는 게 아니라, **"지금 책상 위에 그 책이 올려져 있나?"를 눈으로 확인**하는 방식입니다. 컴팩션이 일어나면 책상이 치워지면서(첨부 메시지가 배열에서 사라짐) 주머니도 자연히 비고 → 같은 책을 다시 꺼내줄 수 있게 되는 거고요. 이게 지난번에 말한 "장부가 아니라 대화 자체가 기준"의 실체입니다.
+
+[USER] 근데 html에 04는 무슨말이야? 이미보여줬다의 기준..
+
+[ASSISTANT] 방금 설명드린 그 내용을 그림으로 그린 섹션입니다. 다이어그램이 3덩어리인데, 하나씩 뜯으면:
+
+## 왼쪽 스트립 — "대화 (컴팩션 전)"
+
+세로로 쌓인 블록들이 **대화의 메시지 배열**입니다. 베이지색 블록 = 일반 메시지, 초록 테두리 블록 2개 = 예전에 끼워넣은 "메모 A 주입됨", "메모 B 주입됨" (아까 말한 꼬리표 달린 특수 메시지).
+
+매 턴 이 배열을 for문으로 훑으니까 → **"A·B가 책상 위에 있네" → 재주입 안 함 ✕**. 아래 작은 글씨는 같은 스캔에서 바이트도 합산해 60KB 세션 스로틀에 쓴다는 부연입니다.
+
+## 가운데 화살표 + 오른쪽 스트립 — "컴팩션 후"
+
+대화가 길어져서 컴팩션(요약)이 일어난 뒤의 배열입니다. 옛 메시지들이 "요약문" 한 덩어리로 뭉개지면서 **메모 첨부 메시지도 배열에서 사라졌어요.**
+
+이제 스캔해도 아무것도 안 나옴 → **"A·B가 책상 위에 없네" → 다시 후보로 복귀 ○**. 60KB 카운터도 같이 0이 됩니다.
+
+## 오른쪽 빨간 박스 — 원칙
+
+이 설계의 한 줄 결론입니다:
+
+> "보여줬다" = 과거에 보여준 이력이 아니라 **"모델이 지금 기억하고 있다"**
+
+왜 이게 포인트냐면 — 만약 "보여준 이력"을 별도 장부에 기록했다면, 컴팩션으로 모델이 메모를 **잊어버려도** 장부엔 "보여줬음"이 남아서 영영 다시 안 보여주는 버그가 됐을 거예요. 대화 자체를 기준으로 삼으니 "모델이 잊음 = 기준도 리셋"이 별도 코드 없이 저절로 맞아떨어지는 거죠.
+
+정리하면 섹션 04는 **"③단계의 주머니 스캔이 컴팩션과 만났을 때 왜 자동으로 잘 동작하는가"**를 보여주는 그림입니다. 혹시 그림 자체가 한눈에 안 들어오면, 블록에 턴 번호를 달거나 스캔 과정(주머니에 경로 담기)을 애니메이션 단계로 쪼개서 다시 그려드릴 수도 있어요.
+
+[USER] 아까는 뭐.. 이렇게하라며;;
+      { path: '~/.claude/.../pnpm-not-npm.md', content: "...", ... },  ← 꼬리표!
+
+[ASSISTANT] 아, 헷갈리게 했네요. **두 설명은 모순이 아니라 같은 얘기입니다.** 꼬리표 얘기가 곧 섹션 04의 그림이에요. 꼬인 지점은 아마 "주머니(Set)에 모은다며? 그 주머니가 장부 아냐?" 일 텐데 — 차이는 **주머니를 어디서, 언제 만드느냐**입니다.
+
+## 장부 방식이었다면 (실제로는 없음)
+
+```
+별도 보관함에 영구 기록: "A 보여줬음, B 보여줬음"
+→ 대화가 컴팩션으로 요약돼도 기록은 그대로 남음
+→ 모델은 A를 잊었는데 시스템은 "이미 보여줬잖아" → 영영 재주입 안 됨 (버그)
+```
+
+## 실제 방식 (꼬리표 + 일회용 주머니)
+
+```
+꼬리표(path)는 대화 메시지 안에 붙어 있음   ← 아까 보여드린 그 { path: ... }
+주머니(Set)는 매 턴 대화를 훑어서 그 자리에서 새로 만들고, 쓰고, 버림
+```
+
+핵심이 이겁니다 — **주머니는 저장하지 않아요.** 턴마다 대화 배열을 처음부터 다시 훑어서 즉석 제작하는 일회용입니다. 그러니까:
+
+- 컴팩션 전: 대화에 A·B 첨부가 있음 → 이번 턴 주머니 = {A, B} → 재주입 ✕
+- 컴팩션 후: 첨부가 대화에서 사라짐 → 다음 턴 주머니 = **텅 빔** → A·B 다시 후보 ○
+
+"장부가 아니라 대화"라는 말의 정확한 뜻은 **"영구 기록(장부)이 없고, 유일한 진실의 원천이 대화 그 자체"**라는 겁니다. 꼬리표는 그 대화 안에 붙어 있는 것이고, 주머니는 대화를 읽어낸 순간의 스냅샷일 뿐이에요.
+
+한 줄 정리: **꼬리표 = 대화에 붙은 데이터, 주머니 = 매 턴 대화에서 즉석으로 다시 만드는 임시 목록, 장부 = 존재하지 않음.** 섹션 04 그림은 이 중 "컴팩션이 일어나면 주머니가 자연히 비는" 장면을 그린 거고요.
+
+[USER] and 조건이어야만 된다는건가
+
+[ASSISTANT] 방향에 따라 표현이 달라지는데, 소스 코드 한 줄을 보면 명확합니다 (attachments.ts:2230):
+
+```ts
+.filter(m => !readFileState.has(m.path) && !alreadySurfaced.has(m.path))
+```
+
+- **후보로 살아남으려면** = AND 조건: "대화에 주입된 적 없음" **그리고** "모델이 직접 읽은 적 없음" — 둘 다 깨끗해야 통과
+- **제외되려면** = OR 조건: 둘 중 **하나라도** 걸리면 아웃
+
+같은 말을 뒤집어 표현한 것뿐이에요. 표로 보면:
+
+| 대화에 주입됨? | 모델이 Read로 읽음? | 결과 |
+|---|---|---|
+| ✕ | ✕ | ✅ 후보 유지 |
+| ○ | ✕ | ❌ 제외 |
+| ✕ | ○ | ❌ 제외 |
+| ○ | ○ | ❌ 제외 |
+
+논리도 자연스럽습니다 — 두 체크는 "이 메모 내용이 어떤 경로로든 이미 컨텍스트에 들어가 있나?"를 묻는 서로 다른 **입구** 2개일 뿐이에요. 주입으로 들어왔든(alreadySurfaced), 모델이 제 발로 파일을 열어서 들어왔든(readFileState), 어느 입구로든 이미 들어와 있으면 또 넣을 이유가 없으니 제외. 둘 다 아닐 때만 "모델이 모르는 정보"라서 후보로 남기는 겁니다.
+
+[USER] 저 조건표도 업데이트해줘
+
+[ASSISTANT] MD의 ③절과 HTML 섹션 04에 조건표를 추가하겠습니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md", "old_string": "**조기 종료**: 스캔 결과에서 alreadySurfaced를 뺀 후보가 **0개면 Sonnet을 부르지 않고 즉시 빈손 반환**\n(findRelevantMemories.
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "  .llm-legend{display:flex;gap:14px;margin-top:20px;padding-top:16px;border-top:1px dashed var(
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html", "old_string": "      <div class=\"src\">src/utils/attachments.ts:2243-2265 (collectSurfacedMemories · \"compac
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/메모리-회상-파이프라인-총정리.html\"", "description": "Reopen updated HTML in browser"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 반영 완료했습니다.
+
+- **MD** — §2-③ "이미 꺼내둔 책 제외" 절에 실제 필터 코드 한 줄 + 진리표(생존 AND / 제외 OR) + 두 체크가 "이미 컨텍스트에 있나"의 서로 다른 입구 2개라는 설명을 추가했습니다.
+- **HTML** — 섹션 04(이미 보여줬다의 기준) 아래에 **"제외 조건표"** 패널을 신설했습니다. 필터 코드 원문, 4행 진리표(후보 유지 행은 초록 하이라이트, 제외 행은 빨강), 출처(`attachments.ts:2230`) 포함. 브라우저에서 다시 열어뒀어요.
+
+[USER] 대화에 적을땐 나이? 같은걸 적어?
+
+[ASSISTANT] 네, 적습니다. 정확한 포맷을 보여드리기 위해 `memoryHeader` 함수를 잠깐 확인할게요.
+
+[도구호출 Bash] {"command": "grep -rn -B3 -A12 \"function memoryHeader\\|export function memoryHeader\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | head -30; echo \"---freshnessNote---\"; sed -n 44,60p /Use
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/attachments.ts-2324- * Header string for a relevant-memory block.  Exported so messages.ts
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts-2325- * can fall back for resumed sessions where the stored header is missing.
+/Users/seobi/jinsup_space/CC/src/util
+
+[ASSISTANT] 네, 적습니다. 방금 확인한 `memoryHeader`(attachments.ts:2327-2332)를 보면 **나이에 따라 두 가지 형태**로 갈립니다:
+
+## 신선한 메모 (오늘/어제)
+
+```
+
+```
+
+나이가 괄호로 살짝 붙는 정도예요.
+
+## 하루 넘은 메모 (2일 이상)
+
+괄호 표기 대신 **경고문 전문**이 앞에 붙습니다:
+
+```
+
+```
+
+"이 메모는 47일 전 관찰이다. 코드 동작이나 파일:라인 인용은 낡았을 수 있으니, 사실이라고 단정하기 전에 현재 코드로 검증하라" — 메모를 맹신하지 말라고 메인 모델에게 명시적으로 경고하는 거죠.
+
+## 왜 이렇게 쓰는지 (소스 주석의 이유 2개)
+
+1. **왜 "47 days ago"지 날짜가 아닌가** — "모델은 날짜 계산에 약하다. ISO 타임스탬프는 '오래됐다'는 감각을 일으키지 못하지만 '47 days ago'는 일으킨다" (memoryAge.ts:11-13)
+2. **왜 나이를 매번 다시 계산 안 하나** — 이 헤더 문자열은 주입되는 순간 한 번만 계산해서 저장합니다. 턴마다 재계산하면 "3 days ago"가 다음 날 "4 days ago"로 바뀌고 → 바이트가 달라져 → **프롬프트 캐시가 깨지기** 때문 (attachments.ts:505-512). 그래서 대화에 한 번 박힌 나이는 그 대화 안에서는 안 늙어요.
+
+덤으로, 신선한 메모(오늘/어제)에는 경고문을 일부러 안 붙이는데 — 주석 왈 "갓 만든 메모에 경고를 다는 건 노이즈"(memoryAge.ts:23-24). 필요할 때만 겁주는 설계입니다.
+
+[USER] 그리고 소넷 아웃풋토큰이 얼마나 잡혀있어? 그리고 메모리가 200개 파일이면 100턴 호출하면 비용이 얼마나 나올까?
+
+[ASSISTANT] 좋은 질문인데 가격 얘기가 나왔으니, 정확한 단가 확인을 위해 claude-api 스킬을 먼저 로드하고, manifest 포맷(입력 토큰 산정 근거)도 확인하겠습니다.
+
+[도구호출 Skill] {"skill": "claude-api", "args": "Sonnet 현재 기본 모델 가격 (input/output per MTok)"}
+
+[도구결과] Launching skill: claude-api
+
+[도구호출 Bash] {"command": "sed -n 80,110p /Users/seobi/jinsup_space/CC/src/memdir/memoryScan.ts; echo \"---model---\"; grep -rn -A6 \"getDefaultSonnetModel\" /Users/seobi/jinsup_space/CC/src/utils/model/model.ts | 
+
+[도구결과] * Format memory headers as a text manifest: one line per file with
+ * [type] filename (timestamp): description. Used by both the recall
+ * selector prompt and the extraction-agent prompt.
+ */
+export function formatMemoryManifest(memories: MemoryHeader[]): string {
+  return memories
+    .map(m => {
+ 
+
+[ASSISTANT] 두 질문 모두 소스 + 공식 단가 기준으로 답합니다.
+
+## 1) Sonnet 출력 토큰 상한: **256 토큰**
+
+`findRelevantMemories.ts:108`에 `max_tokens: 256`으로 하드코딩되어 있습니다. 실제 응답은 `{"selected_memories": ["파일명", ...]}` JSON이라 보통 수십 토큰 수준이고, 256은 안전 상한입니다.
+
+## 2) 메모리 200개 × 100턴 비용 추정
+
+**입력 토큰 산정** — manifest는 파일당 한 줄입니다 (`memoryScan.ts:84-95`):
+
+```
+- [project] repo-shared-two-machines.md (2026-07-11T02:33:12.000Z): 문서 홈 경로를 ~로...
+```
+
+한 줄이 대략 100~180자(한글 설명 기준 ≈ 35~50토큰). 계산해보면:
+
+| 항목 | 토큰 (호출당) |
+|---|---|
+| manifest 200줄 (~40토큰/줄) | ~8,000 |
+| 셀렉터 시스템 프롬프트 | ~250 |
+| 사용자 질문 + 최근 도구 목록 | ~100–500 |
+| **입력 합계** | **~8,500–8,800** |
+| 출력 (최악 256 / 현실 ~60) | 256 |
+
+**단가** — 소스의 `getDefaultSonnetModel()`은 현재 Sonnet 4.6 계열로 해석되고, Sonnet 티어 단가는 **입력 $3 / 출력 $15 per MTok** (Sonnet 5도 정가 동일):
+
+- 호출당: 입력 8,500×$3/1M ≈ $0.0255 + 출력 256×$15/1M ≈ $0.0038 → **약 $0.03 (호출당 약 3센트)**
+- **100턴 이론 상한: 약 $2.9 (~4천 원)**
+
+## 하지만 실제로는 이보다 훨씬 적게 나옵니다
+
+상한 계산은 "매 턴 200개 전체 목록을 보내고 매번 호출된다"는 가정인데, 앞서 본 안전장치들이 정확히 이걸 깎는 방향으로 설계돼 있어요:
+
+1. **60KB 세션 스로틀** — 누적 주입량이 60KB에 닿으면 프리페치 자체가 중단 (풀 주입 기준 ~3회분). 이후 턴들은 호출 0원
+2. **목록이 점점 줄어듦** — 이미 보여준 메모는 스캔 단계에서 빠지므로 manifest가 턴마다 짧아지고, **후보가 0이 되면 Sonnet 호출 자체가 생략** (아까 확인한 그 조기 종료)
+3. **스킵 조건** — 한 단어 질문 등은 호출 없음
+
+그래서 현실적인 100턴 비용은 **$1 미만**으로 보는 게 합리적입니다. 애초에 attachments.ts:281 주석의 "prod에서 세션당 ~26K토큰 관측" 같은 데이터를 보고 60KB 스로틀을 추가한 것이니, 이 비용 구조 자체가 이미 한 번 튜닝된 결과물이죠.
+
+**참고로 캐시도 못 씁니다** — 사용자 메시지가 `Query: <질문>` 다음에 manifest가 오는 구조라(`findRelevantMemories.ts:105`), 턴마다 앞부분(질문)이 바뀌어 프롬프트 캐시 prefix가 매번 깨집니다. 소스에도 `cache_control` 지정이 없고요. 200개 목록 ~8K토큰을 매번 정가로 내는 구조인데, 그래도 호출당 3센트 수준이라 "인프라 없는 대가"로는 싼 편입니다.
+
+[USER] 캐시얘기는 무슨말이야? 그 소넷모델 한정한 이야기?
+
+[ASSISTANT] 아니요, 캐시 자체는 모델 한정 기능이 아니라 **Claude API 전체의 기능**입니다. 제 얘기는 "그 셀렉터 호출의 **요청 구조**가 캐시를 못 써먹는 모양"이라는 뜻이었어요. 풀어서 설명하면:
+
+## 프롬프트 캐시가 뭔가
+
+API에 요청을 보낼 때, **이번 요청의 앞부분이 직전 요청과 글자 하나까지 똑같으면** 서버가 그 부분을 다시 계산하지 않고 재사용해주는 기능입니다. 재사용된 부분은 입력 요금의 ~10%만 받아요. 조건이 하나 있는데 — **"앞에서부터" 일치**해야 합니다. 중간에 한 글자라도 바뀌면 그 지점 뒤로는 전부 무효.
+
+```
+요청 1: [A][B][C][질문1]
+요청 2: [A][B][C][질문2]   → A·B·C는 캐시 재사용 (90% 할인), 질문2만 정가
+```
+
+## 셀렉터 호출은 왜 캐시가 안 먹나
+
+메모리 셀렉터가 Sonnet에게 보내는 메시지 구조가 이렇습니다 (`findRelevantMemories.ts:105`):
+
+```
+Query: <사용자 질문>          ← 턴마다 바뀌는 부분이 맨 앞!
+Available memories:
+- [project] pnpm-not-npm.md (...): ...     ← 거의 안 바뀌는 200줄이 뒤
+- [user] prefers-korean.md (...): ...
+...
+```
+
+**바뀌는 것(질문)이 앞, 안 바뀌는 것(목록)이 뒤**라서, 턴마다 첫 줄부터 달라지고 → 뒤의 8천 토큰짜리 목록도 매번 정가로 다시 계산됩니다. 순서만 뒤집었으면(목록 먼저, 질문 나중) 목록 부분이 캐시돼서 입력비를 크게 아낄 수 있는 구조였다는 얘기였어요.
+
+다만 공정하게 말하면, 뒤집었어도 이득은 제한적이었을 겁니다 — 목록 자체도 턴마다 조금씩 변하거든요 (이미 보여준 메모가 빠지면서 줄어듦). 그러니 "캐시 포기하고 단순하게 간다"는 것도 이해할 만한 선택입니다. 호출당 3센트짜리라 최적화 우선순위가 낮기도 하고요.
+
+## 반대로 메인 대화는 캐시를 빡세게 챙깁니다
+
+클로드코드 본체의 대화(지금 저와의 대화 같은)는 시스템 프롬프트·이전 대화가 앞에 고정되는 구조라 캐시가 아주 잘 먹고, 실제로 비용의 대부분을 캐시가 절감해줍니다. 그래서 앞서 본 디테일들이 전부 이 캐시를 지키려는 장치였죠 — **메모리 나이를 "3 days ago"로 한 번만 계산해 박제하는 것**(매턴 재계산하면 바이트가 바뀌어 캐시 파괴), 스킬 설명 250자 컷 주석의 "turn-1 cache_creation 토큰 낭비" 언급 등.
+
+정리: 캐시는 어느 모델이든 되는 API 기능이고, **메인 대화는 캐시 최적화가 철저한데 이 셀렉터 사이드 호출만은 구조상 캐시를 포기한 상태**라는 관찰이었습니다.
+
+[USER] 사용자가 커맨드로 만들경우 그 커맨드는 컨텍스트윈도우에 목록에 사용하기전까진 절대 안들어가지?
+
+[ASSISTANT] 좋은 질문이에요. "절대 안 들어간다"가 정확한지 소스로 확인해보겠습니다 — 커스텀 커맨드(`.claude/commands/*.md`)가 목록에 어떻게 들어가는지, 제외 조건이 뭔지요.
+
+[도구호출 Bash] {"command": "grep -n -B3 -A10 \"disableModelInvocation\\|disable-model-invocation\" /Users/seobi/jinsup_space/CC/src/commands.ts | head -50; echo \"---hide---\"; grep -rn -B2 -A6 \"hide-from-slash-com
+
+[도구결과] 552-      cmd =>
+553-        cmd.type === 'prompt' &&
+554-        cmd.loadedFrom === 'mcp' &&
+555:        !cmd.disableModelInvocation,
+556-    )
+557-  }
+558-  return []
+559-}
+560-
+561-// SkillTool shows ALL prompt-based commands that the model can invoke
+562-// This includes both skills (from /skill
+
+[도구호출 Bash] {"command": "grep -rn -B4 -A6 \"disableModelInvocation:\" /Users/seobi/jinsup_space/CC/src/utils/loadSkillsDir.ts /Users/seobi/jinsup_space/CC/src/commands.ts 2>/dev/null | grep -B4 -A6 \"frontmatter\
+
+[도구결과] (Bash completed with no output)
+
+[도구호출 Bash] {"command": "grep -rn \"disable-model-invocation\\|disableModelInvocation\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l | head -6; echo ---; grep -rn -B3 -A5 \"'disable-model-invocation'\\|
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/commands.ts
+/Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts
+/Users/seobi/jinsup_space/CC/src/tools/SkillTool/prompt.ts
+/Users/seobi/jinsup_space/CC/src/types/command.ts
+/Users/seobi/jinsup_space/CC/src/plugins/builtinPlugins.ts
+/Users/seobi/jinsup_space
+
+[ASSISTANT] 거의 맞는데 정확히는 **"본문은 절대 안 들어가고, 이름+설명은 처음부터 들어간다"** 입니다. 방금 소스로 확인한 내용:
+
+## 커맨드의 두 부분이 따로 움직입니다
+
+**① 이름 + 설명 (frontmatter)** → **세션 시작부터 컨텍스트에 상주**
+
+`getSkillToolCommands`(commands.ts:563-579)가 목록을 만드는데, `.claude/commands/`나 `.claude/skills/`에 만든 사용자 커맨드는 **기본적으로 전부 포함**됩니다. 주석 그대로 — description frontmatter가 없어도 "본문 첫 줄에서 설명을 자동 추출"해서라도 목록에 넣어요. 이 목록이 `skill_listing` attachment로 주입되고, 바로 이게 **첫날 얘기한 8,000자 예산을 소비하는 그 목록**입니다 (항목당 250자 컷).
+
+**② 본문 (마크다운 내용 전체)** → **invoke 전까지 절대 안 들어감** ✅
+
+이 부분은 말씀이 맞습니다. progressive disclosure 설계라, 사용자가 `/커맨드`를 치거나 모델이 Skill 도구로 호출하는 순간에야 본문이 대화에 펼쳐집니다. 실제 사례가 이 세션에 있어요 — 어제 `/visual-explainer` 치기 전까지 그 스킬의 본문(Step 1~5 지침)은 컨텍스트에 없다가, 치는 순간 통째로 들어왔죠.
+
+## 예외 — 진짜로 "절대" 안 들어가게 하는 방법
+
+frontmatter에 이걸 넣으면:
+
+```yaml
+---
+disable-model-invocation: true
+---
+```
+
+`getSkillToolCommands`의 필터(commands.ts:569 `!cmd.disableModelInvocation`)에서 걸러져 **이름조차 목록에 안 들어갑니다.** 대신 모델이 호출하는 것도 불가능해지고(SkillTool 에러 코드 4), 오직 사용자가 `/이름`으로 직접 칠 때만 발동해요. "모델 몰래 쓰는 개인 매크로"가 되는 거죠.
+
+## 정리
+
+| 구성 요소 | 컨텍스트 진입 시점 |
+|---|---|
+| 이름 + 설명 | 세션 시작 (skill_listing, 예산 내 250자 컷) |
+| 본문 전체 | invoke 순간에만 |
+| `disable-model-invocation: true`일 때 | 이름조차 안 들어감 — 유저가 칠 때 본문만 |
+
+덤: plugin/MCP 출처 커맨드는 조건이 더 까다로워서, **명시적 description이 없으면 목록에서 빠집니다** (commands.ts:573-578 — "Plugin/MCP commands still require an explicit description"). 사용자 로컬 커맨드만 "설명 없어도 무조건 포함" 특혜가 있는 구조입니다.
+
+[USER] 커맨드가? 스킬이아니라?
+
+[ASSISTANT] 네, **커맨드도요.** 놀랄 만한데 소스 주석이 대놓고 명시합니다 (commands.ts:561-562):
+
+> "SkillTool shows ALL prompt-based commands that the model can invoke — **This includes both skills (from /skills/) and commands (from /commands/)**"
+
+필터 조건(commands.ts:574-576)에도 두 출처가 나란히 들어 있어요:
+
+```ts
+cmd.loadedFrom === 'bundled' ||
+cmd.loadedFrom === 'skills' ||              // .claude/skills/
+cmd.loadedFrom === 'commands_DEPRECATED' || // .claude/commands/  ← 이거!
+```
+
+## 왜 이렇게 됐나 — 스킬과 커맨드는 내부적으로 이미 한 몸
+
+클로드코드 내부에서 스킬과 커맨드는 **같은 `Command` 타입 하나**로 통합돼 있고, 구분은 `loadedFrom` 필드값뿐입니다. 그리고 enum 이름을 보세요 — `commands_DEPRECATED`. **`.claude/commands/` 폴더 자체가 "레거시" 취급**이고, `.claude/skills/`가 현행 경로예요. 옛날엔 "커맨드 = 유저가 치는 것, 스킬 = 모델이 쓰는 것"으로 나뉘어 있었는데, 지금은 하나로 흡수됐습니다.
+
+Skill 도구의 프롬프트(어제 읽은 prompt.ts:178)도 이 통합을 모델에게 그대로 가르칩니다:
+
+> "When users reference a 'slash command' or '/<something>' (e.g., '/commit'), **they are referring to a skill.**"
+
+## 실무적 함의
+
+- `.claude/commands/`에 만든 커맨드도 스킬과 **완전히 동등하게** 이름+설명이 목록에 실리고, 모델이 알아서 호출할 수도 있습니다 (설명 frontmatter 없으면 본문 첫 줄을 설명으로 자동 추출까지 해서)
+- 8,000자 예산도 스킬·커맨드가 **한 주머니에서 같이** 소비합니다 — 구분 없음
+- "유저 전용 커맨드"를 원하면 폴더가 어디든 `disable-model-invocation: true`를 달아야 하고, 그때만 목록·모델호출에서 완전히 빠집니다
+
+즉 "커맨드냐 스킬이냐"는 이제 저장 폴더 이름의 차이일 뿐, 컨텍스트 취급·예산·호출 메커니즘은 전부 동일합니다.
+
+[USER] 공식문서 기준으로도 파악해봐
+
+[ASSISTANT] 공식 문서와 대조해보겠습니다. WebFetch를 로드해서 슬래시 커맨드 문서와 스킬 문서를 가져올게요.
+
+[도구호출 ToolSearch] {"query": "select:WebFetch", "max_results": 1}
+
+[도구호출 WebFetch] {"url": "https://code.claude.com/docs/en/slash-commands.md", "prompt": "이 문서에서 다음을 추출해줘: 1) 커스텀 슬래시 커맨드(.claude/commands/)를 모델(Claude)이 자동으로 호출할 수 있는지, SlashCommand/Skill 도구와의 관계 2) 커맨드의 description이 
+
+[도구결과] <persisted-output>
+Output too large (66.4KB). Full output saved to: /Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/5d6cda93-807c-44fa-bd16-c40f8c1fa391/tool-results/toolu_01A7SHxhKryo8NTZYecVvC9g.txt
+
+Preview (first 2KB):
+> ## Documentation Index
+> Fetch the complete documentation index 
+
+[도구호출 WebFetch] {"url": "https://code.claude.com/docs/en/skills.md", "prompt": "이 문서에서 다음을 추출해줘: 1) 스킬의 name+description이 컨텍스트에 언제 로드되는지 (progressive disclosure), 본문은 언제 로드되는지 2) .claude/commands/ 커맨드와 스킬의 관계 — 통합/레거
+
+[도구결과] <persisted-output>
+Output too large (66.4KB). Full output saved to: /Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/5d6cda93-807c-44fa-bd16-c40f8c1fa391/tool-results/toolu_012hrYwgmR8YDBPkE5NBiu8M.txt
+
+Preview (first 2KB):
+> ## Documentation Index
+> Fetch the complete documentation index 
+
+[도구호출 Bash] {"command": "f=\"/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/5d6cda93-807c-44fa-bd16-c40f8c1fa391/tool-results/toolu_01A7SHxhKryo8NTZYecVvC9g.txt\"; grep -n -iE \"disable-model-invocati
+
+[도구결과] 16:  **Custom commands have been merged into skills.** A file at `.claude/commands/deploy.md` and a skill at `.claude/skills/deploy/SKILL.md` both create `/deploy` and work the same way. Your existing `.claude/commands/` files keep working. Skills add optional features: a directory for supporting fi
+
+[도구호출 Bash] {"command": "f=\"/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/5d6cda93-807c-44fa-bd16-c40f8c1fa391/tool-results/toolu_01A7SHxhKryo8NTZYecVvC9g.txt\"; grep -n -iE \"SLASH_COMMAND_TOOL_CHA
+
+[도구결과] 244:| `name`                     | No          | Display name shown in skill listings. Defaults to the directory name. See [How a skill gets its command name](#how-a-skill-gets-its-command-name) for how this differs from the name you type to invoke the skill.                                         
+
+[ASSISTANT] 공식 문서(code.claude.com/docs/en/skills — 슬래시 커맨드 문서가 이 페이지로 통합됨)로 대조 완료했습니다. **핵심 주장은 전부 공식 확인**됐고, 수치 2개에서 버전 차이가 발견됐습니다.
+
+## 공식 문서가 확인해준 것
+
+**1. 커맨드 = 스킬 통합** — 문서 원문:
+
+> "**Custom commands have been merged into skills.** A file at `.claude/commands/deploy.md` and a skill at `.claude/skills/deploy/SKILL.md` both create `/deploy` and **work the same way**."
+
+**2. "본문은 invoke 전까지 안 들어가고 설명은 상주" — 공식 표가 그대로 있음:**
+
+| frontmatter | 유저 호출 | 모델 호출 | 컨텍스트 로드 |
+|---|---|---|---|
+| (기본) | ✅ | ✅ | **설명 항상 상주**, 본문은 invoke 시 |
+| `disable-model-invocation: true` | ✅ | ❌ | **설명조차 안 들어감**, 유저가 칠 때 본문만 |
+| `user-invocable: false` | ❌ | ✅ | 설명 상주 (메뉴에서만 숨김) |
+
+> "In a regular session, skill descriptions are loaded into context so Claude knows what's available, but full skill content only loads when invoked."
+
+**3. 예산 = 윈도우의 1%** — 소스 분석과 정확히 일치:
+
+> "The budget scales at **1% of the model's context window**."
+
+`SLASH_COMMAND_TOOL_CHAR_BUDGET` 환경변수도 문서에 그대로 있고, 추가로 `skillListingBudgetFraction` 설정(예: `0.02` = 2%)으로도 올릴 수 있다고 안내합니다.
+
+## 소스 스냅샷과 다른 점 (버전 차이)
+
+| 항목 | 우리 소스 분석 | 공식 문서 (현행) |
+|---|---|---|
+| 항목당 설명 컷 | **250자** (`MAX_LISTING_DESC_CHARS`) | **1,536자** (`skillListingMaxDescChars` 설정으로 변경 가능) |
+| 초과 시 깎는 순서 | bundled 보호 + 나머지 균등 절단 | **"가장 덜 invoke한 스킬부터"** 설명 제거 — 자주 쓰는 스킬이 전문 유지 |
+
+둘 다 로컬 소스 스냅샷과 현행 문서의 버전 차이로 보입니다. 특히 두 번째가 흥미로운데, 균등 절단 → **사용 빈도 기반 우선순위**로 진화했어요. "이름은 전부 항상 포함"(The listing always contains every skill name)은 양쪽 동일합니다.
+
+## 문서에서 새로 얻은 정보
+
+- **진단 도구**: `/doctor`가 목록의 컨텍스트 비용과 최대 기여자를 추정해주고, `/context`의 Skills 행은 예산 적용 **후** 크기를 표시 (v2.1.196+)
+- **개별 제어**: `skillOverrides` 설정에서 특정 스킬을 `"name-only"`로 지정해 설명 없이 이름만 싣기 가능
+- **컴팩션과 스킬**: invoke했던 스킬은 컴팩션 후 재부착됨 — **스킬당 앞 5,000토큰, 합산 25,000토큰 예산**, 최근 invoke 순으로 채움 (compact.ts에서 봤던 `invoked_skills` attachment의 문서 버전)
+- **서브에이전트 예외**: 스킬을 preload한 서브에이전트는 다르게 동작 — **본문 전체가 시작 시점에 주입**됨
+
+결론: 어제 드린 답("본문은 절대 안 들어가고, 이름+설명은 목록으로 상주, `disable-model-invocation`만이 완전 제외")은 공식 문서 기준으로도 정확합니다. 다만 개당 컷 수치는 최신 버전 기준 250자가 아니라 **1,536자**로 말하는 게 맞겠습니다.
+
+[USER] 갑자기 올드스쿨이 기억안나네.. 툴콜링 순서 어떻게 설계하드라? 어디에 프롬프트적고 코드적고 그런거
+
+[ASSISTANT] Fable 5 requires usage credits. Run /usage-credits to continue or switch models with /model.
+
+[USER] 갑자기 올드스쿨이 기억안나네.. 툴콜링 순서 어떻게 설계하드라? 어디에 프롬프트적고 코드적고 그런거
+
+[ASSISTANT] Fable 5 requires usage credits. Run /usage-credits to continue or switch models with /model.
+
+[USER] [슬래시커맨드 /model]
+
+[USER] <local-command-stdout>Set model to [1mSonnet 5 (default)[22m and saved as your default for new sessions</local-command-stdout>
+
+[USER] [슬래시커맨드 /model]
+
+[USER] <local-command-stdout>Set model to [1mOpus 4.8[22m and saved as your default for new sessions</local-command-stdout>
+
+[USER] 갑자기 올드스쿨이 기억안나네.. 툴콜링 순서 어떻게 설계하드라? 어디에 프롬프트적고 코드적고 그런거
+
+[ASSISTANT] 올드스쿨 수동 툴콜 루프 얘기죠. 핵심은 **"모델은 결정만, 실행은 네 코드가"** — 이 분리를 축으로 4개 조각이 각자 자리가 있습니다. 지금 CLAUDE.md에 적힌 hermes-agent의 `agent/*_adapter.py` ReAct 루프가 바로 이 구조예요.
+
+## 큰 그림 — 경계선 하나
+
+```
+┌─ LLM 쪽 (모델이 결정) ─┐        ┌─ 네 코드 쪽 (하네스가 실행) ─┐
+   "get_weather 불러줘"    ──→        실제 함수 실행 → 결과
+   (tool_use 블록만 뱉음)   ←──        (tool_result 로 되돌려줌)
+```
+
+모델은 **절대 아무것도 실행 안 합니다.** `tool_use` 블록(= "이 도구를 이 인자로 부르고 싶다")만 출력하고, 그걸 받아서 진짜 함수를 돌리는 건 100% 네 하네스 코드예요.
+
+## 4조각이 각각 어디 사는가
+
+**① 도구 정의 = 이름 + 설명 + input_schema** → 요청의 `tools` 배열 (JSON)
+
+여기서 **description이 곧 "그 도구를 위한 프롬프트"**입니다. 네가 "프롬프트 적는" 자리 중 하나가 여기예요. 무엇을 하는지가 아니라 **언제 불러야 하는지**를 처방하듯 써야 모델이 제대로 골라요:
+
+```json
+{
+  "name": "search_db",
+  "description": "사용자가 현재 가격이나 최근 이벤트를 물을 때 호출. 대화에 없는 정보가 필요하면 추측 대신 이걸 먼저 불러라.",
+  "input_schema": { "type": "object", "properties": {...}, "required": [...] }
+}
+```
+
+**② 시스템 프롬프트** → 최상위 `system`. 전체 행동 규칙(페르소나, 언제 도구를 아껴 쓸지 등).
+
+**③ 디스패처 = 실제 실행 코드** → `이름 → 함수` 매핑 테이블. 네가 "코드 적는" 자리. `tool_use.name`을 보고 해당 함수로 라우팅.
+
+**④ 루프** → 아래 순서를 반복하는 while.
+
+## 루프 순서 (이게 "설계"의 핵심)
+
+```python
+messages = [{"role": "user", "content": user_input}]
+while True:
+    resp = client.messages.create(model=..., system=..., tools=tools, messages=messages)
+
+    if resp.stop_reason == "end_turn":
+        break                                    # 모델이 할 말 다 함 → 종료
+
+    # 모델이 도구를 부르고 싶어함 (stop_reason == "tool_use")
+    messages.append({"role": "assistant", "content": resp.content})  # ★ tool_use 블록째로 보존
+
+    results = []
+    for block in resp.content:
+        if block.type == "tool_use":
+            output = dispatch(block.name, block.input)   # ③ 네 코드 실행
+            results.append({
+                "type": "tool_result",
+                "tool_use_id": block.id,                  # ★ id 매칭 필수
+                "content": output,
+            })
+
+    messages.append({"role": "user", "content": results})  # ★ 결과 전부 한 user 메시지에
+```
+
+## 여기서 틀리기 쉬운 3가지 (올드스쿨 함정)
+
+1. **`assistant`의 `content`를 통째로 보존해라** — 텍스트만 뽑아 넣고 `tool_use` 블록을 버리면, 뒤이어 보내는 `tool_result`가 짝을 잃어서 API가 400 낸다.
+2. **`tool_use_id`로 결과를 짝지어라** — 결과가 어느 호출에 대한 건지 id로 매칭. 위치 순서로 때우면 안 됨.
+3. **병렬 호출이면 결과를 한 개의 user 메시지에 몰아넣어라** — 한 assistant 턴에 `tool_use`가 3개면, `tool_result` 3개를 메시지 3개로 쪼개지 말고 **하나의 user 메시지**에. 쪼개면 모델이 "아 병렬 호출하면 안 되나 보다" 하고 학습해서 이후 직렬로만 부른다.
+
+## 설계 순서로 요약하면
+
+1. 에이전트가 할 **행동을 나열** → 각각이 도구 하나
+2. 도구마다 **schema + description 작성** (← 프롬프트 엔지니어링 파트)
+3. **디스패처**(name→함수) 작성 (← 코드 파트)
+4. **루프** 작성
+5. **시스템 프롬프트**로 전체 묶기
+
+SDK의 tool_runner(자동 루프)를 쓰면 ③④가 자동화되지만, 승인 게이트·커스텀 로깅·조건부 실행이 필요하면 위처럼 수동 루프를 직접 굴리는 게 올드스쿨 방식이고 hermes가 그 경로죠.
+
+지금 헷갈리는 게 **"도구 설명을 어디까지 적나"** 인지, **"루프에서 상태를 어떻게 넘기나"** 인지, 아니면 **hermes 코드랑 대조**하고 싶은 건지 짚어주면 그 지점만 더 파고들게요.
+
+[USER] [슬래시커맨드 /login]
+
+[USER] <local-command-stdout>Login successful</local-command-stdout>
+
+[USER] 실제 코드 기준으로 설명해 저거 맞아?
+
+[ASSISTANT] 실제 hermes-agent 코드로 검증하겠습니다. ReAct 툴콜 루프 어댑터를 직접 읽을게요.
+
+[도구호출 Bash] {"command": "ls ~/jinsup_space/hermes-agent/ 2>/dev/null; echo \"---agent dir---\"; find ~/jinsup_space/hermes-agent -path \"*agent*adapter*.py\" 2>/dev/null | head; find ~/jinsup_space/hermes-agent -
+
+[도구결과] AGENTS.md
+CLAUDE.md
+CONTRIBUTING.md
+Dockerfile
+LICENSE
+MANIFEST.in
+README.md
+README.zh-CN.md
+RELEASE_v0.10.0.md
+RELEASE_v0.11.0.md
+RELEASE_v0.12.0.md
+RELEASE_v0.13.0.md
+RELEASE_v0.2.0.md
+RELEASE_v0.3.0.md
+RELEASE_v0.4.0.md
+RELEASE_v0.5.0.md
+RELEASE_v0.6.0.md
+RELEASE_v0.7.0.md
+RELEASE_v0.8.0.md
+RELEA
+
+[도구호출 Bash] {"command": "ls ~/jinsup_space/hermes-agent/agent/ 2>/dev/null | head -40", "description": "List agent directory contents"}
+
+[도구결과] __init__.py
+account_usage.py
+anthropic_adapter.py
+auxiliary_client.py
+bedrock_adapter.py
+codex_responses_adapter.py
+context_compressor.py
+context_engine.py
+context_references.py
+copilot_acp_client.py
+credential_pool.py
+credential_sources.py
+curator.py
+curator_backup.py
+display.py
+error_classifier.py
+
+[도구호출 Bash] {"command": "grep -n -iE \"def .*loop|while |tool_use|tool_result|stop_reason|for .*block|content_block|dispatch|execute_tool|call_tool\" ~/jinsup_space/hermes-agent/agent/anthropic_adapter.py | head 
+
+[도구결과] 1238:    non-null branch while preserving metadata like description/default.
+1489:                    "type": "tool_use",
+1505:            # blocks before text and tool_use blocks.
+1515:                for b in blocks
+1527:            # Sanitize tool_use_id and ensure non-empty content
+1531:        
+
+[ASSISTANT] 어댑터는 메시지 포맷 변환기(내부 포맷 ↔ Anthropic API)네요. 실제 while 루프와 디스패치는 별도 파일에 있을 겁니다. 메인 루프를 찾겠습니다.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; grep -rn -lE \"while.*True|stop_reason|def.*agent_loop|def.*run_agent|tool_calls|execute.*tool\" agent/*.py hermes/*.py run_agent.py 2>/dev/null | head; ec
+
+[도구결과] (eval):1: no matches found: hermes/*.py
+=== 루프 후보 파일 크기 ===
+   14672 run_agent.py
+     206 agent/context_engine.py
+   14878 total
+=== run_agent.py 구조 ===
+5:This module provides a clean, standalone agent that can execute AI models
+66:def _load_openai_cls() -> type:
+80:    def __call__(self, *args, **
+
+[ASSISTANT] run_agent.py가 14000줄짜리 본체네요. 내부는 OpenAI 스타일 포맷(`tool_call.function.name`)을 쓰는 게 보입니다. 실제 루프 본체와 디스패치를 찾겠습니다.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; grep -n -E \"while True|for _ in range|iteration|\\.chat\\.completions|adapter\\.(chat|create|complete)|response\\.choices|message\\.tool_calls|finish_reas
+
+[도구결과] 273:    """Thread-safe iteration counter for an agent.
+276:    The parent's budget is capped at ``max_iterations`` (default 90).
+278:    ``delegation.max_iterations`` (default 50) — this means total
+279:    iterations across parent + subagents can exceed the parent's cap.
+280:    Users control the p
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; grep -n -E \"def _run|def run|def _agent|def execute|def _execute|def _tool_loop|def _call_model|def chat|def step\" run_agent.py 2>/dev/null | head -30; e
+
+[도구결과] 3672:        def _run_review():
+6111:    def _run_codex_stream(self, api_kwargs: dict, client: Any = None, on_first_delta: callable = None):
+6236:    def _run_codex_create_stream_fallback(self, api_kwargs: dict, client: Any = None):
+9632:    def _execute_tool_calls(self, assistant_message, messages:
+
+[ASSISTANT] Found it. `run_conversation`(10774)이 메인 루프, `_execute_tool_calls`(9632)가 디스패처. 핵심 부분을 읽겠습니다.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/hermes-agent/run_agent.py", "offset": 13680, "limit": 80}
+
+[도구결과] 13680	                        # this turn is post-response housekeeping (memory, todo,
+13681	                        # skill_manage, etc.).  If any substantive tool is present
+13682	                        # (search_files, read_file, write_file, terminal, ...),
+13683	                        # keep o
+
+[ASSISTANT] 루프 뼈대와 tool_result 조립부를 확인하겠습니다.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; echo \"=== run_conversation 루프 상단 ===\"; sed -n '11100,11160p' run_agent.py | grep -n -E \"while|for |api_call_count|iteration|break|adapter|stream|choices
+
+[도구결과] === run_conversation 루프 상단 ===
+10:        api_call_count = 0
+47:        # Reuse the cached result on every iteration to avoid re-calling
+50:        # injected skill content that bloats / breaks provider queries.
+59:        while (api_call_count < self.max_iterations and self.iteration_budget.remaini
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/hermes-agent/run_agent.py", "offset": 10165, "limit": 60}
+
+[도구결과] 10165	    def _execute_tool_calls_sequential(self, assistant_message, messages: list, effective_task_id: str, api_call_count: int = 0) -> None:
+10166	        """Execute tool calls sequentially (original behavior). Used for single calls or interactive tools."""
+10167	        for i, tool_call in enume
+
+[ASSISTANT] tool_result가 messages에 어떻게 되돌아가는지 마지막으로 확인하겠습니다.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; awk 'NR>=10224 && NR<=10373 && /role.*tool|tool_call_id|messages\\.append|\"content\"|tool_message|_invoke_tool|function_result/' run_agent.py | head -30",
+
+[도구결과] function_result = json.dumps({"error": _block_msg}, ensure_ascii=False)
+                # tool result for the original tool_call_id without executing.
+                function_result = self._guardrail_block_result(_guardrail_block_decision)
+                function_result = _todo_tool(
+             
+
+[ASSISTANT] 맞습니다 — 실제 hermes 코드로 5개 조각 전부 확인됐고, 제가 어제 경고한 3개 함정이 코드에 **방어 로직으로 그대로 박혀 있습니다.** 다만 뉘앙스가 하나 있어요: 제가 설명한 건 Anthropic 네이티브 컨벤션이고, hermes는 내부적으로 **OpenAI 컨벤션**을 쓰다가 어댑터에서 변환합니다.
+
+## 확인된 5조각 (run_agent.py 실측)
+
+| 조각 | 위치 | 실제 코드 |
+|---|---|---|
+| **루프** | `run_conversation:10774` | `while (api_call_count < self.max_iterations and iteration_budget.remaining > 0)` + `api_call_count += 1` — 제가 말한 while 루프 + 반복 상한 (기본 90회) 그대로 |
+| **모델=결정만** | 루프 안 | 모델은 `assistant_message.tool_calls`만 뱉고, 실행은 코드가 함 — 분리 확인 |
+| **디스패처** | `_execute_tool_calls:9632` → `_invoke_tool:9674` | `function_name`으로 실제 함수 라우팅 — name→함수 매핑 확인 |
+| **assistant 보존** | `13725: messages.append(assistant_msg)` | tool 실행 **전에** tool_calls 담긴 메시지를 먼저 히스토리에 넣음 — 제 함정 #1 그대로 준수 |
+| **시스템 프롬프트** | `prompt_builder.py` (import 152행) | `build_skills_system_prompt`, `TOOL_USE_ENFORCEMENT_GUIDANCE` 등 별도 빌더 |
+
+## 어제 경고한 3함정이 코드에 방어로 박혀 있음
+
+이게 핵심 검증 포인트입니다. hermes는 내부적으로 OpenAI 스타일(`{"role":"tool", "tool_call_id":..., "content":...}`, 10177행)을 쓰고, `anthropic_adapter.py`가 이걸 Anthropic 포맷으로 변환하는데 — **그 변환기가 제가 말한 3규칙을 강제합니다:**
+
+1. **"병렬 결과는 한 user 메시지에"** → 어댑터 1544-1548행: 연속된 tool_result를 `result[-1]["content"].append(tool_result)`로 **하나의 user 메시지에 병합**. 제 함정 #3이 코드로 존재.
+2. **"tool_use_id 짝 맞춰라"** → 1568-1600행: 짝 없는 `tool_use`(뒤에 매칭 tool_result 없음)와 짝 없는 `tool_result`(앞에 tool_use 없음)를 **둘 다 제거**. 주석 원문: *"Anthropic rejects these with a 400."* — 제가 경고한 400 에러 지점이 그대로.
+3. **"assistant content 통째로 보존"** → 13725행에서 tool_calls 포함 메시지를 그대로 append (①과 동일).
+
+## 유일한 차이 (내 설명 vs 실제)
+
+- **내 설명**: Anthropic 네이티브 — `tool_use`/`tool_result` content 블록, 결과를 한 user 메시지에.
+- **hermes 실제**: OpenAI 네이티브 — `role:"tool"` 메시지 + `tool_call_id`. **어댑터가 Anthropic 형태로 변환.**
+
+둘은 같은 개념의 두 표기법일 뿐이고, hermes가 멀티프로바이더(anthropic/openai/gemini/bedrock/codex)라서 내부를 OpenAI 포맷으로 통일하고 프로바이더별 어댑터로 번역하는 구조예요. 제가 "결과를 한 메시지에 몰아라"라고 한 규칙은 hermes에선 **어댑터가 자동으로** 해줍니다(사용자가 신경 안 써도 됨).
+
+## 덤 — 제가 어제 안 말한 것들 (hermes가 추가로 하는 것)
+
+- **병렬 실행**: `_should_parallelize_tool_batch:377` + `_execute_tool_calls_concurrent:9784` — 읽기 전용 도구들은 스레드풀로 동시 실행하되, `_NEVER_PARALLEL_TOOLS`(파괴적 명령 등)는 직렬로 강제
+- **반복 예산**: `IterationBudget:273` — 부모 90 + 서브에이전트 50, `execute_code`(프로그래매틱 툴콜)는 환불(refund)
+- **인터럽트**: 유저가 중간에 "stop" 하면 남은 tool_call들을 취소 메시지로 채워서 스킵(10171-10184) — 짝 안 깨지게
+
+결론: 어제 설명은 **구조·규칙 전부 정확**하고, 실제 프로덕션 하네스(hermes)는 그 규칙들을 어댑터 변환 + orphan-stripping으로 자동 방어하고 있습니다.
+
+[USER] 무슨말이야? 갑자기 OpenAI가 왜나와
+
+[ASSISTANT] 좋은 질문이에요. **hermes가 OpenAI를 쓴다는 게 아니라, "메시지를 담는 데이터 형식(포맷)"에 OpenAI가 만든 방식과 Anthropic이 만든 방식 두 종류가 있다**는 얘기입니다. 헷갈리게 했네요.
+
+## 왜 형식이 두 종류인가
+
+툴콜 대화를 JSON으로 적는 방식이 회사마다 다릅니다. 같은 "도구 결과를 되돌려준다"를 이렇게 다르게 적어요:
+
+**Anthropic 방식** (제가 어제 설명한 것):
+```json
+{ "role": "user", "content": [
+    { "type": "tool_result", "tool_use_id": "abc", "content": "결과" }
+]}
+```
+
+**OpenAI 방식**:
+```json
+{ "role": "tool", "tool_call_id": "abc", "content": "결과" }
+```
+
+내용은 똑같아요("abc라는 호출의 결과는 이거다"). **적는 문법만 다릅니다.** 한국어로 쓰냐 영어로 쓰냐 같은 거예요.
+
+## hermes는 왜 OpenAI 형식을 쓰나
+
+hermes는 Anthropic만 지원하는 게 아니라 **여러 회사 모델을 다 지원**하는 에이전트입니다 (CLAUDE.md에도 "gemini/bedrock/codex 멀티프로바이더 어댑터"라고 적혀 있죠). 그러니 내부에서 형식을 하나로 통일해둬야 코드가 안 꼬여요. hermes는 **내부 통일 형식으로 OpenAI 방식을 선택**했고, Anthropic 모델한테 보낼 때만 `anthropic_adapter.py`가 Anthropic 방식으로 번역합니다.
+
+```
+[내부: OpenAI 형식으로 저장]
+   role:"tool", tool_call_id
+        │
+        ├── Anthropic 모델? → anthropic_adapter가 tool_result 블록으로 번역
+        ├── Gemini 모델?    → gemini_adapter가 Gemini 형식으로 번역
+        └── ...
+```
+
+## 그래서 결론이 뭐냐
+
+- 어제 제가 설명한 **툴콜 루프의 원리·규칙은 100% 맞습니다.** hermes 실제 코드로 다 확인됐어요.
+- 딱 하나 다른 건, 제가 예시를 **Anthropic 문법**으로 적었는데 hermes 내부는 **OpenAI 문법**으로 적혀 있더라 — 이거뿐입니다. 원리는 같고 표기만 다른 거예요.
+- 그리고 제가 "이렇게 하면 400 에러 난다"고 경고한 3가지를, hermes의 그 번역기가 **자동으로 방어**하고 있더라는 게 검증 결과였습니다.
+
+OpenAI가 등장한 건 hermes가 멀티프로바이더라 내부 형식으로 OpenAI 스타일을 골랐기 때문이지, 다른 뜻은 없습니다. 원리 자체를 다시 보고 싶으시면 Anthropic 문법으로만 깔끔하게 다시 정리해드릴까요?
+
+[USER] 그니까 순서 어떻게 잡는다고?
+
+[ASSISTANT] OpenAI니 어댑터니 다 빼고, 순서만 깔끔하게. 이게 툴콜 루프의 뼈대입니다.
+
+## 한 번의 요청에서
+
+```
+1. 요청 보냄   →  system(규칙) + tools(도구 설명) + messages(대화)
+2. 모델 응답   →  "get_weather 불러줘" (실행은 안 함, 요청만)
+3. 내 코드 실행 →  진짜 함수 돌림 → 결과 얻음
+4. 결과 되돌림  →  대화에 결과 추가하고 다시 요청
+5. 2번으로 반복 →  모델이 "끝" 할 때까지
+```
+
+## 코드로 그 순서
+
+```python
+messages = [사용자_질문]
+
+while True:
+    응답 = 모델호출(system, tools, messages)   # 1~2단계
+
+    if 응답.끝났음:            # 모델이 더 할 말 없음
+        break
+
+    messages.append(응답)      # ← 모델의 "도구 불러줘"를 대화에 먼저 보존
+    결과들 = []
+    for 도구요청 in 응답.tool_calls:
+        결과 = 내함수실행(도구요청.이름, 도구요청.인자)   # 3단계
+        결과들.append(결과)
+    messages.append(결과들)     # 4단계 → 다시 while 위로
+```
+
+## 어디에 뭘 적냐 (아까 물어본 것)
+
+| 적는 것 | 적는 자리 |
+|---|---|
+| **프롬프트** — 전체 규칙 | `system` |
+| **프롬프트** — "이 도구 언제 쓰는지" | 각 도구의 `description` |
+| **코드** — 이름 보고 진짜 함수 실행 | 위 루프의 `내함수실행()` (디스패처) |
+| **코드** — 반복 | 위 `while` |
+
+## 절대 틀리면 안 되는 순서 딱 하나
+
+**모델의 "도구 불러줘" 응답을 대화에 먼저 넣고 → 그다음 결과를 넣는다.** (위 코드에서 `messages.append(응답)`이 `messages.append(결과들)`보다 먼저)
+
+이 순서를 어기고 결과부터 넣으면 "무슨 호출에 대한 결과인지" 짝이 안 맞아서 API가 에러 냅니다. 어제 hermes 코드에서 이 순서 지키는 걸 확인했었고요(13725행에서 응답을 먼저 넣고, 그 뒤에 도구 실행).
+
+이게 전부예요. 요청→모델이 결정→내가 실행→결과 돌려줌→반복. 특정 부분(예: 병렬로 여러 도구, 결과 형식)을 더 파고들까요?
+
+[USER] 아니 내말은 1, 2 라는 도구가 있을때 2 -> 1 로 순서가 잡히도록 툴 호출 순서를 어떻게 은은하게 유지하냐구
+
+[ASSISTANT] 아, 완전히 다른 질문이었네요. **"도구를 특정 순서로 부르게 은은하게 유도하는 법"** — 죄송합니다, 그동안 딴 얘기를 했어요.
+
+핵심부터: **강제 순서를 코드로 박는 방법과, 은은하게 유도하는 방법은 완전히 다릅니다.** "은은하게"를 원하시니 후자 위주로.
+
+## 왜 어려운가
+
+모델은 한 턴에 도구를 **병렬로 여러 개** 부르는 게 기본값이에요. 그냥 두면 1, 2를 동시에 던집니다. "2 먼저, 그다음 1"을 원하면 **순차성 자체를 만들어내야** 합니다.
+
+## 방법 (은은함 → 강함 순서)
+
+**① 도구 description에 의존성을 심기** (가장 은은함)
+
+도구 1의 설명에 "2의 결과가 있어야 쓸 수 있다"를 넣습니다:
+
+```
+tool_1.description: "...이 도구는 tool_2가 반환한 토큰이 필요하다.
+                     tool_2를 먼저 호출해 그 값을 확보한 뒤 사용하라."
+```
+
+모델이 "1을 부르려면 2의 출력이 필요하네" → 자연히 2를 먼저 부릅니다. 억지 지시가 아니라 **데이터 의존성**으로 순서가 따라오는 거라 제일 자연스러워요.
+
+**② 스키마로 의존성을 강제** (은은하지만 확실)
+
+도구 1의 input_schema에 **2의 출력값을 required 인자로** 만듭니다:
+
+```
+tool_1: required = ["session_token"]   ← 이건 tool_2만 뱉을 수 있는 값
+```
+
+모델이 1을 부르려면 `session_token`이 있어야 하는데, 그 값은 2를 불러야만 얻어지죠. 물리적으로 2가 선행될 수밖에 없습니다.
+
+**③ 병렬 끄기 + 시스템 프롬프트** (중간)
+
+`disable_parallel_tool_use: true`로 한 턴에 한 도구만 부르게 막고, 시스템 프롬프트에 순서 규칙을 적습니다. 병렬을 끄면 모델이 "부르고 → 결과 보고 → 다음 부르고"를 강제당해서, 각 단계에서 순서를 판단하게 돼요.
+
+**④ 하네스에서 강제** (가장 강함, 은은함 아님)
+
+모델이 1, 2를 같이 던져도 **내 실행 코드가 2를 먼저 실행**합니다. 어제 본 hermes에 이게 실제로 있어요 — `_execute_tool_calls_sequential`이 `assistant_message.tool_calls`를 **모델이 준 순서대로 for 루프**로 돌리고, `_NEVER_PARALLEL_TOOLS`에 든 도구는 아예 병렬 금지시킵니다. 즉 "모델의 요청 순서 = 실행 순서"를 코드가 보장.
+
+## 어느 걸 골라야 하나
+
+- **진짜 은은하게, 프롬프트만으로** → ①. 순서가 어쩌다 어긋나도 되면 이걸로 충분.
+- **어겨선 안 되는 순서** → ② (스키마 의존성). 모델이 순서를 "지키는" 게 아니라 "어길 수 없게" 됨.
+- **모델을 못 믿겠다** → ④ (하네스에서 재정렬). 모델이 뭘 주든 내 코드가 순서를 정함.
+
+"은은하게"라고 하셨으니 저는 **① + ②를 조합**하는 걸 추천합니다 — description으로 이유를 알려주고(①), 스키마로 빠져나갈 구멍을 막는(②) 방식이 프롬프트 인젝션도 안 타고 제일 견고해요.
+
+혹시 1, 2가 **실제로는 서로 데이터 의존이 없는데** 그냥 순서만 지키고 싶은 건가요? 그거면 ②를 못 쓰니 방법이 좀 달라집니다 — 어떤 상황인지 알려주시면 딱 맞는 걸로 좁혀드릴게요.
+
+[USER] 다른 두 API는 멀티펑션콜링 어떻게 활성화 시켜?
+
+[ASSISTANT] "다른 두 API" = OpenAI, Gemini로 보고 답합니다. 정확성을 위해 hermes의 각 프로바이더 어댑터에서 실제로 어떻게 켜는지 먼저 확인할게요.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; echo \"=== OpenAI parallel_tool_calls ===\"; grep -rn \"parallel_tool_calls\" run_agent.py agent/*.py 2>/dev/null | head -10; echo \"=== Gemini function ca
+
+[도구결과] === OpenAI parallel_tool_calls ===
+agent/codex_responses_adapter.py:677:        "tool_choice", "parallel_tool_calls", "prompt_cache_key", "service_tier",
+agent/codex_responses_adapter.py:708:    # Pass through tool_choice, parallel_tool_calls, prompt_cache_key
+agent/codex_responses_adapter.py:709:  
+
+[ASSISTANT] 확인됐습니다. 결론부터: **셋 다 병렬(멀티) 함수 콜링이 "기본 ON"이라 따로 켤 게 없고, 오히려 끄거나 조절하는 파라미터만 다릅니다.** hermes 어댑터에서 실제 파라미터명까지 확인했어요.
+
+## 세 API 비교
+
+| | 기본값 | 켜는 법 | 끄는/조절하는 법 |
+|---|---|---|---|
+| **Anthropic** | 병렬 ON | (자동) | `tool_choice: {disable_parallel_tool_use: true}` |
+| **OpenAI** | 병렬 ON | (자동) | `parallel_tool_calls: false` |
+| **Gemini** | 병렬 ON | (자동) | 토글 없음 — `mode`로 간접 조절 |
+
+## OpenAI
+
+지원 모델이면 **자동으로 켜져 있고**, 한 응답의 `message.tool_calls` 배열에 여러 개가 담겨 옵니다. 별도 활성화 플래그가 없어요. 대신 **끄는** 파라미터가 있습니다:
+
+```json
+{ "tools": [...], "parallel_tool_calls": false }   // false면 한 턴에 하나씩만
+```
+
+hermes에서도 이걸 그냥 통과(passthrough) 파라미터로 넘깁니다 (`codex_responses_adapter.py:709` — `"tool_choice", "parallel_tool_calls", ...`를 그대로 전달). 즉 hermes조차 "켜는" 코드가 없고, 필요할 때 끄는 값만 흘려보내요.
+
+## Gemini
+
+Gemini는 **on/off 토글 자체가 없습니다.** 지원 모델(1.5+/2.x)이면 병렬 functionCall이 자동으로 나와요. 대신 조절하는 건 **모드**입니다 (`gemini_native_adapter.py:361, 368`):
+
+```json
+{ "toolConfig": { "functionCallingConfig": { "mode": "ANY" } } }
+```
+
+- `AUTO` — 모델이 알아서 부를지 말지 결정 (기본)
+- `ANY` — 최소 하나는 반드시 호출 (Anthropic의 `tool_choice: any`, OpenAI의 `tool_choice: required`에 해당)
+- `NONE` — 호출 금지
+- `allowedFunctionNames` — 부를 수 있는 도구를 특정 목록으로 제한 (368행)
+
+그러니까 Gemini에서 "멀티 함수 콜링 활성화"라는 개념 자체가 없고, **모델 능력으로 내장**돼 있으며 mode로 "얼마나 강하게 부르게 할지"만 정하는 구조입니다.
+
+## 정리
+
+- **활성화**: 셋 다 안 해도 됨 (기본 ON)
+- **OpenAI만 명시적 boolean** (`parallel_tool_calls`) — 끄는 용도
+- **Anthropic도 boolean** (`disable_parallel_tool_use`) — 끄는 용도, tool_choice 안에 중첩
+- **Gemini는 boolean 없음** — 병렬은 내장, `mode`(AUTO/ANY/NONE) + `allowedFunctionNames`로만 형태를 잡음
+
+즉 세 API 다 "어떻게 켜냐"가 아니라 **"어떻게 통제하냐"가 설계 포인트**이고, 통제 손잡이의 위치와 형태만 다릅니다 (OpenAI=최상위 boolean, Anthropic=tool_choice 안, Gemini=mode enum).
+
+[USER] 도구 진행중에 만약 에러 나면 그대로 도구 파이프라인 10단계 다 진행했나? 갑자기 궁금하네
+
+[ASSISTANT] 좋은 질문이라 실제 hermes 코드로 확인하겠습니다. "10단계"가 두 가지로 해석돼요 — ① 한 턴에 도구 10개를 병렬/직렬로 부를 때 그중 하나가 에러나면 나머지도 도나?, ② 한 도구 실행 안에서 여러 처리 단계 중 하나가 에러나면? 둘 다 소스에서 짚어볼게요.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/hermes-agent/run_agent.py", "offset": 9917, "limit": 60}
+
+[도구결과] 9917	        def _run_tool(index, tool_call, function_name, function_args):
+9918	            """Worker function executed in a thread."""
+9919	            # Register this worker tid so the agent can fan out an interrupt
+9920	            # to it — see AIAgent.interrupt().  Must happen first thing, and
+
+[ASSISTANT] 한 도구 에러 시 나머지 배치가 계속되는지, 에러 결과가 tool_result로 되돌아가는지 마저 확인하겠습니다.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; echo \"=== 직렬 경로: 에러시 continue/break? ===\"; awk 'NR>=10280 && NR<=10373 && /try:|except|_invoke_tool|is_error|_detect_tool_failure|role.*tool|messages\\.a
+
+[도구결과] === 직렬 경로: 에러시 continue/break? ===
+                except Exception:
+                function_result = json.dumps({"error": _block_msg}, ensure_ascii=False)
+                function_result = self._guardrail_block_result(_guardrail_block_decision)
+                function_result = _todo_tool(
+       
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; grep -rn -A14 \"def _detect_tool_failure\" run_agent.py | head -18; echo \"=== 직렬: tool 메시지 append 지점과 for 루프 흐름 ===\"; awk 'NR>=10340 && NR<=10373' run_ag
+
+[도구결과] === 직렬: tool 메시지 append 지점과 for 루프 흐름 ===
+                                tool_call_id=getattr(tool_call, "id", None),
+                            ),
+                        )
+                    except Exception:
+                        pass
+                tool_duration = time.time() - tool_start_
+
+[ASSISTANT] 핵심(에러 감지 함수 정의 + 에러가 tool 메시지로 되돌아가는 마무리)만 마저 확인하겠습니다.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; grep -rn \"def _detect_tool_failure\" run_agent.py tools/ agent/ 2>/dev/null | head; echo \"=== 직렬 for 루프 끝: tool 메시지 append ===\"; awk 'NR>=10374 && NR<=1
+
+[도구결과] agent//display.py:804:def _detect_tool_failure(tool_name: str, result: str | None) -> tuple[bool, str]:
+=== 직렬 for 루프 끝: tool 메시지 append ===
+                        tool_call_id=tool_call.id,
+                        tool_call_id=tool_call.id,
+Shell cwd was reset to /Users/seobi/jinsup_space/CC
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; sed -n '804,835p' agent/display.py; echo \"=== 직렬 경로 tool 메시지 조립 (10450~10560) ===\"; awk 'NR>=10440 && NR<=10570 && /role|tool_call_id|messages\\.append|i
+
+[도구결과] def _detect_tool_failure(tool_name: str, result: str | None) -> tuple[bool, str]:
+    """Inspect a tool result string for signs of failure.
+
+    Returns ``(is_failure, suffix)`` where *suffix* is an informational tag
+    like ``" [exit 1]"`` for terminal failures, or ``" [error]"`` for generic
+    f
+
+[ASSISTANT] 확인 끝났습니다. 결론: **에러가 나도 배치는 안 멈춥니다. 도구 10개면 10개 다 돕니다.** 에러는 예외로 터지는 게 아니라 "에러 문자열 결과"로 바뀌어서 정상 결과처럼 되돌아가요. 실제 hermes 코드로 검증한 흐름입니다.
+
+## 에러가 나면 벌어지는 일 (run_agent.py 실측)
+
+**1단계 — 예외를 삼킨다** (`_run_tool:9956-9967`)
+
+```python
+try:
+    result = self._invoke_tool(function_name, ...)
+except Exception as tool_error:
+    result = f"Error executing tool '{function_name}': {tool_error}"   # ← 터지는 대신 문자열로
+    logger.error(...)
+```
+
+도구가 Python 예외를 던져도 `try/except`가 잡아서 **에러 메시지를 그냥 결과값으로** 만듭니다. 재던지지(re-raise) 않아요. 그래서 배치 for 루프가 안 끊깁니다.
+
+**2단계 — 실패를 "태그만" 붙인다** (`_detect_tool_failure`, display.py:804)
+
+```python
+is_error, _ = _detect_tool_failure(function_name, result)
+```
+
+이 함수는 결과 문자열을 훑어서 실패 신호(`exit_code != 0`, `"error"`/`"failed"` 포함, `Error`로 시작)를 찾아 **is_error 플래그만** 답니다. 흐름을 멈추는 게 아니라 라벨링일 뿐이에요.
+
+**3단계 — 에러 결과도 정상 tool 메시지로 되돌린다** (직렬 경로 10450+)
+
+```python
+tool_msg = { "role": "tool", "content": function_result, "tool_call_id": tool_call.id }
+messages.append(tool_msg)   # 에러든 성공이든 똑같이 대화에 추가
+```
+
+에러 결과도 성공 결과와 **완전히 같은 방식**으로 대화에 들어갑니다. 그래야 짝(tool_call ↔ tool_result)이 안 깨지거든요 — 하나라도 빠지면 다음 API 호출이 400 나니까.
+
+## 그래서 최종적으로
+
+```
+도구 1: 성공 → 결과 append
+도구 2: 에러 → "Error executing..." 문자열로 변환 → append (is_error 태그)
+도구 3: 성공 → 결과 append
+...
+도구 10: 성공 → 결과 append
+        │
+        └─→ 10개 결과 전부(에러 포함) 모델에게 되돌림
+            → 모델이 2번이 실패한 걸 보고 "그럼 다시 시도할까/우회할까" 판단
+```
+
+**즉 "10단계 다 진행했나?" → 네, 다 진행합니다.** 에러 처리는 "멈추고 던지기"가 아니라 **"에러도 결과의 한 종류로 취급해서 모델에게 보고하기"** 방식이에요. 판단은 모델이 다음 턴에 합니다. (이건 Anthropic API의 `tool_result` + `is_error: true` 규약과도 정확히 같은 철학입니다 — 실패한 도구도 결과를 돌려주되 에러 플래그를 달아라.)
+
+## 예외 — 진짜로 배치를 중간에 끊는 2가지
+
+에러는 안 끊지만, 이 둘은 남은 도구를 실제로 스킵합니다:
+
+1. **유저 인터럽트** (10171-10184): 실행 중 "stop" 하면 남은 도구들을 `"[Tool execution cancelled...]"` 메시지로 채워서 스킵 — 단, **짝은 유지**하려고 스킵 메시지도 tool 메시지로 append
+2. **가드레일 halt** (13742-13750): `_tool_guardrail_halt_decision`이 걸리면 (위험한 도구 등) 루프 자체를 `break`
+
+이 둘만 "의도적 중단"이고, 일반 에러는 배치를 못 멈춥니다. 정리하면 — **평범한 에러는 파이프라인을 못 세우고(결과로 흡수), 오직 유저 취소나 안전 가드레일만 세운다.**
+
+[USER] 그럼 모든 에러에 다 LLM생각해서 LLM설명용 문자열이 준비되어있어?
+
+[ASSISTANT] 좋은 질문이에요 — 실제로 "정성껏 준비된 LLM용 설명"인지, 아니면 그냥 raw 예외를 문자열로 박은 건지 소스로 확인하겠습니다. `error_classifier.py`가 있으니 그것도 보고요.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; echo \"=== error_classifier 무엇을 분류하나 ===\"; grep -n -E \"def |class |LLM|prompt|for the model|user-facing|retry|classify\" agent/error_classifier.py 2>/dev
+
+[도구결과] === error_classifier 무엇을 분류하나 ===
+5:(retry, rotate credential, fallback to another provider, compress
+9:that the main retry loop in run_agent.py consults for every API failure.
+24:class FailoverReason(enum.Enum):
+37:    server_error = "server_error"        # 500/502 — internal server error, retry
+40
+
+[ASSISTANT] 아니요, **에러 종류마다 정성껏 준비된 LLM용 설명은 없습니다.** 확인해보니 에러가 세 층으로 나뉘는데, 그중 LLM에게 가는 건 정형화된 게 아니에요. 핵심은 **"LLM에게 보여주는 에러"와 "코드가 처리하는 에러"가 완전히 분리**돼 있다는 겁니다.
+
+## 세 층의 에러 처리
+
+**① 도구가 Python 예외를 던짐 → 딱 하나의 제네릭 템플릿** (run_agent.py:9966)
+
+```python
+result = f"Error executing tool '{function_name}': {tool_error}"
+```
+
+이게 전부예요. 도구가 뭐든 상관없이 **`{예외를 str()로 박은 것}`**. 파일 없음이든 권한 오류든 네트워크 끊김이든, 전부 이 한 줄 템플릿에 raw 예외 문자열을 끼워넣습니다. "이 에러는 이렇게 설명하자"는 큐레이션 없음.
+
+**② 도구가 논리적 실패를 반환 → 그 도구가 알아서 만든 메시지** (도구마다 제각각)
+
+도구가 예외 없이 "실패했다"를 리턴하는 경우인데, 이건 **도구별로 형식이 다 다릅니다**:
+- `terminal` → `{"exit_code": 1, ...}` (셸 exit 코드)
+- `memory` → `{"success": false, "error": "exceed the limit"}`
+- 그 외 → 각자 알아서
+
+`_detect_tool_failure`(display.py:804)는 이걸 통일된 규칙으로 **감지만** 합니다 — exit_code≠0이거나, 문자열에 `"error"`/`"failed"`가 있거나, `Error`로 시작하면 실패로 태그. 즉 **"공통 설명 생성기"가 아니라 "공통 실패 탐지기"**예요. 설명 문구 자체는 각 도구가 즉흥적으로 만든 것.
+
+**③ API 호출 자체가 실패 (429/500/타임아웃 등) → 풍부하게 분류되지만 LLM용이 아님** (error_classifier.py)
+
+여기가 반전인데, **정교한 에러 분류 시스템은 존재합니다** — `classify_api_error` + `FailoverReason` enum에 `rate_limited`, `server_error`, `timeout`, `context_too_long`, `image_too_large`, `oauth_long_context_beta_forbidden`, `llama_cpp_grammar_pattern`... 수십 종이 있어요. 파일 주석에도 "the main retry loop in run_agent.py consults for every API failure"라고 명시.
+
+**그런데 이건 LLM에게 안 갑니다.** 용도가 다릅니다 — 코드가 읽고 "재시도할까 / 크리덴셜 교체할까 / 다른 프로바이더로 fallback할까 / 컨텍스트 압축할까"를 결정하는 **하네스 내부 제어용**이에요 (`error_classifier.py:5-9`, `77-79`: "Recovery action hints — the retry loop checks these").
+
+## 정리 — 누가 읽느냐로 갈린다
+
+| 에러 종류 | 문자열 형태 | 누가 읽나 |
+|---|---|---|
+| 도구 예외 | 제네릭 템플릿 1개 (raw 예외 삽입) | **LLM** (다음 턴에 판단) |
+| 도구 논리 실패 | 도구마다 제각각 (ad hoc) | **LLM** |
+| API 실패 | `FailoverReason` enum으로 정밀 분류 | **코드** (재시도/failover 결정) |
+
+즉 질문에 정확히 답하면: **"LLM이 읽을 에러"는 큐레이션 안 된 raw/ad-hoc 문자열이고, "정성껏 분류된 에러"는 코드가 읽는 API 에러라서 LLM한테 안 간다.** 정교한 taxonomy는 있지만 그건 자동 복구 로직을 위한 것이지, LLM에게 "이 에러는 이런 뜻이야"라고 설명해주려고 만든 게 아니에요.
+
+이게 합리적인 설계이기도 한데 — 도구 에러는 **모델이 알아서 읽고 판단**하면 되니까(똑똑하니까) 굳이 큐레이션 안 해도 되고, API 에러는 **모델이 손댈 수 없는 인프라 문제**(레이트리밋 등)라 코드가 조용히 처리하고 모델한텐 안 보여주는 게 맞죠.
+
+[USER] Use offset and limit parameters to read specific portions, or search for specific content instead of reading the whole file." · "Please use appropriate tools for binary file analysis 이런 경우는어디로가는건데?
+
+[ASSISTANT] 이건 어느 층에 해당하는지 실제 문자열을 hermes에서 찾아 확인하겠습니다.
+
+[도구호출 Bash] {"command": "cd ~/jinsup_space/hermes-agent; echo \"=== offset/limit 안내 문자열 ===\"; grep -rn -iE \"offset and limit|specific portions|binary file analysis|appropriate tools for binary\" tools/ agent/ *
+
+[도구결과] === offset/limit 안내 문자열 ===
+tools//file_tools.py:563:                    "Use offset and limit to read a smaller range. "
+tools//file_tools.py:583:                "Consider reading only the section you need with offset and limit "
+tools//file_tools.py:1031:    "description": "Read a text file with l
+
+[ASSISTANT] 찾았습니다. `file_tools.py`의 read_file 도구가 직접 뱉는 문자열이네요. 앞뒤 맥락을 확인하겠습니다.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/hermes-agent/tools/file_tools.py", "offset": 550, "limit": 45}
+
+[도구결과] 550	        # amount of content, reject it and tell the model to narrow down.
+551	        # Note: we check the formatted content (with line-number prefixes),
+552	        # not the raw file size, because that's what actually enters context.
+553	        # Check BEFORE redaction to avoid expensive rege
+
+[ASSISTANT] 이건 **②층에 속하는데, 그중에서도 "정성껏 큐레이션된" 쪽**입니다. 앞서 "도구 논리 실패는 제각각"이라고 했는데, 그 "제각각" 안에서도 이 파일 읽기 도구는 도구 작성자가 **LLM이 읽고 스스로 고치라고 손으로 써둔 안내문**이에요.
+
+## 어디로 가나 — LLM에게 직행
+
+`file_tools.py:557-569`를 보면, 파일이 안전 한도(약 10만 자)를 넘으면 도구가 예외를 던지지 않고 이 JSON을 **결과값으로 리턴**합니다:
+
+```python
+if content_len > max_chars:
+    return json.dumps({
+        "error": "Read produced X characters which exceeds the safety limit (100,000 chars). "
+                 "Use offset and limit to read a smaller range. "
+                 "The file has N lines total.",
+        "path": path,
+        "total_lines": total_lines,
+    })
+```
+
+이 문자열은 그대로 tool 메시지가 되어 **다음 턴에 모델이 읽습니다.** 앞서 본 3층 구조로 정확히 위치를 찍으면:
+
+| 층 | 이 케이스 해당? |
+|---|---|
+| ① 도구 예외 → 제네릭 템플릿 | ❌ (예외 안 던짐) |
+| **② 도구 논리 실패 → 도구가 만든 메시지** | ✅ **여기** |
+| ③ API 실패 → 코드용 분류 | ❌ (도구 내부 일이라 API 안 감) |
+
+## "정성껏 준비됐냐"에 대한 답 — 여기선 Yes
+
+앞선 질문("모든 에러에 LLM 설명이 준비돼 있냐")엔 "아니오"였는데, **이 특정 도구는 예외**입니다. 파일 읽기 도구는 실패를 그냥 던지지 않고, **모델이 바로 자가 복구할 수 있게** 문장을 설계해뒀어요. 세 가지가 다 들어 있죠:
+
+1. **뭐가 잘못됐나** — "10만 자 한도 초과"
+2. **어떻게 고치나** — "offset과 limit으로 좁은 범위를 읽어라"
+3. **고치는 데 필요한 정보** — "파일은 총 N줄이다" (offset/limit을 계산하라고 줄 수까지 제공)
+
+바이너리 안내도 같은 패턴입니다 — 도구 description(1031행)에 "Cannot read images or binary files — use vision_analyze for images"라고 박아, 애초에 못 읽는 상황이면 **대체 도구 이름까지 지목**해줍니다.
+
+## 왜 이 도구만 이렇게 공들였나
+
+파일 읽기는 **모델이 가장 자주, 가장 크게 헛발질하는 지점**이라서예요. 큰 파일을 통째로 읽으라고 던지면 컨텍스트가 폭발하니까(그래서 한도 자체가 "context usage" 관점, 553행 주석: "that's what actually enters context"), "거부 + 정확한 복구 지시"를 세트로 줘서 모델이 즉시 `offset/limit`으로 재시도하게 유도합니다. 심지어 실패가 아니어도 파일이 크면 `_hint`로 "다음엔 좁게 읽는 게 효율적"이라고 은은하게 넛지까지 해요(581-585행).
+
+## 정리
+
+- 이 메시지들의 목적지 = **②층, LLM에게 직행**
+- "에러 종류마다 큐레이션된 설명은 없다"는 일반론은 맞지만, **자주 틀리는 핵심 도구(파일 읽기)만은 예외적으로 자가복구용 안내를 손으로 설계**해뒀다
+- 이게 앞 답변의 논리와 일관됩니다 — 모델이 스스로 판단하게 두되, **판단 실수의 대가가 큰 곳(컨텍스트 폭발)에만 선별적으로 가드+안내**를 투자하는 방식
+
+즉 "raw로 던지는 에러"와 "정성껏 안내하는 에러"가 섞여 있고, 그 갈림은 **에러 심각도가 아니라 "모델이 여기서 실수하면 얼마나 손해냐"**로 나뉩니다. 파일 읽기는 손해가 커서 안내가 붙은 쪽이에요.

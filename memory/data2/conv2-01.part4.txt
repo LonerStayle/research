@@ -1,0 +1,1456 @@
+
+
+[도구결과] 6:> **src 대조 범례** (2026-07-11 grep/Read 대조, 구버전 스냅샷 기준): 🟢 일치(핵심 문구 코드로 확인) · 🟡 대응 있으나 문구/구성 다름 · 🔴 스냅샷에 없음(신규) · ⚪ 확인 못함(비교 불가)
+146:> 🔴 **src 대조: 없음(신규)** — src는 Opus 4.6 시대(`FRONTIER_MODEL_NAME = 'Claude Opus 4.6'`, prompts.ts:118). Fable 5/Mythos 문단 자체가 스냅샷에 존재하지 않음.
+300:> 🟡+🔴 **src 대조: 혼합** — 자동 압축 언급은 src `# System` 불릿(prompts.ts:193)에 존재. "operating autonomously" 이하 자율행동 문단들은 src 무매치(신규).
+516:> 🔴 **src 대조: 없음(신규 도구)** — src/tools/ 에 Artifact 디렉토리 자체가 없음.
+691:> 🔴 **src 대조: 없음(신규 도구)** — src에 해당 도구 무존재.
+710:> 🔴 **src 대조: 없음(신규 도구)** — src의 SleepTool·ScheduleCronTool은 이름만 비슷한 별개 도구.
+802:> 🔴 **src 대조: 없음(신규 도구)** — src/tools/ 에 Workflow 무존재. 멀티에이전트 오케스트레이션 계층 전체가 스냅샷 이후 추가된 것.
+1509:Read prompts.ts:115-139 (getHooksSection 원문) → grep getHooksSection (prompts.ts:192 유일 사용처) → Read prompts.ts:160-209 (# System 불릿 6개 맥락). 답변: "시스템 프롬프트에 상시 박힌 모델용 사용설명서" — ① 낯선 메시지 정체 예고 ② 신뢰 등급 부여 (🔴 외부데이터 의심 vs 🟢 훅=유저급) ③ 차단 시 행동 규칙. + "하네스가 던지고 이 문단이 받는 법을 가르친다".
+1622:| Artifact | ✗ | 🔴 신규 | src/tools/ 디렉토리 무존재 |
+1627:| ReportFindings | ✗ | 🔴 신규 | 무존재 |
+1628:| ScheduleWakeup | ✗ | 🔴 신규 | Sleep/ScheduleCron은 별개 도구 |
+1631:| Workflow | ✗ | 🔴 신규 | 무존재 — 오케스트레이션 계층 통째 추가 |
+1634:**총평**: 12종 중 src 존재 8종(🟢2·🟡6) + 스냅샷 이후 신규 4종(🔴 Artifact·ReportFindings·ScheduleWakeup·Workflow). 기존 도구들의 공통 경향은 **설명 축약**(장문 불릿 → 핵심만)이며, 신규 4종은 아티팩트 퍼블리싱·코드리뷰 구조화·자가 웨이크업·멀티에이전트 워크플로 등 **하네스 기능 확장**을 반영.
+
+[도구호출 Bash] {"command": "grep -n \"🔴\\|## 2-2\\|## 2-7\\|## 2-8\\|## 2-11\\|## 1-4\" /Users/seobi/jinsup_space/CC/세션인풋-시스템프롬프트-도구-전문.md | grep \"##\"; echo ---; sed -n '514,518p;800,804p' /Users/seobi/jinsup_space/CC/세션인풋-시스템프롬프트-도구-전문.md", "description": "🔴 마커가 해당 섹션 제목 바로 아래 붙었는지 위치 대조"}
+
+[도구결과] 144:## 1-4. 모델 정체성 문단
+514:## 2-2. Artifact
+689:## 2-7. ReportFindings
+708:## 2-8. ScheduleWakeup (요지)
+800:## 2-11. Workflow (전문 — 가장 긴 도구 설명)
+---
+## 2-2. Artifact
+
+> 🔴 **src 대조: 없음(신규 도구)** — src/tools/ 에 Artifact 디렉토리 자체가 없음.
+
+```
+## 2-11. Workflow (전문 — 가장 긴 도구 설명)
+
+> 🔴 **src 대조: 없음(신규 도구)** — src/tools/ 에 Workflow 무존재. 멀티에이전트 오케스트레이션 계층 전체가 스냅샷 이후 추가된 것.
+
+```
+
+[ASSISTANT] 네, 맞게 들어가 있습니다. 방금 파일에서 직접 확인한 결과:
+
+**🔴 "src에 없음" 마커가 붙은 곳 — 3중으로 표시돼 있어요:**
+
+1. **각 섹션 제목 바로 아래** (제목 → 마커 → 본문 순서 확인 완료):
+   - `1-4 모델 정체성 문단` (144행) — Fable 5/Mythos 문단, src는 Opus 4.6 시대
+   - `2-2 Artifact` (514행) / `2-7 ReportFindings` (689행) / `2-8 ScheduleWakeup` (708행) / `2-11 Workflow` (800행) — 신규 도구 4종
+   - `1-10 Context management` (300행)은 🟡+🔴 혼합 표기 — 자동 압축 언급은 src에 있고, 자율행동 문단들만 신규라서
+
+2. **부록-2 도구 대조표** — 신규 4종이 `src 존재 ✗ / 🔴 신규`로 재확인
+
+3. **문서 머리 범례** (6행) — 🔴 = "스냅샷에 없음(신규)" 정의
+
+각 마커에 근거도 붙어 있습니다 (예: Workflow → "src/tools/에 무존재", ScheduleWakeup → "SleepTool·ScheduleCronTool은 이름만 비슷한 별개 도구", 모델 문단 → "prompts.ts:118 FRONTIER_MODEL_NAME = 'Claude Opus 4.6'").
+
+참고로 1509행에도 🔴가 하나 잡히는데, 그건 마커가 아니라 Part 4 대화 히스토리에 기록된 제 과거 답변 원문(신뢰 등급 표)에 원래 있던 이모지라 정상입니다.
+
+[USER] 2027-07-11-시스템프롬프트및도구내용-최신본 이라구 이름바꿔주고 그리고 /visual-explainer 로 html버전도 만들어줄래?
+
+[도구호출 Bash] {"command": "mv /Users/seobi/jinsup_space/CC/세션인풋-시스템프롬프트-도구-전문.md \"/Users/seobi/jinsup_space/CC/2026-07-11-시스템프롬프트및도구내용-최신본.md\" && ls /Users/seobi/jinsup_space/CC/ | grep 2026-07", "description": "md 파일명 변경 (오늘 날짜 2026-07-11 기준)"}
+
+[도구결과] 2026-07-11-시스템프롬프트및도구내용-최신본.md
+
+[도구호출 Skill] {"skill": "visual-explainer", "args": "2026-07-11 세션 인풋 스냅샷 (시스템프롬프트 13섹션 + 도구 12종 + messages 상주 화물 + src 구버전 대조 🟢🟡🔴⚪) 시각화 — 2026-07-11-시스템프롬프트및도구내용-최신본.md의 HTML 짝꿍"}
+
+[도구결과] Launching skill: visual-explainer
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/2026-07-11-시스템프롬프트및도구내용-최신본.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>세션 인풋 해부도 — 2026-07-11 스냅샷</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Do+Hyeon&family=IBM+Plex+S
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/2026-07-11-시스템프롬프트및도구내용-최신본.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/2026-07-11-시스템프롬프트및도구내용-최신본.html\"", "description": "브라우저로 HTML 열기"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 완료했습니다. 두 가지 다 처리됐고 브라우저로 열어뒀어요.
+
+**① 파일명 변경** — 한 가지만 바로잡았습니다: 말씀하신 "2027-07-11"은 오타로 보고(오늘이 2026-07-11이고 문서 내용도 그 날짜 스냅샷이라) **`2026-07-11-시스템프롬프트및도구내용-최신본.md`** 로 했습니다. 정말 2027을 원하셨다면 말씀해주세요.
+
+**② HTML 짝꿍** — `2026-07-11-시스템프롬프트및도구내용-최신본.html`
+
+| 항목 | 내용 |
+|---|---|
+| 컨셉 | **청사진(blueprint) 제도 도면** — 네이비 도면 그리드 배경 + 시안 선묘, 도면 타이틀 블록(도면번호·검증방법 메타), 신규 도구엔 회전 "SRC 無" 검수 스탬프 |
+| 폰트 | Do Hyeon (디스플레이) + IBM Plex Sans KR (본문) + IBM Plex Mono |
+| 01 적재 구조 | system 파라미터 ↔ messages 배열 좌우 화물칸 도면, 유령 메시지는 점선+↻ |
+| 02 시스템 13섹션 | 판정색 테두리 행 14개 (🟢2 · 🟡8 · 🔴1 · ⚪3) |
+| 03 도구 12종 | 카드 그리드 — 신규 4종(Workflow·Artifact·ReportFindings·ScheduleWakeup)은 붉은 점선 + 스탬프, 기존 8종엔 "톤 반전"·"축약" 태그 |
+| 04 상주 화물 | 6레인 → `messages[]` 합류 싱크 |
+| 05 대시보드 | 판정 분포 세그먼트 바 2개 + 경향 3칩(설명 다이어트/자율행동 신설/기능 확장) + 발견 2건(userEmail 교체, 유령 태그 퇴장) |
+
+각 섹션 하단에 `› source` 로 src 근거(prompts.ts:118 등)를 박았고, ⚪ 항목은 footer에 "비교 불가" 정직 표기했습니다. md의 ~중립 원칙대로 기계 절대경로는 HTML에 넣지 않았어요.
+
+**추가 수정 제안**: 원하시면 ① 02번 행들에 호버 시 원문 문구 미리보기 툴팁 추가, ② 판정 필터 버튼(🔴만 보기 등), ③ `html_group_v2/`로 이동 배치도 가능합니다.
+
+[USER] 도구의 toolsSerach에 대한 로직을 상세히 알려줘
+
+[ASSISTANT] ToolSearch의 실제 구현을 src에서 뜯어보겠습니다.
+
+[도구호출 Bash] {"command": "ls -la /Users/seobi/jinsup_space/CC/src/tools/ToolSearchTool/; echo ---; grep -rn \"deferred\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l | head -10", "description": "ToolSearchTool 파일 구성 + deferred 관련 파일 탐색"}
+
+[도구결과] total 56
+drwxr-xr-x@  5 seobi  staff    160  7  4 11:20 .
+drwxr-xr-x@ 45 seobi  staff   1440  3 31 17:19 ..
+-rw-r--r--@  1 seobi  staff  14275  3 31 17:19 ToolSearchTool.ts
+-rw-r--r--@  1 seobi  staff     50  3 31 17:19 constants.ts
+-rw-r--r--@  1 seobi  staff   5241  7  4 11:20 prompt.ts
+---
+/Users/seobi/jinsup_space/CC/src/Tool.ts
+/Users/seobi/jinsup_space/CC/src/QueryEngine.ts
+/Users/seobi/jinsup_space/CC/src/ink/hooks/use-input.ts
+/Users/seobi/jinsup_space/CC/src/tools/ExitPlanModeTool/ExitPlanModeV2Tool.ts
+/Users/seobi/jinsup_space/CC/src/tools/ToolSearchTool/prompt.ts
+/Users/seobi/jinsup_space/CC/src/tools/ToolSearchTool/ToolSearchTool.ts
+/Users/seobi/jinsup_space/CC/src/tools/PowerShellTool/powershellPermissions.ts
+/Users/seobi/jinsup_space/CC/src/tools/BashTool/bashSecurity.ts
+/Users/seobi/jinsup_space/CC/src/bootstrap/state.ts
+/Users/seobi/jinsup_space/CC/src/bridge/replBridgeTransport.ts
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/tools/ToolSearchTool/ToolSearchTool.ts"}
+
+[도구결과] 1	import type { ToolResultBlockParam } from '@anthropic-ai/sdk/resources/index.mjs'
+2	import memoize from 'lodash-es/memoize.js'
+3	import { z } from 'zod/v4'
+4	import {
+5	  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+6	  logEvent,
+7	} from '../../services/analytics/index.js'
+8	import {
+9	  buildTool,
+10	  findToolByName,
+11	  type Tool,
+12	  type ToolDef,
+13	  type Tools,
+14	} from '../../Tool.js'
+15	import { logForDebugging } from '../../utils/debug.js'
+16	import { lazySchema } from '../../utils/lazySchema.js'
+17	import { escapeRegExp } from '../../utils/stringUtils.js'
+18	import { isToolSearchEnabledOptimistic } from '../../utils/toolSearch.js'
+19	import { getPrompt, isDeferredTool, TOOL_SEARCH_TOOL_NAME } from './prompt.js'
+20	
+21	export const inputSchema = lazySchema(() =>
+22	  z.object({
+23	    query: z
+24	      .string()
+25	      .describe(
+26	        'Query to find deferred tools. Use "select:<tool_name>" for direct selection, or keywords to search.',
+27	      ),
+28	    max_results: z
+29	      .number()
+30	      .optional()
+31	      .default(5)
+32	      .describe('Maximum number of results to return (default: 5)'),
+33	  }),
+34	)
+35	type InputSchema = ReturnType<typeof inputSchema>
+36	
+37	export const outputSchema = lazySchema(() =>
+38	  z.object({
+39	    matches: z.array(z.string()),
+40	    query: z.string(),
+41	    total_deferred_tools: z.number(),
+42	    pending_mcp_servers: z.array(z.string()).optional(),
+43	  }),
+44	)
+45	type OutputSchema = ReturnType<typeof outputSchema>
+46	
+47	export type Output = z.infer<OutputSchema>
+48	
+49	// Track deferred tool names to detect when cache should be cleared
+50	let cachedDeferredToolNames: string | null = null
+51	
+52	/**
+53	 * Get a cache key representing the current set of deferred tools.
+54	 */
+55	function getDeferredToolsCacheKey(deferredTools: Tools): string {
+56	  return deferredTools
+57	    .map(t => t.name)
+58	    .sort()
+59	    .join(',')
+60	}
+61	
+62	/**
+63	 * Get tool description, memoized
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/tools/ToolSearchTool/prompt.ts", "offset": 50}
+
+[도구결과] 50	- "notebook jupyter" — keyword search, up to max_results best matches
+51	- "+slack send" — require "slack" in the name, rank by remaining terms`
+52	
+53	/**
+54	 * Check if a tool should be deferred (requires ToolSearch to load).
+55	 * A tool is deferred if:
+56	 * - It's an MCP tool (always deferred - workflow-specific)
+57	 * - It has shouldDefer: true
+58	 *
+59	 * A tool is NEVER deferred if it has alwaysLoad: true (MCP tools set this via
+60	 * _meta['anthropic/alwaysLoad']). This check runs first, before any other rule.
+61	 */
+62	export function isDeferredTool(tool: Tool): boolean {
+63	  // Explicit opt-out via _meta['anthropic/alwaysLoad'] — tool appears in the
+64	  // initial prompt with full schema. Checked first so MCP tools can opt out.
+65	  if (tool.alwaysLoad === true) return false
+66	
+67	  // MCP tools are always deferred (workflow-specific)
+68	  if (tool.isMcp === true) return true
+69	
+70	  // Never defer ToolSearch itself — the model needs it to load everything else
+71	  if (tool.name === TOOL_SEARCH_TOOL_NAME) return false
+72	
+73	  // Fork-first experiment: Agent must be available turn 1, not behind ToolSearch.
+74	  // Lazy require: static import of forkSubagent → coordinatorMode creates a cycle
+75	  // through constants/tools.ts at module init.
+76	  if (feature('FORK_SUBAGENT') && tool.name === AGENT_TOOL_NAME) {
+77	    type ForkMod = typeof import('../AgentTool/forkSubagent.js')
+78	    // eslint-disable-next-line @typescript-eslint/no-require-imports
+79	    const m = require('../AgentTool/forkSubagent.js') as ForkMod
+80	    if (m.isForkSubagentEnabled()) return false
+81	  }
+82	
+83	  // Brief is the primary communication channel whenever the tool is present.
+84	  // Its prompt contains the text-visibility contract, which the model must
+85	  // see without a ToolSearch round-trip. No runtime gate needed here: this
+86	  // tool's isEnabled() IS isBriefEnabled(), so being asked about its deferral
+87	  // status implies the gate already passed.
+88	  if (
+8
+
+[도구호출 Bash] {"command": "wc -l /Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts; grep -n \"export function\\|export const\\|function \" /Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts | head -30", "description": "isDeferredTool 정의 + toolSearch.ts 함수 목록"}
+
+[도구결과] 756 /Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts
+55:function parseAutoPercentage(value: string): number | null {
+75:function isAutoToolSearchMode(value: string | undefined): boolean {
+83:function getAutoToolSearchPercentage(): number {
+104:function getAutoToolSearchTokenThreshold(model: string): number {
+115:export function getAutoToolSearchCharThreshold(model: string): number {
+172:export function getToolSearchMode(): ToolSearchMode {
+210:function getUnsupportedToolReferencePatterns(): string[] {
+239:export function modelSupportsToolReference(model: string): boolean {
+270:export function isToolSearchEnabledOptimistic(): boolean {
+325: * tool search cannot function and should be disabled.
+330:export function isToolSearchToolAvailable(
+340:async function calculateDeferredToolDescriptionChars(
+385:export async function isToolSearchEnabled(
+395:  function logModeDecision(
+479:export function isToolReferenceBlock(obj: unknown): boolean {
+491:function isToolReferenceWithName(
+513:function isToolResultBlockWithContent(obj: unknown): obj is ToolResultBlock {
+529: * tool_reference blocks. This function scans the message history to find all
+545:export function extractDiscoveredToolNames(messages: Message[]): Set<string> {
+629:export function isDeferredToolsDeltaEnabled(): boolean {
+646:export function getDeferredToolsDelta(
+712:async function checkAutoThreshold(
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts", "offset": 104, "limit": 110}
+
+[도구결과] 104	function getAutoToolSearchTokenThreshold(model: string): number {
+105	  const betas = getMergedBetas(model)
+106	  const contextWindow = getContextWindowForModel(model, betas)
+107	  const percentage = getAutoToolSearchPercentage() / 100
+108	  return Math.floor(contextWindow * percentage)
+109	}
+110	
+111	/**
+112	 * Get the character threshold for auto-enabling tool search for a given model.
+113	 * Used as fallback when the token counting API is unavailable.
+114	 */
+115	export function getAutoToolSearchCharThreshold(model: string): number {
+116	  return Math.floor(getAutoToolSearchTokenThreshold(model) * CHARS_PER_TOKEN)
+117	}
+118	
+119	/**
+120	 * Get the total token count for all deferred tools using the token counting API.
+121	 * Memoized by deferred tool names — cache is invalidated when MCP servers connect/disconnect.
+122	 * Returns null if the API is unavailable (caller should fall back to char heuristic).
+123	 */
+124	const getDeferredToolTokenCount = memoize(
+125	  async (
+126	    tools: Tools,
+127	    getToolPermissionContext: () => Promise<ToolPermissionContext>,
+128	    agents: AgentDefinition[],
+129	    model: string,
+130	  ): Promise<number | null> => {
+131	    const deferredTools = tools.filter(t => isDeferredTool(t))
+132	    if (deferredTools.length === 0) return 0
+133	
+134	    try {
+135	      const total = await countToolDefinitionTokens(
+136	        deferredTools,
+137	        getToolPermissionContext,
+138	        { activeAgents: agents, allAgents: agents },
+139	        model,
+140	      )
+141	      if (total === 0) return null // API unavailable
+142	      return Math.max(0, total - TOOL_TOKEN_COUNT_OVERHEAD)
+143	    } catch {
+144	      return null // Fall back to char heuristic
+145	    }
+146	  },
+147	  (tools: Tools) =>
+148	    tools
+149	      .filter(t => isDeferredTool(t))
+150	      .map(t => t.name)
+151	      .join(','),
+152	)
+153	
+154	/**
+155	 * Tool search mode. Determines how deferrable tools (MCP + shouldDefer) are
+156	 * surfaced:
+157	 *   - 'ts
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts", "offset": 380, "limit": 160}
+
+[도구결과] 380	 * @param getToolPermissionContext Function to get tool permission context
+381	 * @param agents Array of agent definitions
+382	 * @param source Optional identifier for the caller (for debugging)
+383	 * @returns true if tool search should be enabled for this request
+384	 */
+385	export async function isToolSearchEnabled(
+386	  model: string,
+387	  tools: Tools,
+388	  getToolPermissionContext: () => Promise<ToolPermissionContext>,
+389	  agents: AgentDefinition[],
+390	  source?: string,
+391	): Promise<boolean> {
+392	  const mcpToolCount = count(tools, t => t.isMcp)
+393	
+394	  // Helper to log the mode decision event
+395	  function logModeDecision(
+396	    enabled: boolean,
+397	    mode: ToolSearchMode,
+398	    reason: string,
+399	    extraProps?: Record<string, number>,
+400	  ): void {
+401	    logEvent('tengu_tool_search_mode_decision', {
+402	      enabled,
+403	      mode: mode as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+404	      reason:
+405	        reason as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+406	      // Log the actual model being checked, not the session's main model.
+407	      // This is important for debugging subagent tool search decisions where
+408	      // the subagent model (e.g., haiku) differs from the session model (e.g., opus).
+409	      checkedModel:
+410	        model as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+411	      mcpToolCount,
+412	      userType: (process.env.USER_TYPE ??
+413	        'external') as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+414	      ...extraProps,
+415	    })
+416	  }
+417	
+418	  // Check if model supports tool_reference
+419	  if (!modelSupportsToolReference(model)) {
+420	    logForDebugging(
+421	      `Tool search disabled for model '${model}': model does not support tool_reference blocks. ` +
+422	        `This feature is only available on Claude Sonnet 4+, Opus 4+, and newer models.`,
+423	    )
+424	    logModeDecision(false, 'standard', 'model_unsu
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts", "offset": 540, "limit": 216}
+
+[도구결과] 540	 * tool_reference-carrying messages from removal.
+541	 *
+542	 * @param messages Array of messages that may contain tool_result blocks with tool_reference content
+543	 * @returns Set of tool names that have been discovered via tool_reference blocks
+544	 */
+545	export function extractDiscoveredToolNames(messages: Message[]): Set<string> {
+546	  const discoveredTools = new Set<string>()
+547	  let carriedFromBoundary = 0
+548	
+549	  for (const msg of messages) {
+550	    // Compact boundary carries the pre-compact discovered set. Inline type
+551	    // check rather than isCompactBoundaryMessage — utils/messages.ts imports
+552	    // from this file, so importing back would be circular.
+553	    if (msg.type === 'system' && msg.subtype === 'compact_boundary') {
+554	      const carried = msg.compactMetadata?.preCompactDiscoveredTools
+555	      if (carried) {
+556	        for (const name of carried) discoveredTools.add(name)
+557	        carriedFromBoundary += carried.length
+558	      }
+559	      continue
+560	    }
+561	
+562	    // Only user messages contain tool_result blocks (responses to tool_use)
+563	    if (msg.type !== 'user') continue
+564	
+565	    const content = msg.message?.content
+566	    if (!Array.isArray(content)) continue
+567	
+568	    for (const block of content) {
+569	      // tool_reference blocks only appear inside tool_result content, specifically
+570	      // in results from ToolSearchTool. The API expands these references into full
+571	      // tool definitions in the model's context.
+572	      if (isToolResultBlockWithContent(block)) {
+573	        for (const item of block.content) {
+574	          if (isToolReferenceWithName(item)) {
+575	            discoveredTools.add(item.tool_name)
+576	          }
+577	        }
+578	      }
+579	    }
+580	  }
+581	
+582	  if (discoveredTools.size > 0) {
+583	    logForDebugging(
+584	      `Dynamic tool loading: found ${discoveredTools.size} discovered tools in message history` +
+585	        (carriedFromBoundary > 0
+586	     
+
+[도구호출 Bash] {"command": "grep -rn \"defer_loading\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | head -8", "description": "delta/discovered/threshold 로직 + defer_loading 방출 지점"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/Tool.ts:439:   * When true, this tool is deferred (sent with defer_loading: true) and requires
+/Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts:5: * defer_loading: true and discovered via ToolSearchTool rather than being
+/Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts:174:  // features. Tool search emits defer_loading on tool definitions and
+/Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts:291:  // blanket disable breaks defer_loading for those users — all MCP tools
+/Users/seobi/jinsup_space/CC/src/utils/toolSearch.ts:293:  // likely the real cause of CC-330 "v2.1.70 defer_loading regression").
+/Users/seobi/jinsup_space/CC/src/utils/api.ts:68:// Extended BetaTool type with strict mode and defer_loading support
+/Users/seobi/jinsup_space/CC/src/utils/api.ts:71:  defer_loading?: boolean
+/Users/seobi/jinsup_space/CC/src/utils/api.ts:127:    /** When true, mark this tool with defer_loading for tool search */
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/api.ts", "offset": 100, "limit": 80}
+
+[도구결과] 100	  const fieldsToRemove = SWARM_FIELDS_BY_TOOL[toolName]
+101	  if (!fieldsToRemove || fieldsToRemove.length === 0) {
+102	    return schema
+103	  }
+104	
+105	  // Clone the schema to avoid mutating the original
+106	  const filtered = { ...schema }
+107	  const props = filtered.properties
+108	  if (props && typeof props === 'object') {
+109	    const filteredProps = { ...(props as Record<string, unknown>) }
+110	    for (const field of fieldsToRemove) {
+111	      delete filteredProps[field]
+112	    }
+113	    filtered.properties = filteredProps
+114	  }
+115	
+116	  return filtered
+117	}
+118	
+119	export async function toolToAPISchema(
+120	  tool: Tool,
+121	  options: {
+122	    getToolPermissionContext: () => Promise<ToolPermissionContext>
+123	    tools: Tools
+124	    agents: AgentDefinition[]
+125	    allowedAgentTypes?: string[]
+126	    model?: string
+127	    /** When true, mark this tool with defer_loading for tool search */
+128	    deferLoading?: boolean
+129	    cacheControl?: {
+130	      type: 'ephemeral'
+131	      scope?: 'global' | 'org'
+132	      ttl?: '5m' | '1h'
+133	    }
+134	  },
+135	): Promise<BetaToolUnion> {
+136	  // Session-stable base schema: name, description, input_schema, strict,
+137	  // eager_input_streaming. These are computed once per session and cached to
+138	  // prevent mid-session GrowthBook flips (tengu_tool_pear, tengu_fgts) or
+139	  // tool.prompt() drift from churning the serialized tool array bytes.
+140	  // See toolSchemaCache.ts for rationale.
+141	  //
+142	  // Cache key includes inputJSONSchema when present. StructuredOutput instances
+143	  // share the name 'StructuredOutput' but carry different schemas per workflow
+144	  // call — name-only keying returned a stale schema (5.4% → 51% err rate, see
+145	  // PR#25424). MCP tools also set inputJSONSchema but each has a stable schema,
+146	  // so including it preserves their GB-flip cache stability.
+147	  const cacheKey =
+148	    'inputJSONSchema' in tool && tool.inputJSONSchema
+149	      ? `$
+
+[도구호출 Bash] {"command": "grep -n \"deferred_tools_delta\" /Users/seobi/jinsup_space/CC/src/utils/messages.ts /Users/seobi/jinsup_space/CC/src/utils/attachments.ts | head -6", "description": "defer_loading 방출부 + deferred_tools_delta 렌더링 위치"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/messages.ts:4178:    case 'deferred_tools_delta': {
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:686:      type: 'deferred_tools_delta'
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:836:    maybe('deferred_tools_delta', () =>
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:1474:  return [{ type: 'deferred_tools_delta', ...delta }]
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/messages.ts", "offset": 4178, "limit": 30}
+
+[도구결과] 4178	    case 'deferred_tools_delta': {
+4179	      const parts: string[] = []
+4180	      if (attachment.addedLines.length > 0) {
+4181	        parts.push(
+4182	          `The following deferred tools are now available via ToolSearch:\n${attachment.addedLines.join('\n')}`,
+4183	        )
+4184	      }
+4185	      if (attachment.removedNames.length > 0) {
+4186	        parts.push(
+4187	          `The following deferred tools are no longer available (their MCP server disconnected). Do not search for them — ToolSearch will return no match:\n${attachment.removedNames.join('\n')}`,
+4188	        )
+4189	      }
+4190	      return wrapMessagesInSystemReminder([
+4191	        createUserMessage({ content: parts.join('\n\n'), isMeta: true }),
+4192	      ])
+4193	    }
+4194	    case 'agent_listing_delta': {
+4195	      const parts: string[] = []
+4196	      if (attachment.addedLines.length > 0) {
+4197	        const header = attachment.isInitial
+4198	          ? 'Available agent types for the Agent tool:'
+4199	          : 'New agent types are now available for the Agent tool:'
+4200	        parts.push(`${header}\n${attachment.addedLines.join('\n')}`)
+4201	      }
+4202	      if (attachment.removedTypes.length > 0) {
+4203	        parts.push(
+4204	          `The following agent types are no longer available:\n${attachment.removedTypes.map(t => `- ${t}`).join('\n')}`,
+4205	        )
+4206	      }
+4207	      if (attachment.isInitial && attachment.showConcurrencyNote) {
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/api.ts", "offset": 180, "limit": 45}
+
+[도구결과] 180	    // Only add strict if:
+181	    // 1. Feature flag is enabled
+182	    // 2. Tool has strict: true
+183	    // 3. Model is provided and supports it (not all models support it right now)
+184	    //    (if model is not provided, assume we can't use strict tools)
+185	    if (
+186	      strictToolsEnabled &&
+187	      tool.strict === true &&
+188	      options.model &&
+189	      modelSupportsStructuredOutputs(options.model)
+190	    ) {
+191	      base.strict = true
+192	    }
+193	
+194	    // Enable fine-grained tool streaming via per-tool API field.
+195	    // Without FGTS, the API buffers entire tool input parameters before sending
+196	    // input_json_delta events, causing multi-minute hangs on large tool inputs.
+197	    // Gated to direct api.anthropic.com: proxies (LiteLLM etc.) and Bedrock/Vertex
+198	    // with Claude 4.5 reject this field with 400. See GH#32742, PR #21729.
+199	    if (
+200	      getAPIProvider() === 'firstParty' &&
+201	      isFirstPartyAnthropicBaseUrl() &&
+202	      (getFeatureValue_CACHED_MAY_BE_STALE('tengu_fgts', false) ||
+203	        isEnvTruthy(process.env.CLAUDE_CODE_ENABLE_FINE_GRAINED_TOOL_STREAMING))
+204	    ) {
+205	      base.eager_input_streaming = true
+206	    }
+207	
+208	    cache.set(cacheKey, base)
+209	  }
+210	
+211	  // Per-request overlay: defer_loading and cache_control vary by call
+212	  // (tool search defers different tools per turn; cache markers move).
+213	  // Explicit field copy avoids mutating the cached base and sidesteps
+214	  // BetaTool.cache_control's `| null` clashing with our narrower type.
+215	  const schema: BetaToolWithExtras = {
+216	    name: base.name,
+217	    description: base.description,
+218	    input_schema: base.input_schema,
+219	    ...(base.strict && { strict: true }),
+220	    ...(base.eager_input_streaming && { eager_input_streaming: true }),
+221	  }
+222	
+223	  // Add defer_loading if requested (for tool search feature)
+224	  if (options.deferLoading) {
+
+[도구호출 Bash] {"command": "grep -rn \"extractDiscoveredToolNames\\|deferLoading\" /Users/seobi/jinsup_space/CC/src/services/api/claude.ts /Users/seobi/jinsup_space/CC/src/utils/api.ts 2>/dev/null | grep -v \"^\\s*\\*\" | head -12", "description": "discovered 도구의 defer 해제 흐름 확인"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/api.ts:128:    deferLoading?: boolean
+/Users/seobi/jinsup_space/CC/src/utils/api.ts:224:  if (options.deferLoading) {
+/Users/seobi/jinsup_space/CC/src/services/api/claude.ts:187:  extractDiscoveredToolNames,
+/Users/seobi/jinsup_space/CC/src/services/api/claude.ts:1158:    const discoveredToolNames = extractDiscoveredToolNames(messages)
+/Users/seobi/jinsup_space/CC/src/services/api/claude.ts:1243:        deferLoading: willDefer(tool),
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/api/claude.ts", "offset": 1150, "limit": 100}
+
+[도구결과] 1150	  // Filter out ToolSearchTool if tool search is not enabled for this model
+1151	  // ToolSearchTool returns tool_reference blocks which unsupported models can't handle
+1152	  let filteredTools: Tools
+1153	
+1154	  if (useToolSearch) {
+1155	    // Dynamic tool loading: Only include deferred tools that have been discovered
+1156	    // via tool_reference blocks in the message history. This eliminates the need
+1157	    // to predeclare all deferred tools upfront and removes limits on tool quantity.
+1158	    const discoveredToolNames = extractDiscoveredToolNames(messages)
+1159	
+1160	    filteredTools = tools.filter(tool => {
+1161	      // Always include non-deferred tools
+1162	      if (!deferredToolNames.has(tool.name)) return true
+1163	      // Always include ToolSearchTool (so it can discover more tools)
+1164	      if (toolMatchesName(tool, TOOL_SEARCH_TOOL_NAME)) return true
+1165	      // Only include deferred tools that have been discovered
+1166	      return discoveredToolNames.has(tool.name)
+1167	    })
+1168	  } else {
+1169	    filteredTools = tools.filter(
+1170	      t => !toolMatchesName(t, TOOL_SEARCH_TOOL_NAME),
+1171	    )
+1172	  }
+1173	
+1174	  // Add tool search beta header if enabled - required for defer_loading to be accepted
+1175	  // Header differs by provider: 1P/Foundry use advanced-tool-use, Vertex/Bedrock use tool-search-tool
+1176	  // For Bedrock, this header must go in extraBodyParams, not the betas array
+1177	  const toolSearchHeader = useToolSearch ? getToolSearchBetaHeader() : null
+1178	  if (toolSearchHeader && getAPIProvider() !== 'bedrock') {
+1179	    if (!betas.includes(toolSearchHeader)) {
+1180	      betas.push(toolSearchHeader)
+1181	    }
+1182	  }
+1183	
+1184	  // Determine if cached microcompact is enabled for this model.
+1185	  // Computed once here (in async context) and captured by paramsFromContext.
+1186	  // The beta header is also captured here to avoid a top-level import of the
+1187	  // ant-only CACHE_EDITING_BETA_HEADER constan
+
+[ASSISTANT] src 스냅샷의 ToolSearch 구현 전체를 읽었습니다. 이건 단일 도구가 아니라 **"도구 카탈로그 지연 로딩" 시스템의 검색 창구**예요. 전체 생애주기가 5단계로 돌아갑니다.
+
+## 큰 그림 — 왜 존재하나
+
+MCP 서버가 많으면 도구 스키마만 수만 토큰입니다. 그래서 무거운 도구들은 **스키마 없이 이름만** 알려두고, 모델이 필요할 때 ToolSearch로 "장전"하는 구조입니다.
+
+```
+① 분류      isDeferredTool()          — 누구를 미룰 것인가
+② 고지      deferred_tools_delta      — 모델에게 이름만 알림
+③ 검색      ToolSearchTool.call()     — select: / 키워드
+④ 영수증    tool_reference 블록       — tool_result에 남는 "장전 기록"
+⑤ 재조립    다음 API 호출부터 스키마 포함
+```
+
+## ① 분류 — `isDeferredTool` (ToolSearchTool/prompt.ts:62-108)
+
+우선순위 순서대로:
+
+| 규칙 | 판정 |
+|---|---|
+| `alwaysLoad: true` (MCP는 `_meta['anthropic/alwaysLoad']`로 선언) | **절대 defer 안 함** — 최우선 |
+| MCP 도구 (`isMcp: true`) | **무조건 defer** |
+| ToolSearch 자신 | defer 안 함 — "모델이 나머지를 로드하려면 이게 필요" |
+| FORK_SUBAGENT 실험 켜짐 → Agent 툴 | defer 안 함 (1턴부터 fork 가능해야) |
+| KAIROS의 Brief/SendUserFile | defer 안 함 (통신 채널이라 즉시 필요) |
+| 그 외 | `shouldDefer: true`인 도구만 defer |
+
+## ②' 모드 게이트 — 검색 시스템 자체의 온오프 (utils/toolSearch.ts:172-198, 385-473)
+
+`ENABLE_TOOL_SEARCH` 환경변수로 3모드:
+
+- **`tst`** (기본값): MCP·shouldDefer 도구 항상 defer
+- **`tst-auto` (auto:N)**: deferred 도구들의 토큰 총량이 **컨텍스트 윈도의 N% 초과할 때만** 발동. 정확한 토큰 카운팅 API를 먼저 쓰고(memoize, 도구 셋 변경 시 무효화), 실패하면 chars÷4 휴리스틱 폴백 (`checkAutoThreshold`, :712-755)
+- **`standard`**: 전부 인라인 노출 (구식)
+
+추가 차단기 2개: `CLAUDE_CODE_DISABLE_EXPERIMENTAL_BETAS` 킬스위치(프록시 게이트웨이용, :181), 그리고 **모델이 tool_reference를 지원해야** 함 — 미지원 패턴 기본값은 `['haiku']`이고 GrowthBook으로 실시간 갱신 (:204-213).
+
+## ② 고지 — 이름만 대화에 뿌리기 (toolSearch.ts:629-706)
+
+델타 모드(`isDeferredToolsDeltaEnabled`)에서는 매번 전체 목록을 다시 보내지 않습니다. **대화 이력을 스캔해 "이미 고지한 이름 집합"을 재구성**(이전 delta 어태치먼트들의 added/removed를 누적 재생)한 뒤, 차집합만 어태치먼트로 흘립니다. 렌더링 원문(messages.ts:4178-4193)이 바로 이 세션에서 계속 보셨던 그 문구예요:
+
+```
+"The following deferred tools are now available via ToolSearch: ..."
+"The following deferred tools are no longer available (their MCP server
+ disconnected). Do not search for them — ToolSearch will return no match: ..."
+```
+
+방금 이 턴에 도착한 "61 deferred tools are no longer available" 공지가 이 코드의 산물입니다. 미묘한 설계 하나: 고지됐다가 defer가 풀렸지만 여전히 풀에 있는 도구는 removed로 보고하지 **않습니다** — "이제 직접 로드됐는데 '사라졌다'고 말하면 거짓이 되니까" (:641-644 주석).
+
+## ③ 검색 — `call()`의 두 경로 (ToolSearchTool.ts:328-434)
+
+**A. `select:` 경로** (:363-406) — 정확 선택:
+- `select:A,B,C` 콤마 다중 선택 지원
+- deferred 셋 → 전체 풀 순으로 조회. **이미 로드된 도구를 select해도 성공 처리** — "harmless no-op that lets the model proceed without retry churn"
+- 일부만 찾으면 partial (찾은 것만 반환), 0개면 빈 결과 + **아직 연결 중인 MCP 서버 목록** 첨부 (:335-339 → "still connecting... try searching again")
+
+**B. 키워드 경로** (`searchToolsWithKeywords`, :186-302) — 3단 폴백:
+
+1. **Fast path 1**: 쿼리 전체가 도구명과 정확 일치 → 즉시 반환. 모델이 `select:` 없이 맨이름만 던지는 실수(서브에이전트/compact 후 자주 발생)를 흡수
+2. **Fast path 2**: `mcp__`로 시작하면 프리픽스 매칭 (서버명으로 몽땅 찾기)
+3. **스코어링 검색**:
+   - 도구명 파싱(:132-161): `mcp__server__action` → 언더스코어 분해, 일반 도구는 CamelCase → 단어 분해
+   - `+term`은 **필수 텀** — 이름 파트/설명/searchHint 중 하나에서 전부 매치해야 후보 유지 (:236-257)
+   - 점수표 (:266-291):
+
+| 매치 종류 | 점수 |
+|---|---|
+| 이름 파트 정확 일치 | MCP 12 / 일반 10 |
+| 이름 파트 부분 포함 | MCP 6 / 일반 5 |
+| searchHint (큐레이션 문구) | 4 |
+| 설명문 word-boundary 매치 | 2 |
+| full name 폴백 (점수 0일 때만) | 3 |
+
+   - `score > 0` 필터 → 내림차순 → `max_results`(기본 5) 컷
+   - 설명문은 `tool.prompt()` 실행 결과를 **도구명 기준 memoize**하고, deferred 셋이 바뀌면 캐시 전체 무효화 (:49-105)
+
+## ④⑤ 로드의 실체 — 여기가 제일 흥미롭습니다
+
+검색 결과는 텍스트가 아니라 **`tool_reference` 블록**으로 tool_result에 박힙니다 (:462-469):
+
+```ts
+content: content.matches.map(name => ({ type: 'tool_reference', tool_name: name }))
+```
+
+그리고 요청 조립부(claude.ts:1154-1167)의 규칙:
+
+```
+비 deferred 도구        → 항상 전송
+ToolSearch 자신         → 항상 전송
+deferred + 미발견       → tools 배열에서 아예 제외!   ← 사전 선언 자체를 안 함
+deferred + 발견됨       → 전송 (defer_loading: true 플래그, api.ts:223)
+```
+
+"발견됨" 판정은 별도 상태 저장소가 아니라 **대화 이력 자체를 스캔**해서 얻습니다 — `extractDiscoveredToolNames`(toolSearch.ts:545-592)가 이력의 tool_result 속 tool_reference 블록을 전부 긁어 집합을 재구성해요. 대화가 곧 영수증인 거죠. compact로 그 메시지가 날아가면? **compact_boundary 마커에 `preCompactDiscoveredTools`로 스냅숏을 이월**해서 발견 집합이 살아남습니다 (:553-558).
+
+스키마의 실제 "확장"은 클라이언트가 아니라 **API 서버**가 합니다 — tool_reference를 모델 컨텍스트에서 full definition으로 펼치는 베타 기능이라, 베타 헤더가 필수 (1P/Foundry는 advanced-tool-use, Vertex/Bedrock은 tool-search-tool, claude.ts:1174-1182). Bedrock/Vertex는 미지원일 수 있다는 주석도 있고요 (ToolSearchTool.ts:441-443).
+
+## 요약 한 줄
+
+**deferred 도구는 요청에서 통째로 빠지고, ToolSearch가 남긴 tool_reference "영수증"이 대화에 존재하는 동안만 다음 요청부터 스키마가 실린다** — 상태는 DB가 아니라 대화 이력이며, 그래서 resume·compact를 넘어도 복원됩니다. 지난번 정리한 델타 고지(스킬 목록·MCP 지시와 같은 패턴)의 도구판이라고 보시면 됩니다.
+
+원하시면 이것도 visual-explainer로 5단 생애주기 도면 만들어드릴 수 있어요.
+
+[USER] <command-message>visual-explainer</command-message>
+<command-name>/visual-explainer</command-name>
+
+[USER] md로도 만들어주고 /visual-explainer로도 만들어주라
+
+[ASSISTANT] 좋습니다. 먼저 md 문서를 만들고, 이어서 /visual-explainer로 HTML을 빌드할게요.
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md", "content": "# ToolSearch — 도구 지연 로딩 생애주기 소스분석\n\n> 검증일: 2026-07-11 · 대상: `src/tools/ToolSearchTool/` + `src/utils/toolSearch.ts` + `src/services/api/claude.ts` + `src/utils/api.ts` (구버전 src 스냅샷)\n> 짝꿍 문서: `toolsearch-생애주기-소스분석.html` (시각화) · `2026-07-11-시스템프롬프트및도구내용-최신본.md` (Part 2-10)\n\n---\n\n## §00 큰 그림 — ToolSearch는 도구가 아니라 \"시스템의 창구\"\n\nMCP 서버가 많으면 도구 스키마만 수만 토큰. 그래서 무거운 도구들은 **스키마 없이 이름만** 알려두고, 모델이 필요할 때 ToolSearch로 \"
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md", "old_string": "### 구모드\n\n델타 비활성 시엔 `<available-deferred-tools>` 블록을 **매 호출 prepend** — \"claude.ts keeps its per-call header prepend\" (:624-627). 델타 모드의 존재 이유가 곧 이 캐시 파괴 방지다.", "new_string": "### 구모드\n\n델타 비활성 시엔 `<available-deferred-tools>` 블록을 **매 호출 prepend** — \"claude.ts keeps its per-call header prepend\" (:624-627). 델타 모드의 존재 이유가 곧 이 캐시 파괴 방지다.\n\n### FAQ — \"select 인자를 넘기는 건 LLM인데, 그럼 deferred 도
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Skill] {"skill": "visual-explainer", "args": "ToolSearch 도구 지연 로딩 생애주기 5단계 (분류→고지→검색→영수증→재조립) + select/키워드 검색 알고리즘 + \"LLM이 이름을 미리 아는 이유\" FAQ 시각화 — toolsearch-생애주기-소스분석.md의 HTML 짝꿍"}
+
+[도구결과] Launching skill: visual-explainer
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>ToolSearch 생애주기 — 폐가식 서고의 대출 시스템</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&f
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html\"", "description": "HTML 브라우저로 열기"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 완료했습니다. 먼저 작업 중에 주신 질문부터 — 정확한 지적이에요.
+
+## "select 인자를 넘기려면 LLM이 미리 알아야 하는 것 아닌가?"
+
+**맞습니다. 그리고 그게 바로 생애주기 ②고지 단계의 존재 이유예요.** 모델이 모르는 건 이름이 아니라 스키마입니다:
+
+```
+이름 (도구당 1줄, 값쌈)      → 항상 컨텍스트에 있음 ← select:의 재료
+스키마 (수백~수천 토큰, 비쌈) → 영수증 생긴 뒤에만 실림
+```
+
+이번 세션에서 계속 보셨던 `"The following deferred tools are now available via ToolSearch: CronCreate, WebFetch, mcp__..."` 리마인더가 바로 그 **카드 목록**입니다. 저도 아까 Chrome 도구를 `select:mcp__claude-in-chrome__navigate,...`로 부를 수 있었던 게 그 목록을 읽었기 때문이고요. ToolSearch의 도구 설명문 자체에도 "Deferred tools appear by name in system-reminder messages"라고 모델에게 명시돼 있습니다 (`prompt.ts:35-42`).
+
+그리고 이름이 기억 안 나거나 부정확할 때의 안전망이 **키워드 검색**과 **bare-name fast path**(select: 없이 맨이름만 던져도 정확 일치면 통과)예요. 결국 frontmatter 4종에서 봤던 그 패턴의 도구판입니다 — **값싼 색인은 항상, 비싼 본문은 방아쇠 당길 때만.** 재미있는 건 "이름 옆에 설명 힌트도 붙여주자" A/B 실험이 있었는데 매치율 개선이 없어서 중단됐고(`prompt.ts:110-117`), 그래서 카드 목록이 이름 한 줄로 확정된 겁니다.
+
+## 산출물 2종
+
+| 파일 | 구성 |
+|---|---|
+| **`toolsearch-생애주기-소스분석.md`** | §00 큰 그림 5단계 → §01 분류 사다리 → §02 모드 게이트(tst/auto/standard) → §03 고지 델타 + **방금 질문을 FAQ로 수록** → §04 검색 알고리즘·점수표 → §05 영수증·재조립 4행 규칙 → §06 이 세션 실측(61개 해제 공지) → 검증 이력 |
+| **`toolsearch-생애주기-소스분석.html`** | **폐가식 서고 + 대출 시스템** 메타포, 웜 다크 아카데미아(세피아+황동), Gowun Batang/Gothic A1/IBM Plex Mono. 01 생애주기 5노드 체인 → 02 분류 사다리(면제/서고행 판정) → **03 대표님 질문 전용 섹션** (카드 목록 vs 봉인 스키마 좌우 분리) → 04 select/키워드 2경로 + 점수 막대 → 05 4행 규칙 + 영수증 스탬프 → 06 3모드 + 실측 |
+
+전 섹션에 `› source 파일:line` 근거를 박았고, HTML은 브라우저로 열어뒀습니다. 수정 원하시면 말씀해주세요 — 예: 03 섹션을 맨 앞으로, 점수표에 실제 검색 예시 시뮬레이션 추가 등.
+
+[USER] 툴서치 쓸때마다 그때 인풋으로 system-reminder가 항상들어오는거야?? 어느타이밍을 말하는거지
+
+[ASSISTANT] 아니요 — **ToolSearch 호출과는 무관합니다.** 두 방향을 분리해서 보셔야 해요.
+
+## 방향이 다른 두 물건
+
+```
+[입력 방향]  system-reminder 카드 목록   ← 어태치먼트 파이프라인이 넣음 (ToolSearch와 무관)
+[출력 방향]  ToolSearch의 tool_result    ← 호출했을 때만, 영수증(tool_reference) 반환
+```
+
+ToolSearch를 쓰면 돌아오는 건 tool_result뿐입니다. 카드 목록 system-reminder는 ToolSearch를 한 번도 안 불러도 들어와요.
+
+## 그럼 카드 목록은 언제 들어오나 — 두 조건의 교집합
+
+**① 타이밍**: 우리가 rules/skill_listing에서 봤던 바로 그 **어태치먼트 수집 지점**입니다 — 턴 시작(유저 입력 처리 시) + 사이클 꼬리(도구 실행 직후). `deferred_tools_delta`도 같은 `maybe(...)` 목록에 등록돼 있어요 (`attachments.ts:836`).
+
+**② 조건**: 수집 지점마다 "보낼까?"를 검사하는데, **델타가 있을 때만** 보냅니다 (`getDeferredToolsDelta`, toolSearch.ts:646-706):
+
+```
+현재 deferred 풀  vs  이 대화에서 이미 고지한 이름 집합(과거 델타 어태치먼트 스캔으로 재구성)
+    → 새로 생긴 이름 or 사라진 이름이 있으면  → 그 차이분만 어태치먼트 발행
+    → 차이 없으면                            → null, 아무것도 안 들어옴 (:677)
+```
+
+그리고 한 번 발행된 고지 메시지는 **대화 이력에 그대로 잔류**하니까 재전송이 필요 없습니다. 모델은 과거에 쌓인 고지들을 항상 볼 수 있고, 다음 델타 계산도 그 잔류 메시지들을 스캔해서 "이미 알렸던 것"을 복원해요 (:655-663).
+
+## 이 세션의 실제 타임라인으로 보면
+
+```
+세션 진행 ────────────────────────────────────────────────▶
+   │                    │                       │
+   ▼                    ▼                       ▼
+[초기 고지]        [figma/supabase/vercel    [Atlassian/Gmail 등
+ 전체 deferred      플러그인 서버 연결됨]      서버 연결 끊김]
+ 목록 1회           → "now available" 추가분   → "no longer available" 61개
+                      고지가 그 다음 수집       해제 고지
+                      지점에 실림
+```
+
+중간에 제가 ToolSearch를 여러 번 썼지만(Chrome 도구 로드 등), 그 턴들에 카드 목록이 또 오지는 않았죠 — **풀이 안 변했으니까**. 반대로 ToolSearch를 안 쓴 턴에도 MCP 서버가 붙거나 끊기면 고지가 들어왔습니다.
+
+요약하면: **"툴서치 쓸 때마다"가 아니라 "deferred 풀이 변한 직후의 수집 지점마다"**입니다. 발행 주체도 ToolSearch가 아니라 하네스의 어태치먼트 파이프라인이고요. skill_listing이 스킬 추가될 때만 델타로 오는 것과 완전히 같은 패턴입니다.
+
+[USER] system-reminder로 유저 첫번째 프롬프트에 들어가나?
+
+[ASSISTANT] 첫 발행 시점이 정확히 어디 붙는지 소스로 확인해볼게요.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "offset": 1440, "limit": 45}
+
+[도구결과] 1440	    }
+1441	  }
+1442	
+1443	  return [{ type: 'date_change', newDate: currentDate }]
+1444	}
+1445	
+1446	function getUltrathinkEffortAttachment(input: string | null): Attachment[] {
+1447	  if (!isUltrathinkEnabled() || !input || !hasUltrathinkKeyword(input)) {
+1448	    return []
+1449	  }
+1450	  logEvent('tengu_ultrathink', {})
+1451	  return [{ type: 'ultrathink_effort', level: 'high' }]
+1452	}
+1453	
+1454	// Exported for compact.ts — the gate must be identical at both call sites.
+1455	export function getDeferredToolsDeltaAttachment(
+1456	  tools: Tools,
+1457	  model: string,
+1458	  messages: Message[] | undefined,
+1459	  scanContext?: DeferredToolsDeltaScanContext,
+1460	): Attachment[] {
+1461	  if (!isDeferredToolsDeltaEnabled()) return []
+1462	  // These three checks mirror the sync parts of isToolSearchEnabled —
+1463	  // the attachment text says "available via ToolSearch", so ToolSearch
+1464	  // has to actually be in the request. The async auto-threshold check
+1465	  // is not replicated (would double-fire tengu_tool_search_mode_decision);
+1466	  // in tst-auto below-threshold the attachment can fire while ToolSearch
+1467	  // is filtered out, but that's a narrow case and the tools announced
+1468	  // are directly callable anyway.
+1469	  if (!isToolSearchEnabledOptimistic()) return []
+1470	  if (!modelSupportsToolReference(model)) return []
+1471	  if (!isToolSearchToolAvailable(tools)) return []
+1472	  const delta = getDeferredToolsDelta(tools, messages ?? [], scanContext)
+1473	  if (!delta) return []
+1474	  return [{ type: 'deferred_tools_delta', ...delta }]
+1475	}
+1476	
+1477	/**
+1478	 * Diff the current filtered agent pool against what's already been announced
+1479	 * in this conversation (reconstructed from prior agent_listing_delta
+1480	 * attachments). Returns [] if nothing changed or the gate is off.
+1481	 *
+1482	 * The agent list was embedded in AgentTool's description, causing ~10.2% of
+1483	 * fleet cache_creation: MCP async connect, /reload-plugins, or
+
+[도구호출 Bash] {"command": "grep -n \"maybe('deferred_tools_delta'\\|maybe('skill_listing'\\|maybe('agent_listing\\|maybe('mcp_instructions\" /Users/seobi/jinsup_space/CC/src/utils/attachments.ts; sed -n '800,860p' /Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "description": "델타 어태치먼트들의 수집 파이프라인 위치와 순서 확인"}
+
+[도구결과] 836:    maybe('deferred_tools_delta', () =>
+851:    maybe('agent_listing_delta', () =>
+854:    maybe('mcp_instructions_delta', () =>
+875:    maybe('skill_listing', () => getSkillListingAttachments(context)),
+        // queries on every skill invocation (session 13a9afae).
+        ...(feature('EXPERIMENTAL_SKILL_SEARCH') &&
+        skillSearchModules &&
+        !options?.skipSkillDiscovery
+          ? [
+              maybe('skill_discovery', () =>
+                skillSearchModules.prefetch.getTurnZeroSkillDiscovery(
+                  input,
+                  messages ?? [],
+                  context,
+                ),
+              ),
+            ]
+          : []),
+      ]
+    : []
+
+  // Process user input attachments first (includes @mentioned files)
+  // This ensures files are added to nestedMemoryAttachmentTriggers before nested_memory processes them
+  const userAttachmentResults = await Promise.all(userInputAttachments)
+
+  // Thread-safe attachments available in sub-agents
+  // NOTE: These must be created AFTER userInputAttachments completes to ensure
+  // nestedMemoryAttachmentTriggers is populated before getNestedMemoryAttachments runs
+  const allThreadAttachments = [
+    // queuedCommands is already agent-scoped by the drain gate in query.ts —
+    // main thread gets agentId===undefined, subagents get their own agentId.
+    // Must run for all threads or subagent notifications drain into the void
+    // (removed from queue by removeFromQueue but never attached).
+    maybe('queued_commands', () => getQueuedCommandAttachments(queuedCommands)),
+    maybe('date_change', () =>
+      Promise.resolve(getDateChangeAttachments(messages)),
+    ),
+    maybe('ultrathink_effort', () =>
+      Promise.resolve(getUltrathinkEffortAttachment(input)),
+    ),
+    maybe('deferred_tools_delta', () =>
+      Promise.resolve(
+        getDeferredToolsDeltaAttachment(
+          toolUseContext.options.tools,
+          toolUseContext.options.mainLoopModel,
+          messages,
+          
+
+[ASSISTANT] 네, **사실상 첫 유저 프롬프트와 함께 들어옵니다** — 단, "프롬프트 안"이 아니라 "프롬프트 옆"입니다. 방금 소스로 확인한 구조로 정리하면:
+
+## 첫 발행이 1턴에 붙는 이유
+
+`deferred_tools_delta`는 어태치먼트 파이프라인의 정식 멤버입니다 (`attachments.ts:836`). 델타 계산은 "현재 풀 − 이미 고지한 집합"인데, **세션 첫 턴엔 고지 이력이 0이니까 델타 = 전체 deferred 목록**이 됩니다. 그래서 세션의 첫 수집 지점 — 즉 첫 유저 프롬프트 처리 시점 — 에 최초 전체 목록이 발행돼요. (텔레메트리 주석도 이를 명시: "subagent getAttachments → prior=0 is EXPECTED — fresh conversation", toolSearch.ts:606-608. compact 직후 재발행도 같은 원리 — 옛 고지 메시지가 요약으로 날아가서 prior=0.)
+
+## 1턴 messages 배열의 실제 배치
+
+```
+[0] 유령 메시지            ← claudeMd·userEmail·currentDate (별개 트랙, prependUserContext)
+[1] 유저의 첫 프롬프트      ← 대표님이 타이핑한 텍스트 그대로
+[2] deferred_tools_delta   ← ⟨system-reminder⟩ The following deferred tools are
+                              now available via ToolSearch: ... (isMeta user 메시지)
+[3] skill_listing          ← 스킬 카드 목록 (같은 파이프라인 이웃)
+[4] agent_listing_delta / mcp_instructions_delta ...
+```
+
+즉 유저 프롬프트 텍스트에 섞이는 것도 아니고, 0번 유령 메시지에 합쳐지는 것도 아니고, **프롬프트 직후에 별도 isMeta 메시지로 나란히 서는 겁니다.** 방금 확인한 소스에서 이 델타 4형제가 같은 목록에 연달아 등록돼 있어요 — `deferred_tools_delta`(:836) · `agent_listing_delta`(:851) · `mcp_instructions_delta`(:854) · `skill_listing`(:875).
+
+## 발행 전 통과해야 하는 문 4개 (attachments.ts:1461-1471)
+
+첫 턴이라도 이 게이트를 못 넘으면 안 들어옵니다: ① 델타 모드 켜짐 ② tool search 활성 ③ 모델이 tool_reference 지원 (haiku 계열이면 탈락) ④ ToolSearch 도구가 disallowed 아님. 주석이 이유를 설명해요 — "어태치먼트 문구가 'available via ToolSearch'라고 말하니, ToolSearch가 실제로 요청에 있어야 한다."
+
+## 유령 메시지와의 결정적 차이
+
+| | 0번 유령 메시지 (claudeMd) | deferred 카드 목록 |
+|---|---|---|
+| 발행 | **매 호출 재생성** (이력에 없음) | **1턴에 1회 발행 후 이력에 잔류** |
+| 이후 | 항상 새로 만들어 prepend | 풀이 변할 때만 증분 추가 |
+
+참고로 델타 모드가 꺼진 구모드에서는 얘기가 달라집니다 — `<available-deferred-tools>` 블록을 유령 메시지처럼 **매 호출 prepend**했고(toolSearch.ts:624-627), 그게 캐시를 깨서 지금의 "1회 발행 + 증분" 방식으로 바뀐 거예요.
+
+[USER] 그러면 그..나중에 mcp추가하면 그때 최신 메시지에 어태치먼트로 들어가?
+
+[ASSISTANT] 네, 정확히 그렇게 동작합니다. 서버가 붙는 순간이 아니라 **그 다음에 오는 수집 지점**에서, 대화의 최신 위치에 어태치먼트로 꽂혀요.
+
+## 시나리오: 세션 중간에 MCP 서버 추가
+
+```
+대화 진행중 ──────────────────────────────────────────────▶
+                    │
+                    ▼
+            (백그라운드) 새 MCP 서버 연결 완료
+            → deferred 풀에 새 도구들 합류. 아직 아무 일도 안 일어남
+                    │
+                    ▼
+            다음 수집 지점 도래 — 둘 중 먼저 오는 쪽:
+            (a) 다음 유저 프롬프트 처리 시   (턴 머리)
+            (b) 진행 중인 턴의 도구 실행 직후 (사이클 꼬리, query.ts:1569)
+                    │
+                    ▼
+            델타 계산: 현재 풀 − 이미 고지한 집합 = 새 도구들
+                    │
+                    ▼
+            대화 꼬리(최신 위치)에 isMeta 메시지로 삽입:
+            ⟨system-reminder⟩ The following deferred tools are
+            now available via ToolSearch: mcp__새서버__... ⟨/system-reminder⟩
+```
+
+한 번 꽂히면 그 자리에 영구 잔류하고, 다음 델타 계산 때 "이미 알린 것"으로 집계됩니다.
+
+## 이 세션에서 실제로 두 번 목격하셨어요
+
+1. **추가**: 대화 중간에 figma/supabase/vercel 플러그인 서버들이 연결됐고, 제가 작업하던 턴의 수집 지점에 "now available" 목록(약 90종)이 꽂혔습니다. 심지어 유저 프롬프트를 기다리지 않고 **제 도구 실행 사이(사이클 꼬리)** 에 들어왔어요.
+2. **제거**: 대표님이 "toolSearch 로직 알려줘"라고 치신 턴에 Atlassian/Gmail/Calendar/Drive 서버가 끊긴 상태였고, 그 프롬프트 옆에 "61 deferred tools are no longer available... Do not search for them" 해제 공지가 함께 들어왔습니다.
+
+## 덤으로 같이 타는 동승자들
+
+MCP 서버 연결/해제는 델타 4형제 중 셋을 동시에 깨울 수 있습니다 (같은 수집 지점에 나란히 발행):
+
+| 어태치먼트 | 내용 |
+|---|---|
+| `deferred_tools_delta` | 새 도구 이름들 (카드 목록 증분) |
+| `mcp_instructions_delta` | 그 서버의 사용 지침 (# MCP Server Instructions 증분) |
+| `agent_listing_delta` | 서버가 에이전트 타입을 제공하면 그 증분 |
+
+이 방식의 존재 이유가 앞서 본 캐시 보존입니다 — 시스템 프롬프트나 도구 스키마를 건드리면 프리픽스 캐시가 통째로 깨지니까, **변경분을 대화 끝에 덧붙이는 것으로 대체**한 거예요 (attachments.ts:836-860, 렌더링 messages.ts:4178-4193).
+
+[USER] 근데 대화가 길어지다보면 중간에 껴서 로스트인더미들로 까먹는거 아닌가
+
+[ASSISTANT] 날카로운 지적이에요. 결론부터: **리스크는 실재하고, 소스를 보면 설계자들도 그걸 알고 있었습니다.** 다만 방어선이 계층적으로 깔려 있어서 "까먹어도 복구되는" 구조예요.
+
+## 먼저 구분 — 누가 까먹을 수 있는가
+
+**하네스는 절대 안 까먹습니다.** 델타 계산이 모델 기억이 아니라 **프로그램적 이력 스캔**(getDeferredToolsDelta의 어태치먼트 재생)이라, 고지가 10만 토큰 중간에 묻혀 있어도 집계는 정확해요. 위험한 건 **모델의 주의력** — 중간에 묻힌 이름 목록을 attention이 놓치는 것, 말씀하신 lost-in-the-middle입니다.
+
+## 모델이 까먹었을 때의 4중 안전망 (전부 소스 확인)
+
+**① 입구 표지판은 안 묻힘** — ToolSearch 도구의 설명문("Deferred tools appear by name in system-reminder messages")은 대화 이력이 아니라 **tools 배열에 매 요청 fresh하게** 실립니다. "정확한 목록"은 묻혀도 "그런 목록이 존재하고 검색하면 된다"는 사실 자체는 항상 눈앞에 있어요.
+
+**② 키워드 검색** — 이름을 정확히 기억 못 해도 `"notebook jupyter"`처럼 의미로 던지면 점수 검색이 찾아줍니다. 목록 암기가 전제 조건이 아니에요.
+
+**③ bare-name fast path** — 결정적 증거가 이 주석입니다 (ToolSearchTool.ts:194-198):
+
+> "Handles models using a bare tool name instead of select: prefix (**seen from subagents/post-compaction**)"
+
+"compact 후·서브에이전트에서 모델이 흐릿한 기억으로 이름만 던지는 걸 관찰했다" — **기억 열화 상황을 실측하고 그걸 겨냥해 만든 방어선**이라는 뜻이죠.
+
+**④ 실패해도 회복 유도** — 매치 0이면 "No matching deferred tools found" + 연결 중 서버 안내로 재시도를 유도합니다.
+
+## 그리고 compact가 역설적으로 리프레시 장치
+
+가장 재미있는 부분인데, 고지가 너무 오래돼서 묻힐 때쯤이면 보통 compact가 옵니다. 그런데 compact는 옛 고지 메시지들을 요약으로 날려버리죠 → 다음 델타 스캔에서 "고지한 적 없음(prior=0)"이 되고 → **전체 목록이 새 컨텍스트 맨 앞쪽에 통째로 재발행**됩니다. 소스 근거:
+
+- `getDeferredToolsDeltaAttachment`가 compact.ts에서도 호출되도록 export됨 — "the gate must be identical at both call sites" (attachments.ts:1454-1455)
+- 텔레메트리 주석: "**compact_full: compact.ts passes [] → prior=0 is EXPECTED**" (toolSearch.ts:608)
+
+실측도 있습니다 — 이 세션 compact 직후 첫 리마인더에 deferred 전체 목록이 다시 들어왔었죠. 즉 lost-in-the-middle가 최악이 되는 시점(초장기 대화)에 컨텍스트가 리셋되면서 목록도 앞쪽으로 끌어올려지는 구조예요. 영수증(tool_reference) 쪽도 별도 보호 — snip은 영수증 보유 메시지를 제거 대상에서 제외하고(toolSearch.ts:539-540), compact는 발견 집합을 boundary 마커에 스냅숏으로 이월합니다.
+
+## 정직 표기 — 남는 구멍
+
+compact가 안 일어난 채로 아주 긴 대화가 이어지면, 중간에 묻힌 고지를 모델이 놓치는 구간은 **소스상 별도 재주입 장치를 확인 못 했습니다.** 그 구간의 실질 방어는 ①~④뿐이에요. 다만 목록이 "이름 한 줄×N"이라 애초에 짧고, 모델이 "이런 도구가 있을 법한데" 수준의 추측만 해도 키워드 검색으로 복구되니, 설계 철학은 "완벽한 기억"이 아니라 **"흐릿한 기억 + 좋은 검색"**에 베팅한 것으로 보입니다.
+
+[USER] 1번 무슨말인지 모르겠네.. tools에는 검색될 도구 목록은 안들어가잖니
+
+[ASSISTANT] 아 맞습니다, 제가 모호하게 말했네요. **검색될 도구들의 목록은 tools 배열에 안 들어갑니다** — 대표님 말씀이 정확해요. ①에서 말한 건 목록이 아니라 **ToolSearch 도구 "자기 자신"의 설명문**입니다.
+
+## 두 가지를 분리하면
+
+```
+[tools 배열 — 매 요청 재전송, 항상 눈앞]
+  ├─ Read, Bash, Edit ... (비 deferred 도구들)
+  ├─ ToolSearch ★           ← 자기 자신은 항상 실림 (4행 규칙의 2번)
+  │    └─ description: "Fetches full schema definitions for deferred tools...
+  │        Deferred tools appear by name in ⟨system-reminder⟩ messages.
+  │        Until fetched, only the name is known..."
+  │                          ← 이 문장이 "표지판"
+  └─ (deferred + 미발견 도구들 = 여기 없음 ✓ 대표님 말대로)
+
+[대화 이력 — 오래되면 중간에 묻힘]
+  └─ ⟨system-reminder⟩ 카드 목록: WebFetch, mcp__... ← 실제 "이름들"은 여기
+```
+
+## 그래서 ①의 논리는 이겁니다
+
+lost-in-the-middle로 모델이 잊을 수 있는 건 **구체적 이름들**(대화 중간의 카드 목록)이죠. 그런데 매 요청마다 tools 배열에 실려 오는 ToolSearch의 설명문이 이렇게 말해줍니다:
+
+> "deferred 도구라는 게 존재한다. 이름은 system-reminder에 나와 있다. 나한테 쿼리하면 로드된다."
+
+즉 **"무엇이 있는지"는 까먹어도 "찾는 방법이 있다는 사실"은 까먹을 수 없는** 구조예요. 이름 기억이 날아간 모델도 이 표지판을 보고 "그럼 키워드로 검색해보자" → `"jira issue"` 같은 쿼리 → 점수 검색이 이름을 되찾아줍니다. ②③④ 안전망으로 이어지는 입구가 항상 열려 있는 거죠.
+
+표지판(ToolSearch 설명문)과 목록(카드 리마인더)의 위치가 다르다는 게 핵심인데, 제가 "입구 표지판"이라고만 써서 목록이 tools에 있다는 것처럼 읽혔네요. 정정: **tools 배열에 있는 건 ToolSearch 자신과 그 설명문뿐이고, 목록은 대화 이력에만 있습니다.**
+
+[USER] 아아 찾는방법만 리마인드하는구나 그럼 여전히 로스트인더미들 문제는있는거 아니야?
+
+[ASSISTANT] 네, 맞습니다. **구조적으로 남아 있어요.** 이 설계는 lost-in-the-middle을 "제거"한 게 아니라 **실패의 성격을 바꾼** 겁니다. 정직하게 갈라보면:
+
+## 설계가 바꾼 것 — 실패 모드의 변환
+
+| | 목록이 안 묻히게 전부 인라인 (구 standard 모드) | 현행 (이름은 이력에, 표지판만 상시) |
+|---|---|---|
+| 토큰 비용 | 매 요청 수만 토큰 (MCP 수백 개면 감당 불가) | 이름 한 줄×N + 표지판 |
+| 이름을 잊으면 | 잊을 일 없음 | **묻힐 수 있음** ← 남은 문제 |
+| 잊었을 때 결과 | — | 침묵 실패가 아니라 **회복 가능한 검색 실패** (키워드 검색 1회로 복구, 비용 = 라운드트립 1번) |
+
+## 남은 진짜 급소는 이겁니다
+
+모델이 이름을 어렴풋이라도 기억하면 안전망이 다 작동합니다. 문제는 **"그런 도구가 있다는 발상 자체를 못 하는 경우"** — 표지판은 "deferred 도구들이 존재한다"고만 말하지, "Jira 도구가 있다"고 말해주진 않으니까요. 목록이 깊이 묻힌 상태에서 유저가 "이슈 정리 좀 해줘"라고 하면, 모델이 "Jira MCP를 검색해볼까?"라는 생각에 도달하지 못할 수 있습니다. 이건 unknown unknowns라 검색 안전망이 못 구해줘요.
+
+이 급소를 실무에서 얇게 만들어주는 건 설계 밖의 정황들입니다: 유저 프롬프트가 보통 능력을 직접 언급하고("figma에서 가져와" → "figma" 검색은 목록 기억 없이도 가능), MCP 서버 지침("라이브러리 질문이면 context7 써라" 같은)이 의미적 라우팅 힌트를 주고, 대화가 그 지경으로 길어지기 전에 대개 compact가 와서 목록을 앞으로 끌어올리죠. 하지만 이것들은 완화지 해결이 아닙니다.
+
+## 그래서 결론은
+
+- **하네스 상태**: 절대 안 잃음 (프로그램적 스캔)
+- **모델 회복력**: 어렴풋한 기억만 있으면 복구됨 (검색 3중 안전망)
+- **모델 발상**: 목록이 묻히고 compact도 안 온 구간에서는 **여전히 취약** — 소스상 주기적 재주입 같은 추가 장치는 확인 못 했습니다
+
+설계 철학이 "완벽한 기억"이 아니라 "흐릿한 기억 + 좋은 검색"에 베팅했다고 했는데, 대표님 지적대로 그 베팅이 안 먹히는 구간(기억이 흐릿한 게 아니라 아예 증발한 경우)이 존재하고, 그건 **토큰 절약의 대가로 수용한 리스크**로 보는 게 정확합니다. 수백 개 MCP 도구 시대에 인라인 방식이 아예 불가능해진 상황에서 고른 차악인 셈이죠.
+
+[USER] 좀쉽게말해봐 플로우 위주로;;;
+
+[ASSISTANT] 간단하게, 흐름 3개로만 볼게요.
+
+## 흐름 1 — 정상 (목록이 아직 안 묻힘)
+
+```
+유저: "Jira 이슈 정리해줘"
+  → 모델: 아까 목록에서 mcp__Atlassian__ 봤지
+  → ToolSearch("select:mcp__Atlassian__...")
+  → 장전 완료, 사용
+```
+
+## 흐름 2 — 목록은 까먹었지만 회복됨 (대화 길어진 경우)
+
+```
+유저: "Jira 이슈 정리해줘"
+  → 모델: 이름은 기억 안 나네...
+  → 근데 눈앞의 ToolSearch 설명에 "숨겨진 도구들 있음, 검색해라"라고 써 있음
+  → ToolSearch("jira issue")  ← 키워드 검색
+  → 점수 매겨서 이름 되찾음 → 장전 완료
+```
+
+까먹어도 **검색 한 번이면 복구**. 손해는 라운드트립 1번뿐.
+
+## 흐름 3 — 진짜 구멍 (대표님이 지적한 케이스)
+
+```
+유저: "이슈 정리 좀 해줘"   ← "Jira"라는 단어를 안 씀
+  → 모델: 이름도 까먹었고, Jira 도구가 있다는 발상 자체가 안 남
+  → 검색할 생각조차 안 함
+  → 도구 있는데 안 쓰고 그냥 답변  ← 조용한 실패
+```
+
+**표지판은 "검색하는 법"만 알려주지, "뭘 검색해야 할지"는 못 알려줍니다.** 검색하려는 생각이 안 들면 안전망 전체가 무용지물 — 이게 남은 구멍이에요.
+
+## 구멍을 메워주는 우연들
+
+- 유저가 보통 단어를 직접 말함 ("figma에서", "지라에")→ 그 단어로 검색하면 됨
+- 대화가 그렇게 길어지기 전에 대개 **compact가 와서 목록을 새 컨텍스트 맨 앞으로 재발행** → 리셋
+- 그래도 compact 없이 어중간하게 긴 구간 = 무방비
+
+한 줄 요약: **까먹어도 되찾는 길은 있는데, 되찾으려는 생각이 안 나면 끝 — 그 구간이 lost-in-the-middle의 잔여 리스크고, 토큰 아끼는 대가로 감수한 겁니다.**
+
+[USER] 흐름2에서 한단어만들어가? 키워드검색이? 그럼 진짜놓치기 쉬워보이는데
+
+[ASSISTANT] 아뇨, 한 단어 아닙니다 — 그리고 생각보다 그물이 넓어요. 소스 기준으로 정확히 뭘 뒤지는지 흐름으로 볼게요.
+
+## 키워드 검색이 실제로 뒤지는 것
+
+```
+쿼리: "jira issue create"   ← 공백으로 쪼개서 여러 단어, 각각 점수 합산
+
+도구 하나마다 3군데를 뒤짐:
+  ① 이름 조각들   mcp__claude_ai_Atlassian__createJiraIssue
+                  → [claude, ai, atlassian, createjiraissue] 로 분해
+  ② 설명문 전문   "Create a new Jira issue in a project..." ← 서버가 준 설명 통째로
+  ③ searchHint    (있을 때만, 큐레이션 문구)
+```
+
+**설명문까지 뒤진다**는 게 핵심이에요. 이름을 하나도 몰라도 설명에 있는 단어면 걸립니다.
+
+## 실제 점수 계산 흐름 (위 쿼리 → createJiraIssue)
+
+```
+"atlassian" → 이름 조각 정확 일치        +12
+"jira"      → 조각 부분 포함 (createjiraissue 안에) +6
+"issue"     → 조각 부분 포함 +6, 설명문에도 있음 +2
+"create"    → 조각 부분 포함 +6, 설명문 +2
+                                    합계 34점 → 1등으로 반환
+```
+
+단어가 많을수록 점수가 쌓이니 **오히려 여러 단어가 유리**하고, `+jira`처럼 쓰면 "jira 없는 도구는 후보 탈락"으로 조일 수도 있습니다.
+
+## 그래도 남는 약점 — 대표님 감이 반은 맞아요
+
+이 검색은 **어휘 매칭이지 의미 검색이 아닙니다** (임베딩 없음, 소스 확인):
+
+```
+ToolSearch("지라 이슈")     → 영어 설명문과 매치 안 됨 → 0건 ✗
+ToolSearch("ticket")       → 설명문에 "ticket"이란 단어가 없으면 → 0건 ✗
+ToolSearch("jira issue")   → 잡힘 ✓
+```
+
+동의어·한국어는 못 잡아요. 그런데 설계가 이걸 메우는 방식이 재미있습니다 — **검색기를 똑똑하게 만드는 대신, 쿼리 작성자가 LLM이라는 점에 기댑니다**:
+
+```
+모델: ToolSearch("지라 이슈")
+  → "No matching deferred tools found"   ← 실패가 명시적으로 돌아옴
+모델: 아, 영어로 다시. ToolSearch("jira issue")
+  → 잡힘 ✓
+```
+
+실패해도 조용히 넘어가는 게 아니라 "없다"고 답이 오니까, 모델이 단어를 바꿔 재시도하면 됩니다. 검색 자체는 단순한 대신 **재시도 루프의 두뇌가 모델**인 구조예요.
+
+한 줄 요약: **여러 단어 + 이름·설명문·힌트 3면 검색이라 그물은 꽤 넓은데, 어휘 매칭의 한계(동의어·타언어)는 있고, 그건 "모델이 단어 바꿔 다시 던진다"로 때우는 설계**입니다.
+
+[USER] 궁금한게 그.. 만약에 새로운 mcp세팅하면 그때도 다시 추가됬다고 알려줄거 잖아? 그때 유저가 엔터쳐야 시스템리마인더가 함께 들어가? 아니면 자동이야? 그리고 키워드검색 알고리즘은 BM25야?
+
+[ASSISTANT] 둘 다 명확히 답할 수 있습니다.
+
+## Q1. 새 MCP 추가 고지 — 엔터 필요? 자동?
+
+**"밀어넣기(푸시)"는 없고 "수집 지점에서 주워가기(풀)"라서, 상황에 따라 갈립니다:**
+
+```
+케이스 A — 대화가 놀고 있을 때 (모델 대기 중)
+  MCP 서버 연결됨 → 풀에는 반영됐지만 아무 일도 안 일어남
+  → 유저가 엔터 침 → 턴 시작 수집 지점에서 델타 발견
+  → 프롬프트 옆에 system-reminder 부착        ← 엔터가 방아쇠
+
+케이스 B — 모델이 턴 도는 중일 때 (도구 실행하며 작업 중)
+  MCP 서버 연결됨
+  → 진행 중인 사이클의 도구 실행이 끝난 직후(사이클 꼬리, query.ts:1569)
+     수집이 돌면서 델타 발견 → 그 자리에 자동 부착   ← 엔터 불필요
+```
+
+즉 **연결 즉시 대화에 끼어드는 게 아니라, 다음번 수집 타이밍에 실리는 것**이고, 그 타이밍이 유저 엔터일 수도(A), 진행 중 턴의 도구 사이일 수도(B) 있습니다. 이 세션에서 B를 실제로 보셨어요 — 제가 작업하던 턴 중간에 figma/supabase/vercel 도구 고지가 끼어들어왔죠. 유저 입력 없이요.
+
+## Q2. 키워드 검색이 BM25인가?
+
+**아닙니다. BM25의 핵심 요소가 전부 빠진, 손으로 짠 가중 매칭입니다.** 소스(ToolSearchTool.ts:266-291) 기준 비교:
+
+| BM25 구성 요소 | ToolSearch에 있나 |
+|---|---|
+| TF (단어 빈도 — 많이 나올수록 가점) | ✗ — `pattern.test()`는 불리언, 1번이든 10번이든 동일 점수 |
+| IDF (희귀 단어 가중 — 흔한 단어 감점) | ✗ — 말뭉치 통계 자체가 없음 |
+| 문서 길이 정규화 | ✗ — 설명 길이 무관 |
+| 필드별 가중치 | ✓ 이것만 유사 — 이름 정확(12/10) > 이름 부분(6/5) > 힌트(4) > 설명(2) |
+
+정확히 부르면 **"필드 가중치를 손으로 박은 불리언 매칭 + 합산 정렬"**입니다. BM25F에서 TF·IDF·정규화를 다 떼어낸 껍데기에 가깝죠. 랭킹 이론 없이 "이름에 맞으면 세게, 설명에 맞으면 약하게"라는 직관을 상수로 하드코딩한 거예요.
+
+왜 이렇게 조악해도 되냐면 — 앞서 본 그 이유입니다. 검색 대상이 수백 건짜리 미니 목록이고(코퍼스 통계가 무의미한 규모), 쿼리 작성자가 LLM이라 실패하면 단어를 바꿔 재시도하니까, 정교한 랭킹의 투자 대비 효용이 낮은 겁니다. 검색 엔진이 아니라 **"LLM용 그물망"** 수준으로 설계 눈높이를 잡은 거죠.
+
+[USER] 필드별가중치는 뭐였지
+
+[ASSISTANT] ToolSearch 점수표 (ToolSearchTool.ts:266-291) 다시 정리하면:
+
+| 어디에 맞았나 | 점수 |
+|---|---|
+| **이름 조각 정확 일치** — 분해된 조각과 단어가 완전 일치 | MCP **12** / 일반 **10** |
+| **이름 조각 부분 포함** — 조각 안에 단어가 들어있음 (`createjiraissue` ⊃ `jira`) | MCP **6** / 일반 **5** |
+| **searchHint 일치** — 개발자가 손으로 달아둔 능력 설명 문구 | **4** |
+| **이름 전체 문자열 폴백** — 위에서 0점일 때만 | **3** |
+| **설명문 일치** — 도구 description 전문에서 단어 경계 매치 | **2** |
+
+읽는 법: **이름 > 힌트 > 설명** 순으로 신뢰하는 구조입니다. 이름에 박힌 단어가 가장 확실한 신호(정확 일치면 10점대), 설명문은 아무 말이나 길게 들어있어서 오탐 가능성이 크니 겨우 2점.
+
+MCP가 일반 도구보다 +2 높은 이유는 이름 구조 때문이에요 — `mcp__서버명__동작` 형식이라 서버명 조각(`atlassian`, `slack`)이 맞으면 "그 서버 도구를 찾는 중"이라는 의도가 거의 확실하거든요.
+
+쿼리가 여러 단어면 단어마다 이 표로 채점해서 **합산**하고, 0점 초과만 남겨 내림차순 → 상위 `max_results`(기본 5)개 반환입니다.
+
+[USER] 위에 추가된 내용 다 md와 html에 반영해줘 그리고 새로운질문
+ReAct사이클이 아닌경우는 다 시스템리마인드나 어태치먼트는 사용자가 엔터쳐야 올라가 예외는있나?
+
+[ASSISTANT] 먼저 새 질문(엔터 없이 올라가는 예외) 검증용으로 src를 한 번 확인하고, md/html 반영을 진행할게요.
+
+[도구호출 Bash] {"command": "grep -rn \"task-notification\\|task_notification\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l | head -3; echo ---; grep -n \"queuedCommands\\|drain\" /Users/seobi/jinsup_space/CC/src/query.ts | head -8; echo ---; grep -rn \"isMeta.*scheduled\\|scheduled tasks\" /Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts | head -3", "description": "엔터 없이 턴을 여는 경로들(태스크 알림/큐 드레인/스케줄) src 확인"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/query.ts
+/Users/seobi/jinsup_space/CC/src/tasks/stopTask.ts
+/Users/seobi/jinsup_space/CC/src/tasks/LocalMainSessionTask.ts
+---
+234:  // drainCommandQueue와 동일한 비대칭 started-without-completed 시그널을 제공합니다.
+1078:        // collapse_drain_retry가 아닌 경우에만 — 이미 드레인했는데
+1083:          state.transition?.reason !== 'collapse_drain_retry'
+1085:          const drained = contextCollapse.recoverFromOverflow(
+1089:          if (drained.committed > 0) {
+1091:              messages: drained.messages,
+1101:                reason: 'collapse_drain_retry',
+1102:                committed: drained.committed,
+---
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:143:  // Skip for isMeta (system-generated prompts like scheduled tasks) — those
+
+[도구호출 Bash] {"command": "grep -n \"task-notification\" /Users/seobi/jinsup_space/CC/src/query.ts /Users/seobi/jinsup_space/CC/src/tasks/LocalMainSessionTask.ts | head -6; echo ---; grep -rn \"queued_commands\\|getQueuedCommandAttachments\" /Users/seobi/jinsup_space/CC/src/utils/attachments.ts | head -4", "description": "태스크 알림 주입 경로와 큐 드레인 어태치먼트 확인"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/query.ts:1564:      // 서브에이전트는 자신에게 주소가 지정된 task-notification만 드레인 —
+/Users/seobi/jinsup_space/CC/src/query.ts:1566:      return cmd.mode === 'task-notification' && cmd.agentId === currentAgentId
+/Users/seobi/jinsup_space/CC/src/query.ts:1619:    // 프롬프트와 task-notification 커맨드는 위에서 첨부 파일로 변환됨.
+/Users/seobi/jinsup_space/CC/src/query.ts:1621:      cmd => cmd.mode === 'prompt' || cmd.mode === 'task-notification',
+/Users/seobi/jinsup_space/CC/src/tasks/LocalMainSessionTask.ts:262:  enqueuePendingNotification({ value: message, mode: 'task-notification' })
+---
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:760:    return getQueuedCommandAttachments(queuedCommands)
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:829:    maybe('queued_commands', () => getQueuedCommandAttachments(queuedCommands)),
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:1046:export async function getQueuedCommandAttachments(
+
+[도구호출 Bash] {"command": "grep -rn \"enqueuePendingNotification\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | grep -v \"LocalMainSessionTask\" | head -5; echo ---; grep -rn \"function enqueuePendingNotification\" -A 25 /Users/seobi/jinsup_space/CC/src/utils/messageQueue.ts 2>/dev/null | head -40; ls /Users/seobi/jinsup_space/CC/src/utils/ | grep -i queue", "description": "태스크 알림이 유휴 세션을 깨우는지 확인"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/messageQueueManager.ts:142:export function enqueuePendingNotification(command: QueuedCommand): void {
+/Users/seobi/jinsup_space/CC/src/utils/sdkEventQueue.ts:108: * through enqueuePendingNotification-with-<task-id> (print.ts parses that
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:134:import { enqueuePendingNotification } from './messageQueueManager.js'
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:237:        enqueuePendingNotification({
+/Users/seobi/jinsup_space/CC/src/utils/task/framework.ts:17:import { enqueuePendingNotification } from '../messageQueueManager.js'
+---
+messageQueueManager.ts
+queueProcessor.ts
+sdkEventQueue.ts
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/messageQueueManager.ts", "offset": 120, "limit": 75}
+
+[도구결과] 120	// Write operations
+121	// ============================================================================
+122	
+123	/**
+124	 * Add a command to the queue.
+125	 * Used for user-initiated commands (prompt, bash, orphaned-permission).
+126	 * Defaults priority to 'next' (processed before task notifications).
+127	 */
+128	export function enqueue(command: QueuedCommand): void {
+129	  commandQueue.push({ ...command, priority: command.priority ?? 'next' })
+130	  notifySubscribers()
+131	  logOperation(
+132	    'enqueue',
+133	    typeof command.value === 'string' ? command.value : undefined,
+134	  )
+135	}
+136	
+137	/**
+138	 * Add a task notification to the queue.
+139	 * Convenience wrapper that defaults priority to 'later' so user input
+140	 * is never starved by system messages.
+141	 */
+142	export function enqueuePendingNotification(command: QueuedCommand): void {
+143	  commandQueue.push({ ...command, priority: command.priority ?? 'later' })
+144	  notifySubscribers()
+145	  logOperation(
+146	    'enqueue',
+147	    typeof command.value === 'string' ? command.value : undefined,
+148	  )
+149	}
+150	
+151	const PRIORITY_ORDER: Record<QueuePriority, number> = {
+152	  now: 0,
+153	  next: 1,
+154	  later: 2,
+155	}
+156	
+157	/**
+158	 * Remove and return the highest-priority command, or undefined if empty.
+159	 * Within the same priority level, commands are dequeued FIFO.
+160	 *
+161	 * An optional `filter` narrows the candidates: only commands for which the
+162	 * predicate returns `true` are considered. Non-matching commands stay in the
+163	 * queue untouched. This lets between-turn drains (SDK, REPL) restrict to
+164	 * main-thread commands (`cmd.agentId === undefined`) without restructuring
+165	 * the existing while-loop patterns.
+166	 */
+167	export function dequeue(
+168	  filter?: (cmd: QueuedCommand) => boolean,
+169	): QueuedCommand | undefined {
+170	  if (commandQueue.length === 0) {
+171	    return undefined
+172	  }
+173	
+174	  // Find the first command with the highest priority (respec
+
+[도구호출 Bash] {"command": "grep -n \"subscribe\\|onQueueChange\\|idle\\|startQuery\\|processQueue\" /Users/seobi/jinsup_space/CC/src/utils/queueProcessor.ts | head -15; echo ---; sed -n '1,40p' /Users/seobi/jinsup_space/CC/src/utils/queueProcessor.ts", "description": "유휴 상태에서 큐를 드레인해 턴을 시작하는 주체 확인"}
+
+[도구결과] 52:export function processQueueIfReady({
+---
+import type { QueuedCommand } from '../types/textInputTypes.js'
+import {
+  dequeue,
+  dequeueAllMatching,
+  hasCommandsInQueue,
+  peek,
+} from './messageQueueManager.js'
+
+type ProcessQueueParams = {
+  executeInput: (commands: QueuedCommand[]) => Promise<void>
+}
+
+type ProcessQueueResult = {
+  processed: boolean
+}
+
+/**
+ * Check if a queued command is a slash command (value starts with '/').
+ */
+function isSlashCommand(cmd: QueuedCommand): boolean {
+  if (typeof cmd.value === 'string') {
+    return cmd.value.trim().startsWith('/')
+  }
+  // For ContentBlockParam[], check the first text block
+  for (const block of cmd.value) {
+    if (block.type === 'text') {
+      return block.text.trim().startsWith('/')
+    }
+  }
+  return false
+}
+
+/**
+ * Processes commands from the queue.
+ *
+ * Slash commands (starting with '/') and bash-mode commands are processed
+ * one at a time so each goes through the executeInput path individually.
+ * Bash commands need individual processing to preserve per-command error
+ * isolation, exit codes, and progress UI. Other non-slash commands are
+ * batched: all items **with the same mode** as the highest-priority item
+
+[도구호출 Bash] {"command": "grep -rn \"processQueueIfReady\" /Users/seobi/jinsup_space/CC/src --include=\"*.tsx\" --include=\"*.ts\" | grep -v queueProcessor.ts | head -5", "description": "processQueueIfReady 호출자(유휴 웨이크 주체) 확인"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/QueryGuard.ts:15: *   dispatching → idle  (cancelReservation, when processQueueIfReady fails)
+/Users/seobi/jinsup_space/CC/src/utils/QueryGuard.ts:46:   * Cancel a reservation when processQueueIfReady had nothing to process.
+/Users/seobi/jinsup_space/CC/src/hooks/useQueueProcessor.ts:8:import { processQueueIfReady } from '../utils/queueProcessor.js'
+/Users/seobi/jinsup_space/CC/src/hooks/useQueueProcessor.ts:60:    processQueueIfReady({ executeInput: executeQueuedInput })
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/hooks/useQueueProcessor.ts"}
+
+[도구결과] 1	import { useEffect, useSyncExternalStore } from 'react'
+2	import type { QueuedCommand } from '../types/textInputTypes.js'
+3	import {
+4	  getCommandQueueSnapshot,
+5	  subscribeToCommandQueue,
+6	} from '../utils/messageQueueManager.js'
+7	import type { QueryGuard } from '../utils/QueryGuard.js'
+8	import { processQueueIfReady } from '../utils/queueProcessor.js'
+9	
+10	type UseQueueProcessorParams = {
+11	  executeQueuedInput: (commands: QueuedCommand[]) => Promise<void>
+12	  hasActiveLocalJsxUI: boolean
+13	  queryGuard: QueryGuard
+14	}
+15	
+16	/**
+17	 * Hook that processes queued commands when conditions are met.
+18	 *
+19	 * Uses a single unified command queue (module-level store). Priority determines
+20	 * processing order: 'now' > 'next' (user input) > 'later' (task notifications).
+21	 * The dequeue() function handles priority ordering automatically.
+22	 *
+23	 * Processing triggers when:
+24	 * - No query active (queryGuard — reactive via useSyncExternalStore)
+25	 * - Queue has items
+26	 * - No active local JSX UI blocking input
+27	 */
+28	export function useQueueProcessor({
+29	  executeQueuedInput,
+30	  hasActiveLocalJsxUI,
+31	  queryGuard,
+32	}: UseQueueProcessorParams): void {
+33	  // Subscribe to the query guard. Re-renders when a query starts or ends
+34	  // (or when reserve/cancelReservation transitions dispatching state).
+35	  const isQueryActive = useSyncExternalStore(
+36	    queryGuard.subscribe,
+37	    queryGuard.getSnapshot,
+38	  )
+39	
+40	  // Subscribe to the unified command queue via useSyncExternalStore.
+41	  // This guarantees re-render when the store changes, bypassing
+42	  // React context propagation delays that cause missed notifications in Ink.
+43	  const queueSnapshot = useSyncExternalStore(
+44	    subscribeToCommandQueue,
+45	    getCommandQueueSnapshot,
+46	  )
+47	
+48	  useEffect(() => {
+49	    if (isQueryActive) return
+50	    if (hasActiveLocalJsxUI) return
+51	    if (queueSnapshot.length === 0) return
+52	
+53	    // Reservation is now owned by handl
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md", "old_string": "---\n\n## 검증 이력", "new_string": "---\n\n## §08 추가 Q&A 보강 (2026-07-11 후속 검증)\n\n### Q1. 카드 목록 리마인더는 ToolSearch를 쓸 때마다 들어오나?\n\n**아니다 — ToolSearch 호출과 무관.** ToolSearch의 산출물은 tool_result(영수증)뿐이고, 카드 목록은 입력측 어태치먼트 파이프라인 소관이다. 수집 지점(턴 시작 + 사이클 꼬리)마다 \"풀이 변했나?\"를 검사해 **델타가 있을 때만** 발행 (`getDeferredToolsDelta` → 차이 없으면 null, toolSearch.ts:677). 발행된 고지는 이력에 잔류하므로 재전송이 없고, 다음 델타 계산이 그 잔류 메시지를 스캔해 \"이
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md", "old_string": "- 2026-07-11: ToolSearchTool.ts 전문(472줄) Read · prompt.ts 전문 Read · toolSearch.ts(756줄) 주요부 Read · claude.ts:1150-1250 Read · api.ts:100-224 Read · grep 교차 확인 (defer_loading / deferred_tools_delta / extractDiscoveredToolNames)", "new_string": "- 2026-07-11: ToolSearchTool.ts 전문(472줄) Read · prompt.ts 전문 Read · toolSearch.ts(756줄) 주요부 Read · claude.ts:1150-1250 Read · api.ts:100-224 Read · g
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 이제 HTML에 새 섹션(07 추가 Q&A)을 삽입합니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html", "old_string": "    <h3>스코어링 가중치 (word-boundary 정규식 · 이름은 CamelCase/언더스코어 분해)</h3>", "new_string": "    <h3>스코어링 가중치 — 신뢰 순서: 이름 &gt; 힌트 &gt; 설명 (BM25 아님 → 07)</h3>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html", "old_string": "<footer>", "new_string": "<!-- ========== 07 추가 Q&A ========== -->\n<section class=\"sec\">\n  <div class=\"shead\"><span class=\"snum\">07</span><h2>추가 Q&amp;A — 타이밍 · 망각 · 알고리즘</h2></div>\n  <p class=\"cap\">후속 검증으로 확정한 세 가지: 고지가 실리는 문 3개, lost-in-the-middle 방어선과 남는 구멍, 그리고 BM25가 아닌 이유.</p>\n\n  <div class=\"scores\" style=\"margin-bottom:16px\">\n    <h3>Q. 카드 목록 고지는 언제 실리나 — 푸시가 아니라 \
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/toolsearch-생애주기-소스분석.html\"", "description": "갱신된 HTML 다시 열기"}

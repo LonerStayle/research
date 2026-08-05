@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>대화 메모리 요약기법 평가 — 한국어 기준</title>
+<style>
+  :root {
+    color-scheme: light;
+    --page:#f9f9f7; --surface:#fcfcfb; --ink:#0b0b0b; --ink2:#52514e; --muted:#898781;
+    --grid:#e1e0d9; --axis:#c3c2b7; --ring:rgba(11,11,11,.10);
+    --codex:#2a78d6; --cc:#008300; --grok:#e87ba4; --openclaw:#eda100;
+    --good:#006300;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      color-scheme: dark;
+      --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+      --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+      --codex:#3987e5; --cc:#008300; --grok:#d55181; --openclaw:#c98500;
+      --good:#0ca30c;
+    }
+  }
+  :root[data-theme="dark"] {
+    color-scheme: dark;
+    --page:#0d0d0d; --surface:#1a1a19; --ink:#ffffff; --ink2:#c3c2b7; --muted:#898781;
+    --grid:#2c2c2a; --axis:#383835; --ring:rgba(255,255,255,.10);
+    --codex:#3987e5; --cc:#008300; --grok:#d55181; --openclaw:#c98500;
+    --good:#0ca30c;
+  }
+  * { box-sizing:border-box; margin:0; }
+  body {
+    background:var(--page); color:var(--ink);
+    font-family:system-ui,-apple-system,"Segoe UI",sans-serif;
+    line-height:1.55; padding:40px 20px 80px;
+  }
+  .wrap { max-width:1040px; margin:0 auto; }
+  header h1 { font-size:26px; letter-spacing:-.01em; }
+  header .sub { color:var(--ink2); margin-top:6px; font-size:14px; max-width:72ch; }
+  .meta { color:var(--muted); font-size:12.5px; margin-top:10px; }
+
+  .tiles { display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:12px; margin:28px 0; }
+  .tile { background:var(--surface); border:1px solid var(--ring); border-radius:10px; padding:16px 18px; }
+  .tile .k { font-size:12.5px; color:var(--ink2); }
+  .tile .v { font-size:30px; font-weight:650; margin-top:2px; }
+  .tile .d { font-size:12px; color:var(--muted); margin-top:2px; }
+
+  section { background:var(--surface); border:1px solid var(--ring); border-radius:12px; padding:22px 24px; margin:18px 0; }
+  section h2 { font-size:16.5px; margin-bottom:2px; }
+  section .cap { font-size:13px; color:var(--ink2); margin-bottom:16px; }
+
+  /* 가로 막대 */
+  .hbar-row { display:grid; grid-template-columns:110px 1fr 64px; align-items:center; gap:10px; margin:9px 0; }
+  .hbar-row .lab { font-size:13px; color:var(--ink2); text-align:right; }
+  .hbar-track { position:relative; height:18px; }
+  .hbar-track .grid-lines { position:absolute; inset:0; }
+  .hbar-track .gl { position:absolute; top:-4px; bottom:-4px; width:1px; background:var(--grid); }
+  .hbar { position:relative; height:18px; border-radius:0 4px 4px 0; }
+  .hbar-row .val { font-size:13px; font-variant-numeric:tabular-nums; color:var(--ink); }
+  .axis-row { display:grid; grid-template-columns:110px 1fr 64px; gap:10px; margin-top:6px; }
+  .axis-labels { position:relative; height:16px; font-size:11px; color:var(--muted); }
+  .axis-labels span { position:absolute; transform:translateX(-50%); }
+
+  /* 범례 */
+  .legend { display:flex; flex-wrap:wrap; gap:14px; margin:4px 0 14px; font-size:12.5px; color:var(--ink2); }
+  .legend .sw { display:inline-block; width:10px; height:10px; border-radius:2px; margin-right:5px; vertical-align:-1px; }
+
+  /* 그룹 세로 막대 */
+  .gchart { display:grid; grid-template-columns:repeat(4,1fr); gap:26px; align-items:end; height:220px; padding:0 6px; border-bottom:1.5px solid var(--axis); position:relative; }
+  .gchart .yline { position:absolute; left:0; right:0; height:1px; background:var(--grid); }
+  .ggroup { display:flex; gap:2px; align-items:end; height:100%; position:relative; z-index:1; }
+  .gbar { flex:1; border-radius:4px 4px 0 0; position:relative; min-width:10px; }
+  .gbar .dl { position:absolute; top:-18px; left:50%; transform:translateX(-50%); font-size:10.5px; color:var(--ink2); font-variant-numeric:tabular-nums; white-space:nowrap; }
+  .gx { display:grid; grid-template-columns:repeat(4,1fr); gap:26px; padding:6px 6px 0; font-size:12.5px; color:var(--ink2); text-align:center; }
+
+  svg text { font-family:inherit; }
+  .tbl { width:100%; border-collapse:collapse; font-size:13px; }
+  .tbl th, .tbl td { padding:7px 10px; text-align:right; font-variant-numeric:tabular-nums; border-bottom:1px solid var(--grid); }
+  .tbl th { color:var(--ink2); font-weight:600; }
+  .tbl th:first-child, .tbl td:first-child { text-align:left; }
+  .tbl .best { color:var(--good); font-weight:650; }
+  .dot { display:inline-block; width:9px; height:9px; border-radius:2px; margin-right:7px; vertical-align:0; }
+
+  .langgrid { display:grid; grid-template-columns:110px repeat(6,1fr); gap:6px; align-items:center; font-size:12.5px; }
+  .langgrid .rowlab { color:var(--ink2); text-align:right; padding-right:6px; }
+  .langgrid .collab { color:var(--muted); text-align:center; font-size:11.5px; }
+  .badge { text-align:center; border-radius:6px; padding:4px 0; font-weight:600; font-size:12px; border:1px solid var(--ring); }
+  .b-ko { background:color-mix(in srgb, var(--good) 14%, var(--surface)); color:var(--good); border-color:color-mix(in srgb, var(--good) 40%, transparent); }
+  .b-mixed { background:color-mix(in srgb, var(--ink) 6%, var(--surface)); color:var(--ink2); }
+  .b-en { background:var(--surface); color:var(--muted); }
+
+  .findings { display:grid; grid-template-columns:repeat(auto-fit,minmax(300px,1fr)); gap:12px; }
+  .fcard { border:1px solid var(--ring); border-left:4px solid var(--fc,var(--axis)); border-radius:8px; padding:14px 16px; }
+  .fcard h3 { font-size:14px; margin-bottom:4px; }
+  .fcard p { font-size:13px; color:var(--ink2); }
+  .caveat { font-size:12.5px; color:var(--muted); }
+  .caveat li { margin:4px 0 4px 16px; }
+
+  #tip { position:fixed; pointer-events:none; background:var(--ink); color:var(--page); font-size:12px; padding:6px 9px; border-radius:6px; opacity:0; transition:opacity .12s; z-index:10; max-width:260px; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>대화 메모리 요약기법 평가 — 한국어 기준</h1>
+    <p class="sub">codex · claude-code · grok · openclaw 4개 하네스의 <b>원문 컴팩션 프롬프트</b>를 동일 모델로 시뮬레이션.
+    실제 한국어 에이전트 대화 6건(각 ~10만 자)을 각 기법으로 압축한 뒤, 압축본만 보고 QA 프로브 12개에 답하게 하고 블라인드 채점했다.</p>
+    <p class="meta">2026-08-04 · 24셀 · 에이전트 78개(프로브 6 + 압축 24 + 답변 24 + 채점 24) · 에러 0 · 데이터: ~/.claude/projects 실세션</p>
+  </header>
+
+  <div class="tiles">
+    <div class="tile"><div class="k">종합 1위</div><div class="v">openclaw</div><div class="d">회상 0.972 · 압축률 0.135</div></div>
+    <div class="tile"><div class="k">효율 격차 (회상÷압축)</div><div class="v">7.2×</div><div class="d">openclaw 7.2 vs claude-code 1.7</div></div>
+    <div class="tile"><div class="k">환각</div><div class="v">0건</div><div class="d">288개 프로브 전수 — 틀린 기억 조작 없음</div></div>
+    <div class="tile"><div class="k">전면 한국어 요약</div><div class="v">1/4</div><div class="d">openclaw만 6/6 한국어 (프롬프트에 명시)</div></div>
+  </div>
+
+  <section>
+    <h2>회상 정확도</h2>
+    <p class="cap">압축본만 보고 답한 QA 프로브 72개(대화 6건 × 12개) 평균 · 1.0 = 전부 정답</p>
+    <div id="recall-bars"></div>
+  </section>
+
+  <section>
+    <h2>압축률 — 낮을수록 좋음</h2>
+    <p class="cap">압축본 문자수 ÷ 원본 문자수 · openclaw는 원본의 13.5%만 남기고도 회상 1위</p>
+    <div id="comp-bars"></div>
+  </section>
+
+  <section>
+    <h2>효율 지형 — 적게 쓰고 많이 기억하는가</h2>
+    <p class="cap">이상적인 기법은 좌상단(강한 압축 + 높은 회상). 세로축은 0.90–1.00 구간 확대.</p>
+    <svg id="scatter" viewBox="0 0 640 300" style="width:100%;height:auto" role="img" aria-label="압축률 대비 회상 정확도 산점도"></svg>
+  </section>
+
+  <section>
+    <h2>카테고리별 회상</h2>
+    <p class="cap">프로브 카테고리별 평균 — openclaw는 '미결·다음 단계' 유일 만점, codex는 '의도·선호'가 약점</p>
+    <div class="legend" id="cat-legend"></div>
+    <div class="gchart" id="cat-chart"></div>
+    <div class="gx"><span>사실·결정</span><span>기술 디테일</span><span>의도·선호</span><span>미결·다음</span></div>
+  </section>
+
+  <section>
+    <h2>요약 언어 — 한국어 대화를 무슨 언어로 기억하는가</h2>
+    <p class="cap">셀별 압축본의 주 언어 판정. 언어가 회상 점수를 크게 깎진 않지만, 후속 세션의 언어 일관성과 한국어 뉘앙스 보존이 갈린다.</p>
+    <div class="langgrid" id="langgrid"></div>
+  </section>
+
+  <section>
+    <h2>상세 테이블</h2>
+    <p class="cap">대화별 회상 정확도 / 압축률 (표 = 접근성용 데이터 뷰)</p>
+    <table class="tbl" id="detail-tbl"></table>
+  </section>
+
+  <section>
+    <h2>핵심 발견</h2>
+    <div class="findings">
+      <div class="fcard" style="--fc:var(--openclaw)"><h3>openclaw — 조준이 정확한 5섹션</h3>
+        <p>Decisions/TODO/제약/미결 요청/식별자 고정 구조가 "미래 세션에 필요한 것"에 정조준. 7.4배 작은 요약으로 회상 1위. 유일하게 "대화의 주 언어로 작성"을 명시해 한국어 요약 6/6.</p></div>
+      <div class="fcard" style="--fc:var(--cc)"><h3>claude-code — 요약이 아니라 인덱스</h3>
+        <p>사용자 메시지 전수 나열 + verbatim 인용 강제로 산출물이 원본의 57%. 정확도는 2위지만 토큰 효율 꼴찌. 단 실제 하네스에선 transcriptPath로 원본 복구가 전제된 설계라 실전은 이보다 유리.</p></div>
+      <div class="fcard" style="--fc:var(--codex)"><h3>codex — 426자 프롬프트의 가성비</h3>
+        <p>"다른 LLM에게 인수인계" 프레임 하나로 0.944. 다만 의도·선호 0.833 최하 — 사용자 취향의 뉘앙스가 가장 많이 유실. 요약은 전부 영어화.</p></div>
+      <div class="fcard" style="--fc:var(--grok)"><h3>grok — 언어가 널뛴다</h3>
+        <p>기술디테일엔 강하지만 언어 지시가 없어 요약 언어가 영어 3 · 혼합 2 · 한국어 1로 셀마다 요동. 동일 사용자의 연속 세션에서 메모리 언어 일관성이 가장 불안정.</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>한계</h2>
+    <ul class="caveat">
+      <li><b>천장 효과</b> — 0.94~0.97 밀집. 프로브가 핵심 정보 위주라 변별력 낮음. 지엽 디테일 프로브면 격차 확대 예상.</li>
+      <li><b>동일 모델 시뮬레이션</b> — 프롬프트(기법) 차이만 분리 측정. 실제 하네스의 모델·런타임 차이는 미반영.</li>
+      <li><b>회상 채널 미평가</b> — grok의 하이브리드 검색, claude-code의 transcriptPath/attachment 복원 등 "압축본 밖" 복구 채널은 범위 밖.</li>
+      <li><b>사전 플러시 1패스 근사</b> · <b>표본 6대화</b> · 프로브 생성과 채점 모두 동일 모델 계열(자기 채점 편향 가능).</li>
+    </ul>
+  </section>
+</div>
+<div id="tip"></div>
+
+<script>
+const TECHS = {
+  'codex':       { color:'var(--codex)',    label:'codex' },
+  'claude-code': { color:'var(--cc)',       label:'claude-code' },
+  'grok':        { color:'var(--grok)',     label:'grok' },
+  'openclaw':    { color:'var(--openclaw)', label:'openclaw' },
+};
+const ORDER = ['codex','claude-code','grok','openclaw'];
+const S = {
+  'codex':       { recall:.944, comp:.255, cat:[1,.958,.833,.917], langs:['en','en','en','en','en','en'],
+                   recalls:[.83,1,.96,1,1,.88], comps:[.250,.357,.214,.215,.261,.230] },
+  'claude-code': { recall:.965, comp:.567, cat:[1,.979,1,.833], langs:['en','en','mixed','mixed','mixed','mixed'],
+                   recalls:[.96,.96,.96,1,1,.92], comps:[.598,.715,.503,.557,.601,.428] },
+  'grok':        { recall:.958, comp:.310, cat:[1,.979,.958,.833], langs:['en','en','en','mixed','mixed','ko'],
+                   recalls:[.96,.92,1,1,1,.88], comps:[.352,.349,.372,.243,.370,.174] },
+  'openclaw':    { recall:.972, comp:.135, cat:[.958,.958,1,1], langs:['ko','ko','ko','ko','ko','ko'],
+                   recalls:[.83,1,1,1,1,1], comps:[.103,.169,.124,.171,.126,.118] },
+};
+
+const tip = document.getElementById('tip');
+function bindTips(root){
+  root.querySelectorAll('[data-tip]').forEach(el=>{
+    el.addEventListener('mousemove',e=>{
+      tip.textContent = el.dataset.tip;
+      tip.style.opacity = 1;
+      tip.style.left = Math.min(e.clientX+14, innerWidth-280)+'px';
+      tip.style.top = (e.clientY+14)+'px';
+    });
+    el.addEventListener('mouseleave',()=>tip.style.opacity=0);
+  });
+}
+
+/* 가로 막대 공통 */
+function hbars(elId, key, max, ticks, fmt, tipFmt){
+  const el = document.getElementById(elId);
+  const sorted = [...ORDER].sort((a,b)=> key==='comp' ? S[a][key]-S[b][key] : S[b][key]-S[a][key]);
+  let html = '';
+  for(const t of sorted){
+    const v = S[t][key], w = (v/max*100).toFixed(1);
+    const gls = ticks.slice(1).map(x=>`<span class="gl" style="left:${(x/max*100)}%"></span>`).join('');
+    html += `<div class="hbar-row">
+      <span class="lab">${TECHS[t].label}</span>
+      <div class="hbar-track"><div class="grid-lines">${gls}</div>
+        <div class="hbar" style="width:${w}%;background:${TECHS[t].color}" data-tip="${tipFmt(t,v)}"></div></div>
+      <span class="val">${fmt(v)}</span></div>`;
+  }
+  const axis = ticks.map(x=>`<span style="left:${(x/max*100)}%">${fmt(x)}</span>`).join('');
+  html += `<div class="axis-row"><span></span><div class="axis-labels">${axis}</div><span></span></div>`;
+  el.innerHTML = html;
+  bindTips(el);
+}
+hbars('recall-bars','recall',1,[0,.25,.5,.75,1], v=>v.toFixed(2).replace(/^0/,''),
+  (t,v)=>`${t} — 회상 ${v} (72프로브 평균)`);
+hbars('comp-bars','comp',.6,[0,.2,.4,.6], v=>(v*100).toFixed(0)+'%',
+  (t,v)=>`${t} — 압축본이 원본의 ${(v*100).toFixed(1)}%`);
+
+/* 산점도 */
+(function(){
+  const svg = document.getElementById('scatter');
+  const W=640,H=300,L=52,R=16,T=18,B=40;
+  const x = v => L + (v/0.65)*(W-L-R);
+  const y = v => T + (1 - (v-0.90)/0.10)*(H-T-B);
+  let g = '';
+  for(const yv of [0.90,0.925,0.95,0.975,1.0]){
+    g += `<line x1="${L}" y1="${y(yv)}" x2="${W-R}" y2="${y(yv)}" stroke="var(--grid)" stroke-width="1"/>
+          <text x="${L-8}" y="${y(yv)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yv.toFixed(3).replace(/^0/,'')}</text>`;
+  }
+  for(const xv of [0,0.2,0.4,0.6]){
+    g += `<text x="${x(xv)}" y="${H-B+18}" text-anchor="middle" font-size="11" fill="var(--muted)">${(xv*100)}%</text>`;
+  }
+  g += `<line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="var(--axis)" stroke-width="1.5"/>`;
+  g += `<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle" font-size="11.5" fill="var(--ink2)">압축률 (← 왼쪽일수록 강한 압축)</text>`;
+  g += `<text x="14" y="${(T+H-B)/2}" text-anchor="middle" font-size="11.5" fill="var(--ink2)" transform="rotate(-90 14 ${(T+H-B)/2})">회상 정확도</text>`;
+  g += `<text x="${x(0.03)}" y="${y(0.995)}" font-size="11" fill="var(--muted)">◤ 이상적 영역</text>`;
+  const lblOff = { 'codex':[12,4], 'claude-code':[-12,-10], 'grok':[12,4], 'openclaw':[12,-8] };
+  for(const t of ORDER){
+    const px=x(S[t].comp), py=y(S[t].recall), [dx,dy]=lblOff[t];
+    g += `<circle cx="${px}" cy="${py}" r="7" fill="${TECHS[t].color}" stroke="var(--surface)" stroke-width="2"
+            data-tip="${t} — 압축률 ${(S[t].comp*100).toFixed(1)}% · 회상 ${S[t].recall}"/>`;
+    g += `<text x="${px+dx}" y="${py+dy}" font-size="12" font-weight="600" fill="var(--ink)"
+            text-anchor="${dx<0?'end':'start'}">${t}</text>`;
+  }
+  svg.innerHTML = g;
+  bindTips(svg);
+})();
+
+/* 카테고리 그룹 막대 */
+(function(){
+  const CATS = ['사실·결정','기술 디테일','의도·선호','미결·다음'];
+  const chart = document.getElementById('cat-chart');
+  let html = '';
+  for(const yv of [0.25,0.5,0.75,1.0]) html += `<div class="yline" style="bottom:${yv*100}%"></div>`;
+  for(let ci=0; ci<4; ci++){
+    let bars = '';
+    for(const t of ORDER){
+      const v = S[t].cat[ci];
+      bars += `<div class="gbar" style="height:${v*100}%;background:${TECHS[t].color}"
+        data-tip="${t} · ${CATS[ci]} — ${v.toFixed(3)}"><span class="dl">${v===1?'1.0':v.toFixed(2).replace(/^0/,'')}</span></div>`;
+    }
+    html += `<div class="ggroup">${bars}</div>`;
+  }
+  chart.innerHTML = html;
+  document.getElementById('cat-legend').innerHTML = ORDER.map(t=>
+    `<span><span class="sw" style="background:${TECHS[t].color}"></span>${t}</span>`).join('');
+  bindTips(chart);
+})();
+
+/* 언어 매트릭스 */
+(function(){
+  const el = document.getElementById('langgrid');
+  const NAME = { ko:'한국어', mixed:'혼합', en:'영어' };
+  let html = '<span></span>' + [1,2,3,4,5,6].map(i=>`<span class="collab">conv-0${i}</span>`).join('');
+  for(const t of ORDER){
+    html += `<span class="rowlab"><span class="dot" style="background:${TECHS[t].color}"></span>${t}</span>`;
+    html += S[t].langs.map(l=>`<span class="badge b-${l}">${NAME[l]}</span>`).join('');
+  }
+  el.innerHTML = html;
+})();
+
+/* 상세 테이블 */
+(function(){
+  const tbl = document.getElementById('detail-tbl');
+  const cols = [1,2,3,4,5,6].map(i=>`conv-0${i}`);
+  let html = `<tr><th>기법</th>${cols.map(c=>`<th>${c}</th>`).join('')}<th>평균</th></tr>`;
+  const bestR = Math.max(...ORDER.map(t=>S[t].recall));
+  for(const t of ORDER){
+    html += `<tr><td><span class="dot" style="background:${TECHS[t].color}"></span>${t} · 회상</td>`
+      + S[t].recalls.map(v=>`<td>${v.toFixed(2)}</td>`).join('')
+      + `<td class="${S[t].recall===bestR?'best':''}">${S[t].recall.toFixed(3)}</td></tr>`;
+  }
+  const bestC = Math.min(...ORDER.map(t=>S[t].comp));
+  for(const t of ORDER){
+    html += `<tr><td><span class="dot" style="background:${TECHS[t].color}"></span>${t} · 압축률</td>`
+      + S[t].comps.map(v=>`<td>${(v*100).toFixed(1)}%</td>`).join('')
+      + `<td class="${S[t].comp===bestC?'best':''}">${(S[t].comp*100).toFixed(1)}%</td></tr>`;
+  }
+  tbl.innerHTML = html;
+})();
+</script>
+</body>
+</html>

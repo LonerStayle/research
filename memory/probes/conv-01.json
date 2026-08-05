@@ -1,0 +1,100 @@
+{
+  "probes": [
+    {
+      "id": "conv-01-p01",
+      "category": "사실결정",
+      "question": "이 머신(사용자 계정)에서 클로드코드의 세션 메모리 기능은 실제로 작동한 적이 있는가? 그 근거는?",
+      "gold_answer": "작동한 적 없음. tengu_session_memory feature gate가 기본 OFF라 검사마다 게이트 2에서 종료되며, 실물 증거로 ~/.claude/projects/ 전체에 session-memory/ 디렉토리가 0개임이 확인됐다.",
+      "evidence": "이 머신에서는 feature gate가 꺼져 있어서 영원히 실행되지 않습니다 ... ~/.claude/projects/ 전체에 `session-memory/` 디렉토리가 0개인 게 그 증거입니다"
+    },
+    {
+      "id": "conv-01-p02",
+      "category": "사실결정",
+      "question": "컴팩션 요약은 별도 파일로 저장되는가? 어디에 어떤 형태로 남는가?",
+      "gold_answer": "별도 파일로 저장되지 않는다. isCompactSummary: true 꼬리표가 붙은 user 메시지로 새 컨텍스트 맨 앞에 삽입되고, 세션 트랜스크립트 .jsonl에 함께 append된다. .jsonl은 append-only라 원본 대화도 지워지지 않으며, 요약 본문에 transcriptPath 포인터가 들어가 원본 복구가 가능하다.",
+      "evidence": "컴팩션 요약은 별도 파일로 저장되지 않고, 대화 자체에 메시지로 삽입된 뒤 세션 트랜스크립트 `.jsonl`에 함께 기록됩니다 ... `.jsonl` 트랜스크립트는 append-only입니다"
+    },
+    {
+      "id": "conv-01-p03",
+      "category": "사실결정",
+      "question": "탐색 결과 /Users/seobi/jinsup_space/CC/src/ 의 소스 형태는 무엇으로 판정됐고, 규모는 얼마인가?",
+      "gold_answer": "디컴파일본이 아닌 원본 TypeScript 소스 미러로 판정 (bun:bundle feature flag, Biome 주석, 프로덕션급 코멘트가 그대로 있고 minified/재구성 흔적 없음). 규모는 TS/TSX 1,902개 파일, 약 512,670줄이며 메모리 관련 코드는 memdir + SessionMemory + compact 세 축으로 약 6,722줄.",
+      "evidence": "결론: 원본 TypeScript 소스 코드 ... 총 TypeScript/TSX 파일 1,902개 / 총 코드 라인 수 512,670줄"
+    },
+    {
+      "id": "conv-01-p04",
+      "category": "사실결정",
+      "question": "사용자가 정리한 '메모리 3종류' 요약을 어시스턴트가 채점했을 때 고쳐준 두 가지 오류는 무엇인가?",
+      "gold_answer": "① 자동 메모리는 '4개 섹션'이 아니라 4개 타입(user/feedback/project/reference)으로 분류되며 저장 형태는 주제당 파일 + MEMORY.md 인덱스다 (10섹션 템플릿은 세션 메모리 쪽). ② 컴팩션은 /compact 수동만이 아니라 임계값 도달 시 자동 발동이 주력이며, 요약은 파일이 아닌 user 메시지로 대화에 삽입된다.",
+      "evidence": "1. \"자동메모리는 4개의 섹션으로\" → 4개의 '타입'입니다. ... 2. \"컴팩션은 /compact를 사용했을 때\" → 자동이 주력, /compact는 수동 옵션입니다."
+    },
+    {
+      "id": "conv-01-p05",
+      "category": "기술디테일",
+      "question": "세션 메모리(summary.md)의 저장 경로는 정확히 어디이고, 이를 정의하는 소스 파일은?",
+      "gold_answer": "~/.claude/projects/<프로젝트-슬러그>/<세션ID>/session-memory/summary.md. getSessionMemoryDir/getSessionMemoryPath가 src/utils/permissions/filesystem.ts:259-270에 정의돼 있고, 프로젝트 슬러그는 cwd 경로의 비영숫자를 하이픈으로 치환해 만든다 (자동 메모리 memory/는 세션 밖 프로젝트 레벨, session-memory/는 세션 UUID 안쪽).",
+      "evidence": "// Path format: {projectDir}/{sessionId}/session-memory/summary.md ... `~/.claude/projects/<프로젝트-슬러그>/<세션ID>/session-memory/summary.md`"
+    },
+    {
+      "id": "conv-01-p06",
+      "category": "기술디테일",
+      "question": "세션 메모리 추출이 실행되기 위한 4중 게이트(조건)와 그 수치는?",
+      "gold_answer": "매 API 응답 직후(query.ts:992, post-sampling hook, void fire-and-forget) 검사하며: ① 메인 REPL 스레드일 것, ② tengu_session_memory 게이트 ON, ③ 초기화 임계값 10,000토큰, ④ 지난 추출 대비 +5,000토큰 성장(항상 필수) AND (도구 호출 3회 이상 OR 마지막 턴이 무도구 휴지점). 5K는 눈금이 아니라 하한선이라 실제 갱신 지점은 10K→18K→23K처럼 건너뛴다.",
+      "evidence": "① 메인 REPL 스레드? ✓ → ② tengu_session_memory 게이트? → ③ 10K 초기화 → ④ +5K AND 도구3회/휴지점 ... 5K는 \"최소 간격\"이지 \"눈금\"이 아님"
+    },
+    {
+      "id": "conv-01-p07",
+      "category": "기술디테일",
+      "question": "autoCompact의 자동 발동 임계값 계산 공식과 200K 모델 기준 대략적인 발동 지점은?",
+      "gold_answer": "임계값 = 모델 컨텍스트 윈도우 − MAX_OUTPUT_TOKENS_FOR_SUMMARY 20,000 − AUTOCOMPACT_BUFFER_TOKENS 13,000 (src/services/compact/autoCompact.ts:30,62). 200K 모델이면 약 167K에서 자동 발동한다.",
+      "evidence": "임계값 = 모델 컨텍스트 윈도우 − 요약 출력 예약 20,000 − 버퍼 13,000토큰 (`src/services/compact/autoCompact.ts:30,62`). 200K 모델이면 대략 167K 부근에서 자동 발동"
+    },
+    {
+      "id": "conv-01-p08",
+      "category": "기술디테일",
+      "question": "자동 메모리의 MEMORY.md 인덱스에 걸린 용량 캡과 관련 상수/함수는? 세션 메모리의 캡과 비교하면?",
+      "gold_answer": "MEMORY.md 인덱스는 200줄 / 25KB 캡 (MAX_ENTRYPOINT_LINES=200, MAX_ENTRYPOINT_BYTES=25_000, src/memdir/memdir.ts:34-38; truncateEntrypointContent가 초과분을 잘라냄). 세션 메모리는 섹션당 ~2,000자 / 총 12,000토큰 캡 (MAX_SECTION_LENGTH=2000, MAX_TOTAL_SESSION_MEMORY_TOKENS=12000, prompts.ts:8-9).",
+      "evidence": "MAX_ENTRYPOINT_LINES = 200 ... MAX_ENTRYPOINT_BYTES = 25_000 ... MAX_SECTION_LENGTH = 2000 ... MAX_TOTAL_SESSION_MEMORY_TOKENS = 12000"
+    },
+    {
+      "id": "conv-01-p09",
+      "category": "의도선호",
+      "question": "사용자는 이 대화에서 정리한 메모리 분석 내용을 어떤 형식으로 남기길 원했는가?",
+      "gold_answer": "/visual-explainer 스킬로 HTML 시각화를 만들어 남기길 원했고, 새 내용이 확인될 때마다 '이 내용까지 반영해서 아까 만든 HTML 업데이트해줘'라며 기존 HTML(클로드코드-메모리-시스템.html)을 계속 갱신하는 방식을 선호했다. 어시스턴트는 프로젝트 컨벤션에 따라 md_group/에 LLM 판독용 md 정본도 페어로 작성했다.",
+      "evidence": "메모리에대한 내용들 .. 우리 나눈 대화들을 /visual-explainer 로 정리해서 남겨줘 ... 이 내용까지 반영해서 아까 만든 HTML 업데이트해줘"
+    },
+    {
+      "id": "conv-01-p10",
+      "category": "의도선호",
+      "question": "마지막 /visual-explainer 호출(자동메모리 딥다이브) 때 사용자가 명시적으로 붙인 지시는 무엇인가?",
+      "gold_answer": "'위 내용들 세세히 적어! 빠짐없이!' — 직전 대화의 딥다이브 내용(2×2 매트릭스, WHO/HOW/WHY/WHERE 4타입 매핑, 충분성 논증, 갱신 2경로, 지침 8섹션, eval 계측)을 누락 없이 상세하게 담으라는 지시였고, 그 결과 자동메모리-딥다이브.html이 만들어졌다.",
+      "evidence": "<command-args>위 내용들 세세히 적어! 빠짐없이!</command-args>"
+    },
+    {
+      "id": "conv-01-p11",
+      "category": "미결다음",
+      "question": "프로젝트 파악 단계에서 확인된 '분석 문서 갭'(향후 분석 후보로 지목된 영역)은 무엇인가?",
+      "gold_answer": "메모리 전담 분석 문서는 09-loadMemoryPrompt-analysis.md 1개뿐이라, 세션 메모리(SessionMemory)와 sessionMemoryCompact 연동, findRelevantMemories 검색 로직이 분석 문서 없는 갭으로 지목됐다. 이 세션에서 md_group/클로드코드-메모리-시스템.md를 작성해 상당 부분 메웠지만, findRelevantMemories→relevant_memories 첨부 경로 등 후반 발견 내용의 문서 반영은 계속 진행 중이던 작업이다.",
+      "evidence": "세션 메모리(SessionMemory)와 sessionMemoryCompact 연동, findRelevantMemories 검색 로직은 아직 분석 문서가 없는 갭입니다 — 이번 세션 주제가 메모리라면 여기가 파볼 지점"
+    },
+    {
+      "id": "conv-01-p12",
+      "category": "미결다음",
+      "question": "세션 종료 시점에 어시스턴트가 제안했지만 사용자 확답을 받지 못한 후속 작업들은?",
+      "gold_answer": "① 자동메모리 딥다이브 내용(2×2 저장 축, WHO/HOW/WHY/WHERE 매핑, 4타입 충분성 논증)을 md_group/클로드코드-메모리-시스템.md §2에 마저 반영하기, ② HTML 시각화들을 html_group_v2/ 컨벤션 위치로 옮기기(또는 md 페어 생성), ③ 8섹션 지침 내용을 메모리-시스템 HTML에도 반영하기. 셋 다 제안 상태로 남았다.",
+      "evidence": "원하시면 이 딥다이브 내용(2×2 축, WHO/HOW/WHY/WHERE 매핑, 4타입 충분성 논증)도 `md_group/클로드코드-메모리-시스템.md` §2에 마저 반영해 드릴 수 있습니다 ... `html_group_v2/`에 넣을 시각화 사본이 필요하면 말씀 주세요"
+    }
+  ],
+  "korean_terms": [
+    "자동 메모리",
+    "세션 메모리",
+    "컴팩션",
+    "포크 서브에이전트(분신)",
+    "MEMORY.md",
+    "summary.md",
+    "isCompactSummary",
+    "tengu_session_memory",
+    "4타입 분류(user/feedback/project/reference)",
+    "클로드코드-메모리-시스템.md"
+  ]
+}

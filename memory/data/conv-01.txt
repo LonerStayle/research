@@ -1,0 +1,2095 @@
+[USER] 프로젝트 코드랑 내용 전체 파악 해 자 시작!
+
+[ASSISTANT] 프로젝트 구조를 먼저 빠르게 훑은 뒤, 전역 지침대로 탐색은 Explore 서브에이전트에 맡기겠습니다.
+
+[도구호출 Bash] {"command": "ls /Users/seobi/jinsup_space/CC && echo '---' && find /Users/seobi/jinsup_space/CC -maxdepth 2 -type d -not -path '*/.git*' | sort | head -60", "description": "List project root and direc
+
+[도구결과] CLAUDE.md
+backfill-경로정규화-시각설명.html
+html_group_v2
+kv-캐시-타이밍-시각설명.html
+mcp-캐시-3전선.html
+md_group
+md_group-교정-변경내역.md
+read-edit-시나리오.html
+src
+도구-정렬-캐시보존.html
+배치-세계-전수도감.md
+위드홀드-복구-사다리-시각설명.html
+위드홀드-플래그-비교-시각설명.html
+도구-배치-스케줄링.html
+배치-세계-전수도감.html
+백그라운드
+
+[도구호출 Agent] {"description": "md_group 문서 전체 카탈로그", "subagent_type": "Explore", "prompt": "탐색 대상: /Users/seobi/jinsup_space/CC 의 분석 문서들. 이 워크스페이스는 Claude Code 내부 동작을 분석·정리하는 리서치 프로젝트다.\n\n탐색 범위 (very thorough):\n1
+
+[도구결과] Async agent launched successfully.
+agentId: a577a1911a4c18655 (internal ID - do not mention to user. Use SendMessage with to: 'a577a1911a4c18655', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes.
+Do no
+
+[도구호출 Agent] {"description": "src 소스 구조 전체 파악", "subagent_type": "Explore", "prompt": "탐색 대상: /Users/seobi/jinsup_space/CC/src/ — Claude Code(클로드코드)의 소스 코드 미러(디컴파일/복원본으로 추정)다. 이 워크스페이스는 Claude Code 내부 동작을 분석하는 리서치
+
+[도구결과] Async agent launched successfully.
+agentId: a49f8b31bd7266cd8 (internal ID - do not mention to user. Use SendMessage with to: 'a49f8b31bd7266cd8', summary: '<5-10 word recap>' to continue this agent.)
+The agent is working in the background. You will be notified automatically when it completes.
+Do no
+
+[ASSISTANT] 두 개의 Explore 에이전트를 병렬로 띄웠습니다:
+
+1. **문서 탐색** — `md_group/` 전체 카탈로그 + 루트 md 요약, 특히 메모리 관련 분석 문서를 집중적으로 찾는 중
+2. **소스 탐색** — `src/` 디렉토리별 역할 맵 + 소스 형태 판정(원본 vs 복원본) + 메모리 관련 코드(`memdir/`, compaction 등) 상세 맵
+
+완료되면 결과를 종합해서 프로젝트 전체 그림을 보고드리겠습니다.
+
+[USER] <task-notification>
+<task-id>a49f8b31bd7266cd8</task-id>
+<tool-use-id>toolu_01ApwcgNtdE4mUBTp6cQX1cu</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-seobi-jinsup-space-CC/725702dd-7cc0-4ecd-ba6a-c64b33f9d5e9/tasks/a49f8b31bd7266cd8.output</output-file>
+<status>completed</status>
+<summary>Agent "src 소스 구조 전체 파악" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>Perfect! Now I have enough information to provide a comprehensive analysis. Let me compile the final report.
+
+## 최종 분석 보고서: Claude Code 소스 구조 탐사
+
+---
+
+### 섹션 1: 소스 형태 판정
+
+**결론: 원본 TypeScript 소스 코드 (Anthropic Claude Code의 공식 복원/미러)**
+
+**근거:**
+1. **일관된 코드 스타일**: 모든 파일이 표준 TypeScript/TSX 형식
+   - ESLint/Biome 주석 (`// biome-ignore-all assist/source/organizeImports`)
+   - Commander.js, React, Bun 번들러 사용
+   - `import ... from '...'` 최신 ES 모듈 문법
+
+2. **빌드 시스템 직접 참조**: `bun:bundle`에서 feature flag 읽음 (원본 빌드 구조 보존)
+   ```typescript
+   import { feature } from 'bun:bundle'
+   ```
+
+3. **프로덕션급 주석**: 
+   - 성능 기준점, 백분위수 참조 (p97, p99.99)
+   - BQ 데이터 분석 결과 인용 ("BQ 2026-03-10: 1,279 sessions had 50+ consecutive failures")
+   - 메모리 구조 설명과 의도
+
+4. **한국어 주석**: 프로젝트 리서치 노트 (원본은 영문), 마크다운 및 분석 문서에만 있음
+
+5. **디컴파일 없음**: minified/obfuscated 코드, 재구성 흔적, 자동 생성 마커 전혀 없음
+
+---
+
+### 섹션 2: 디렉토리별 역할 맵
+
+| 디렉토리 | 파일 수 | 역할 |
+|---------|--------|------|
+| **utils** | 298 | 유틸리티 레이어 (토큰/에러/권한/파일 시스템/설정/메모리 검색) |
+| **components** | 113 | React UI 컴포넌트 (Ink 기반 터미널, 권한 대화, 피드백 폼) |
+| **services** | 16 주+20 하위 | API/MCP/컨텍스트 압축/세션 메모리 — 핵심 비즈니스 로직 |
+| **commands** | 15 주+86 하위 | CLI 커맨드 구현 (add-dir, agents, bridge, compact 등 86개) |
+| **tools** | 1 주+42 하위 | Tool 구현 (FileRead, Edit, Bash, Grep, Agent 등 42개) |
+| **hooks** | 83 | React/App 훅 (권한 제안, 포커스, 키보드 이벤트 등) |
+| **ink** | 43 | 터미널 렌더링 레이어 (Ink 추상화) |
+| **memdir** | 8 | 메모리 디렉토리 관리 (`MEMORY.md` 엔트리포인트, 타입, 경로) |
+| **bridge** | 31 | 세션/원격 연결 프로토콜 (REPL bridge, WebSocket, SDK) |
+| **state** | 6 | 상태 관리 (AppState, 변경 감지) |
+| **tasks** | 4+5 하위 | 비동기 작업 (LocalAgent, Teammate, Dream) |
+| **cli** | 6+2 하위 | CLI I/O 레이어 (print, structuredIO, transports) |
+| **bootstrap** | 1 | 부트스트랩 상태 (56K 모놀리식 파일 — 초기화/캐시/글로벌) |
+| **context** | 9 | React context (큐/메일박스/FPS 메트릭) |
+| **keybindings** | 14 | 키바인딩 설정 |
+| **migrations** | 11 | 설정/세션 마이그레이션 스크립트 |
+| **entrypoints** | 5 | 진입점 (init, CLI, SDK 타입) |
+| **plugins** | 1+1 하위 | 플러그인 로드/번들 |
+| **skills** | 3+1 하위 | 스킬 로드/번들 |
+
+---
+
+### 섹션 3: 메모리 관련 코드 상세 맵
+
+#### **A. 메모리 디렉토리 관리 (src/memdir/)**
+
+| 파일 | 라인 수 | 핵심 기능 |
+|------|--------|---------|
+| `memdir.ts:507` | 메모리 프롬프트 빌드, 엔트리포인트 truncate |
+| `paths.ts:278` | 자동 메모리 경로, 활성화 게이트 (isAutoMemoryEnabled) |
+| `memoryTypes.ts:271` | 메모리 타입 분류 (user/feedback/project/reference) |
+| `findRelevantMemories.ts:141` | 관련성 높은 메모리 검색 |
+| `memoryScan.ts:94` | MEMORY.md 파일 스캔/헤더 파싱 |
+| `memoryAge.ts:53` | 메모리 갱신도 계산 (나이 기준) |
+| `teamMemPaths.ts:292` | 팀 메모리 경로 (TEAMMEM feature flag) |
+| `teamMemPrompts.ts:100` | 팀/개인 통합 메모리 프롬프트 |
+
+**핵심 상수:**
+- `ENTRYPOINT_NAME = 'MEMORY.md'` (라인 34)
+- `MAX_ENTRYPOINT_LINES = 200` (라인 35)
+- `MAX_ENTRYPOINT_BYTES = 25_000` (라인 38)
+
+**핵심 함수:**
+- `buildMemoryPrompt()` — 시스템 프롬프트에 메모리 섹션 추가
+- `truncateEntrypointContent()` (라인 57) — 200줄/25KB 제한 적용
+- `isAutoMemoryEnabled()` (src/memdir/paths.ts:30) — 메모리 활성화 여부
+- `getAutoMemPath()` (src/memdir/paths.ts:memoized) — ~/.claude/projects/&lt;slug&gt;/memory/
+
+---
+
+#### **B. 세션 메모리 (자동 추출/업데이트 시스템) — src/services/SessionMemory/**
+
+| 파일 | 라인 수 | 핵심 기능 |
+|------|--------|---------|
+| `sessionMemory.ts:495` | 세션 메모리 백그라운드 에이전트 (자동 추출) |
+| `sessionMemoryUtils.ts:207` | 설정 저장/로드, 초기화 추적 |
+| `prompts.ts:324` | 템플릿 및 업데이트 프롬프트 생성 |
+
+**자동 메모리 템플릿 구조 (prompts.ts:11-41):**
+```
+# Session Title
+# Current State
+# Task specification
+# Files and Functions
+# Workflow
+# Errors &amp; Corrections
+# Codebase and System Documentation
+# Learnings
+# Key results
+# Worklog
+```
+
+**핵심 상수:**
+- `MAX_SECTION_LENGTH = 2000` (prompts.ts:8)
+- `MAX_TOTAL_SESSION_MEMORY_TOKENS = 12000` (prompts.ts:9)
+
+**핵심 함수:**
+- `buildSessionMemoryUpdatePrompt()` (prompts.ts) — 포크된 서브에이전트 프롬프트
+- `isSessionMemoryGateEnabled()` (sessionMemory.ts:80) — feature gate 읽기 (`tengu_session_memory`)
+- `getSessionMemoryConfig()` (sessionMemoryUtils.ts) — 세션별 메모리 설정
+
+---
+
+#### **C. 컨텍스트 압축 (Compaction) — src/services/compact/**
+
+| 파일 | 라인 수 | 핵심 기능 |
+|------|--------|---------|
+| `compact.ts:1705` | 메인 컴팩션 로직 (메시지 요약/병합) |
+| `autoCompact.ts:351` | 자동 컴팩션 트리거 (토큰 임계값) |
+| `microCompact.ts:530` | 마이크로 컴팩션 (경량 요약) |
+| `sessionMemoryCompact.ts:630` | 세션 메모리 동기화 컴팩션 |
+| `prompt.ts:374` | 컴팩션 프롬프트 생성 |
+| `postCompactCleanup.ts:77` | 컴팩션 후 정리 (파일 첨부 제거 등) |
+| `apiMicrocompact.ts:153` | API 마이크로컴팩션 호출 |
+| `grouping.ts:63` | 메시지 그룹핑 (에러/결과 묶음) |
+
+**핵심 상수 (autoCompact.ts):**
+- `MAX_OUTPUT_TOKENS_FOR_SUMMARY = 20_000` (라인 30)
+- `AUTOCOMPACT_BUFFER_TOKENS = 13_000` (라인 62)
+- `WARNING_THRESHOLD_BUFFER_TOKENS = 20_000` (라인 63)
+- `MAX_CONSECUTIVE_AUTOCOMPACT_FAILURES = 3` (라인 70)
+
+**임계값 계산:**
+```typescript
+getEffectiveContextWindowSize(model)  // 컨텍스트 - 출력예약
+  = getContextWindowForModel(model) - MAX_OUTPUT_TOKENS_FOR_SUMMARY
+
+getAutoCompactThreshold(model)
+  = getEffectiveContextWindowSize(model) - AUTOCOMPACT_BUFFER_TOKENS
+```
+
+**핵심 함수:**
+- `compactConversation()` (compact.ts) — 메인 컴팩션 엔트리
+- `getAutoCompactThreshold()` (autoCompact.ts:72) — 자동 컴팩션 활성화 임계값
+
+---
+
+#### **D. 메모리 관련 유틸리티 — src/utils/**
+
+| 파일 | 기능 |
+|------|------|
+| `memory/types.ts` | 메모리 타입 상수 |
+| `memoryFileDetection.ts` | MEMORY.md 파일 검출 |
+| `tokens.ts` | 토큰 계산 (컴팩션 판단 용) |
+| `context.ts` | 컨텍스트 윈도우 크기 (`COMPACT_MAX_OUTPUT_TOKENS`) |
+| `messages.ts` | 메시지 유틸 (컴팩션 경계 생성) |
+
+---
+
+#### **E. 메모리 관련 기타 코드**
+
+| 경로 | 기능 |
+|------|------|
+| `src/tools/AgentTool/agentMemory.ts` | 에이전트 개인 메모리 |
+| `src/query.ts` | 메모리 쿼리 엔진 |
+| `src/QueryEngine.ts` | 메모리 검색 로직 |
+| `src/commands/compact/compact.ts` | `/compact` 커맨드 |
+| `src/services/awaySummary.ts` | "away" 상태 요약 |
+
+---
+
+### 섹션 4: 규모 통계
+
+| 지표 | 값 |
+|------|-----|
+| **총 TypeScript/TSX 파일** | 1,902개 |
+| **총 코드 라인 수** | 512,670줄 |
+| **메모리 관련 코드** | 6,722줄 (compact + SessionMemory + memdir) |
+| **최대 파일** | src/main.tsx (4,680줄 / 794KB) |
+| **두 번째** | src/bridge/replBridge.ts (2,406줄) |
+| **세 번째** | src/bridge/bridgeMain.ts (2,999줄) |
+| **평균 파일 크기** | ~270줄 |
+| **가장 큰 디렉토리** | utils (298파일, 31개 하위디렉토리) |
+
+---
+
+### 추가 통찰
+
+1. **빌드 품질**: Biome 포맷터 + TypeScript strict 모드, production-grade 린팅
+2. **보안**: 메모리 보안 검토 (세션 토큰/키체인 프리페치, OTel 계측)
+3. **성능**: 
+   - 메모리 임계값 기반 자동 압축
+   - 포크된 서브에이전트로 백그라운드 추출
+   - 토큰 예측 기반 사전 트리거
+4. **기능 게이팅**: GrowthBook 기반 동적 설정 (tengu_* feature flags)
+5. **프로젝트 구조**: 모노레포, CLI + SDK 듀얼 모드, 원격 세션 지원</result>
+<usage><subagent_tokens>49161</subagent_tokens><tool_uses>47</tool_uses><duration_ms>169341</duration_ms></usage>
+</task-notification>
+
+[ASSISTANT] 소스 탐색이 끝났습니다 — `src/`는 원본 TypeScript 형태의 클로드코드 소스 미러(1,902개 파일, 약 51만 줄)이고, 메모리 관련 코드는 `memdir/`(자동 메모리) + `services/SessionMemory/`(세션 메모리) + `services/compact/`(컴팩션) 세 축으로 확인됐습니다.
+
+문서 카탈로그 쪽 Explore 에이전트가 아직 진행 중이라, 완료되면 두 결과를 합쳐 전체 그림을 정리해 드리겠습니다.
+
+[USER] <task-notification>
+<task-id>a577a1911a4c18655</task-id>
+<tool-use-id>toolu_019SzqLAWh666v66AQh97ivB</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-seobi-jinsup-space-CC/725702dd-7cc0-4ecd-ba6a-c64b33f9d5e9/tasks/a577a1911a4c18655.output</output-file>
+<status>completed</status>
+<summary>Agent "md_group 문서 전체 카탈로그" finished</summary>
+<note>A task-notification fires each time this agent stops with no live background children of its own. The user can send it another message and resume it, so the same task-id may notify more than once.</note>
+<result>이제 전체 그림을 종합하여 최종 보고서를 작성하겠습니다.
+
+---
+
+## 탐색 완료: Claude Code 분석 문서 카탈로그
+
+### 섹션 1: md_group 디렉토리별 문서 카탈로그
+
+#### **md_group/ 루트 레벨 (46개 마크다운 파일)**
+
+| 파일명 | 주제 요약 |
+|--------|---------|
+| `CLAUDE.md` | 프로젝트 안내서. Claude Code 분석의 범위, 소스 기반 검증 원칙, 4개 로컬 비교 레포(Hermes, Gemini CLI, OpenClaw) 참조 경로 제시. |
+| `배치-세계-전수도감.md` | 도구 배치 스케줄링의 `isConcurrencySafe` 전수 분석. 21개 항상 병렬, 4개 항상 단독, 2개 진짜 조건부(Bash·PowerShell) 도구의 3색 분류 및 병렬화 허용 기준. |
+| `cc-distinctive-tech.md` | Claude Code의 distinctive 기술 47가지 카탈로그. 핵심 메타포는 "한 덩어리 → 다층 분해" — 캐시·지연숨김·안전·진화의 4축으로 평범한 에이전트와 차별화. TOP6 기술: 투기적 다음 프롬프트, 모델 공진화, 글로벌 캐시 스코프, 언더커버 모드, race-to-resolve 권한, 동급 에이전트 팀. |
+| `attachment-system.md` | 첨부 시스템 30+종. getAttachments()의 3그룹 수집 구조(userInputAttachments → allThreadAttachments·mainThreadAttachments 병렬). 유저 메시지 1줄 뒤에 수십 개 시스템 첨부물이 자동 끼워짐. |
+| `multiTurn-flow.md` | 멀티턴 대화 흐름 10단계 분석. PHASE 1(main 초기화)→PHASE 2(queryLoop while 루프)→컨텍스트 압축(5단계)→API 호출→도구 분기→권한 확인→실행→결과. |
+| `도구-실행-10단계-파이프라인.md` | 모든 도구 호출의 checkPermissionsAndCallTool() 10단계 파이프라인. JSON 형식 검증→도구 검증→LLM 분류기→입력 정규화→PreToolUse 훅→권한→실행→결과 변환→텔레메트리→PostToolUse 훅. |
+| `프롬프트캐시-경계와-global스코프.md` | 시스템 프롬프트 캐시 경계 마커 `__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__`와 `cacheScope: 'global'` 메커니즘. 정적 앞부분은 모든 유저 공유(global 캐시), 동적 뒷부분은 세션별(null). 2^N 캐시 파편화 방지 원리. |
+| `시스템프롬프트-7섹션-구조.md` | 정적 캐시 영역의 7섹션: Intro(정체성), System(도구 환경), Doing tasks(코드 철학), Actions(위험 확인), Using tools(도구 선택), Tone &amp; style(말투), Output efficiency(효율성). 동메인 특화 최소화, 응용 가능 구조. |
+| `시스템프롬프트-7섹션-요약.md` | 위 문서의 요약본. 각 섹션의 핵심 내용을 1~2문단으로 압축. |
+| `도구-카탈로그와-ToolSearch-메커니즘.md` | 40개 도구의 전체 카탈로그(파일시스템 4, 검색/탐색 3, 실행 5, 웹 2, 서브에이전트 4, 플랜 모드 2, 워크트리 2, 사용자 상호작용 1, 태스크 7, MCP/외부 4, 유틸 6). ToolSearch의 deferred 로딩 메커니즘. |
+| `도구-카탈로그와-ToolSearch-메커니즘.md` (cont.) | ToolSearch가 **deferred 도구의 schema를 런타임에 로드**하는 메커니즘. 도구 풀 크기 가변성 해결. |
+| `모델컨텍스트-주입경로-전수조사.md` | 모델이 받는 6가지 컨텍스트 경로: ①시스템 프롬프트 ②Attachments ③Hooks ④도구 프롬프트 주입 ⑤직접 주입 메시지 ⑥런타임 제어. 각 경로의 조립 함수, 캐시 상태, 소스 라인 인용. |
+| `클로드코드-mcp-캐싱.md` | MCP × Prompt Caching 전략. 캐시 prefix는 tools→system→messages 순서. MCP를 tools 앞에 두면 다 깨짐 → deferred로 뒤로 숨김. "안 바뀌는 건 앞, 바뀌는 건 뒤" 원칙. |
+| `클로드코드-mcp-연결구조.md` | MCP 연결의 5가지 transport(stdio, sse, http, ws, sdk)와 4가지 거주지(별도 프로세스, 네트워크, In-Process, SDK 호스트). 10단계 파이프라인은 공유, 7단계 실행(call)에서 외부로 갈림. |
+| `에이전트-성능-결정요인-총정리.md` | 에이전트 성능의 모든 결정 요인 정리. 모델→시스템 프롬프트→도구 설계→컨텍스트 엔지니어링→안전성→캐싱→검증→스트리밍 순서별 분석. |
+| `human-in-the-loop.md` | 10단계 도구 호출 중 6번 단계인 권한 체크 상세 분석. hasPermissionsToUseToolInner() 규칙 기반 판정(deny→ask→allow). 권한 모드 3가지(default/auto/bypass). |
+| `대용량-결과-디스크-복구.md` | 도구 결과 대용량 오프로드. 30K~50K자 초과 시 디스크에 저장, 컨텍스트엔 2KB 미리보기만. 다음 턴에 모델이 Read(offset, limit)로 부분 복구. |
+| `todo-task-system-analysis.md` | 두 투두 시스템 공존: V1 TodoWriteTool(레거시, 메모리 저장) vs V2 TaskCreate/Update/Get/List(현재, 파일 저장+lockfile 동시성+의존성). taskListId 결정 우선순위 5단계. |
+| `claude-code-research_v2.md` | 공식 기술 리서치 문서. 세션 생성→첫 질문 시 시스템 프롬프트 조립→캐싱(내부 메모이즈 + API 프롬프트 캐시) 구조의 핵심 설명. |
+| `첨부시스템-이중설계와-TodoWrite-응용비법.md` | 첨부시스템의 이중 타이밍: user-input 계열(입력 의존 @-mention) + in-loop 계열(진행 상태). smooshSystemReminderSiblings, assistant turn 카운터, SendUserMessage 게이트. |
+| `prompt-engineering-techniques.md` | 시스템 프롬프트 엔지니어링 14가지 기법. 상황별 섹션 분리로 간섭 제거, 정적/동적 경계, 도구 설명서 패턴(5종: DO NOT, 실패 조건, 대안, if/when, 전제), 모델별 교정(`@[MODEL LAUNCH]`). |
+| `cc-kv-cache-preservation.md` | KV 캐시 보존 기술. 도구 결과를 매 턴 재계산 대신 cached MC(cache_edits)로 API 계층에서 삭제. 프롬프트 캐시 무효화 없이 메모리만 정리. |
+| `cc-max-output-recovery-timing.md` | max_output_tokens 초과 시 복구 타이밍. 8K→64K 에스컬레이션 재시도. 이미 출력된 토큰은 보존, 타임아웃 vs output token 한계 구분. |
+| `cc-context-preprocessing-timing.md` | 컨텍스트 전처리 타이밍. 매 턴 루프 시작 시 5단계 압축(applyToolResultBudget→snipCompact→microcompact→contextCollapse→autocompact). 도구 결과 우선 절약, 이후 대화 요약. |
+| `cc-withhold-pattern.md` | withhold 패턴 — 에러 복구 메커니즘. 413 Prompt Too Long 시 contextCollapse 드레인→reactiveCompact. max_output_tokens 재시도. 미디어 크기 초과 시 이미지 스트립. |
+| `출력잘림-복구-메커니즘.md` | 출력 잘림 복구. max_output_tokens 도달 시 50KB 늘려서 재시도(최대 8회). 타임아웃/완료 구분. 부분 응답도 유효한 도구 호출로 취급. |
+| `도구결과-가공-5규칙.md` | 도구 결과 가공의 5가지 규칙. ①여러 호출 결과 병합 ②예외 처리(에러면 추가 정보 포함) ③중복 제거 ④정렬/필터링 ⑤크기 제한. |
+| `도구결과-가공-시스템.md` | 도구 결과 가공의 전체 시스템. 도구마다 고유 변환 로직(tool.mapToolResultToToolResultBlockParam). 결과 크기별 처리 경로 분기. |
+| `도구결과-생애-읽기창.md` | 도구 결과의 생애 주기. 생성(tool.call)→변환(mapToolResult)→압축(microcompact)→보관(messages)→복구(Read offset/limit). 각 단계의 추가/삭제/조회 패턴. |
+| `8단계-도구결과-가공-도구별.md` | 8단계(결과 변환)의 도구별 상세 구현. Bash(stdout/stderr 분리), Read(파일 내용), Grep(매칭 라인만), Edit(수정 결과), TaskCreate(task ID), 등. |
+| `backfill-4단계-입국심사.md` | 4단계 backfillObservableInput 분석. 도구 입력 정규화 → 훅/권한이 볼 표준 형식으로. BashTool·Edit·FileWrite의 경로 확장, 절대경로 변환 등. |
+| `도구-병렬-스트리밍.md` | 도구 병렬 호출과 스트리밍. partitionToolCalls로 isConcurrencySafe 기준 배치 분할. 각 배치는 병렬 실행. 스트리밍 도중 배치 다음 배치 예측 시작(prefetch). |
+| `도구-연계-11종.md` | 도구 간 연계 패턴 11가지. 순차(read→edit), 병렬(여러 read), 조건부(file 있으면 edit), 의존성, 루프, 등. 시스템 프롬프트의 규칙. |
+| `도구지침-분산기준-라우터.md` | 도구 지침 4층 분산 기준. L1(시스템 프롬프트 우선순위)→L2(도구 설명서 패턴)→L3(코드 validateInput)→L4(도구 실행 후 보상). 각 층의 책임과 우선순위. |
+| `도구-카탈로그와-ToolSearch-메커니즘.md` | (중복 항목) 전체 도구 카탈로그. |
+| `에이전트-개발-인사이트_cc질의.md` | CC 내부 동작 질의응답 모음. 에이전트 개발자의 실질적 질문과 답변. |
+| `에이전트-개발-인사이트_cc분석.md` | CC 소스 기반 종합 분석. 아키텍처·권한·메모리 등 10가지 주요 영역. |
+| `에이전트-개발-인사이트_cc기타.md` | CC 분석의 기타 주제. 웹훅, 팀 모드, REPL, 비표준 설정. |
+| `스필-예외-대상.md` | SPILL(시스템 프롬프트 길이 초과) 예외 대상. 특정 섹션은 토큰 한계 도달 시에도 제거 안 함. |
+| `클로드코드-입력정규화-4가지.md` | 사용자 입력 정규화 4가지 형태. 텍스트 정규화, 파일 경로 표준화, @-mention 파싱, slash 커맨드 토큰화. |
+| `시스템리마인더-타이밍별-전수.md` | `&lt;system-reminder&gt;` 태그의 타이밍별 전수 조사. 매 턴 주입되는 위치, 내용, 캐시 상태. |
+| `대화-하네스-LLM강약점-vs-Gemini.md` | Claude vs Gemini LLM 하네스 수준 비교. 모델 능력, 도구 호출, 컨텍스트 처리. |
+| `claude-vs-gemini-성능차이-분석.md` | Claude와 Gemini의 성능 차이 분석. 거짓 주장율, 코드 정확도, 추론 깊이. |
+| `claude-code-vs-gemini-cli-비교.md` | Claude Code vs Gemini CLI 비교. CLI UX, 세션 관리, 도구 설계, 권한 시스템. |
+| `제미나이-vs-클로드코드.md` | Gemini CLI와 Claude Code의 아키텍처 비교. 고수준 차이. |
+| `toolsearch-시스템.md` | ToolSearch 도구 시스템 상세 분석. deferred 도구 로딩, schema 확장, 런타임 발견. |
+| `모델컨텍스트-주입경로-전수조사.md` | (중복) 모델 입력 경로 전수. |
+| `어태치먼트-선택규칙.md` | 30+ 첨부물의 선택 규칙. 우선순위, 크기 제한, 중복 제거. |
+
+#### **cc-analysis/ (10개 분석 파일)**
+
+| 파일명 | 주제 요약 |
+|--------|---------|
+| `00-OVERVIEW.md` | 전체 분석 개요. 81개 문서 + 1902개 src 파일 분석 결과 요약. 4계층 아키텍처, 핵심 통합 발견 7가지, 5대 설계 원칙. |
+| `01-system_info.md` | 시스템 프롬프트 아키텍처 23개 문서 정리. 정적/동적 분리, 컨텍스트 관리 5단계, 메모리 4타입, 캐시 경계. |
+| `02-tools_info.md` | 도구 시스템 명세 49개 문서 정리. 40개 도구 카탈로그, 10단계 파이프라인, MCP 통합, 권한 시스템. |
+| `03-top-level-docs.md` | 한국어 연구 문서 9개 요약. 배치 도감, 첨부 시스템, 메모리, 등. |
+| `04-src-core.md` | src/ 최상위 18파일(query, Tool, main, setup 등). 4계층 아키텍처 핵심. |
+| `05-tools-commands.md` | 40 디렉토리 / 42종 도구(Cron 서브 3) + 101 명령 카탈로그. |
+| `06-src-utils.md` | utils/ 564파일 14개 주제별 정리. 캐싱, 권한, 첨부, 메모리, 등. |
+| `07-components-hooks.md` | 346 컴포넌트 + 104 훅. UI, TUI, 상태 관리. |
+| `08-bridge-services-skills-state.md` | 통신/서비스/상태 레이어. SendMessage, Skill 호출, AppState. |
+| `09-remaining-src.md` | 나머지 24 디렉토리. MCP, Electron, 타입 정의, 등. |
+
+#### **prod/ (12개 운영 가이드)**
+
+| 파일명 | 주제 요약 |
+|--------|---------|
+| `00_개요_5대기둥과_운영레이어.md` | 프로덕션 Agentic AI의 5대 기둥(Planning, Tool Design, Verification, Context Engineering, Safety)과 4개 운영 축 통합 가이드. Claude Code 구현 사례 매핑. |
+| `01_기둥1_계획_Planning.md` | 계획 심화 분석. 설계 시간 vs 런타임, 4가지 계획 패턴(Plan-and-Execute, ReAct, Hybrid, 병렬/오케스트레이터), 안티 패턴 5가지, 체크리스트. |
+| `02_기둥2_도구설계_ToolDesign.md` | 도구 설계 이론과 Claude Code 구현. 3레이어 설계(시스템 프롬프트 L1, 도구 설명서 L2, 코드 검증 L3). |
+| `03_기둥3_검증_Verification.md` | 검증 시스템. Self-check, Monitor, Human review. |
+| `04_기둥4_컨텍스트엔지니어링_ContextEngineering.md` | 컨텍스트 전략. 정보 완전성, 중복 제거, 토큰 효율성. |
+| `05_보충_RAG_엔지니어링.md` | RAG 엔지니어링 보충. 첨부, 메모리, 검색. |
+| `06_기둥5_안전성_Safety.md` | 안전 레이어. 권한, 감시, 복구. |
+| `07_관찰가능성과_평가시스템_Flywheel.md` | 관찰성과 평가 시스템 구성. 로깅, 모니터링, 성능 지표. |
+| `08_멀티에이전트_오케스트레이션.md` | 다중 에이전트 조율. 팀 모드, 메시징, 동기화. |
+| `09_비용_지연시간_최적화.md` | 비용과 지연시간 최적화. 캐싱, 배치, 병렬화, 토큰 예산. |
+| `10_실전적용_로드맵_종합체크리스트.md` | 실전 적용 7단계 + 종합 체크리스트. |
+| `11_부록_2026생태계와_참고자료.md` | 2026년 에이전트 생태계 정보와 참고 자료. |
+
+#### **system_info/ (23개 시스템 분석 파일)**
+
+| 파일명 | 주제 요약 |
+|--------|---------|
+| `query-context-management.md` | 컨텍스트 관리 5단계 파이프라인(applyToolResultBudget→snipCompact→microcompact→contextCollapse→autocompact). 각 단계의 발동 조건, 효과, 복구 방식. |
+| `prompts/01~07-*.md` (7개) | 정적 7섹션 각각의 상세 분석. Intro, System, Doing Tasks, Actions, Using Tools, Tone &amp; Style, Output Efficiency. |
+| `prompts/08-getSessionSpecificGuidanceSection-analysis.md` | D1. 세션 지침 섹션. AskUserQuestion, Agent 도구, /skill, 검증 에이전트 안내. |
+| `prompts/09-loadMemoryPrompt-analysis.md` | **메모리 시스템 상세 분석.** 3가지 분기(KAIROS 데일리 로그, TEAMMEM 팀 메모리, 일반 경로). 메모리 4타입, 금지 항목, 저장/접근 방법. |
+| `prompts/10-computeSimpleEnvInfo-analysis.md` | D4. 환경 정보 블록. CWD, git 상태, 모델, 지식 컷오프, 플랫폼, 쉘. |
+| `prompts/11-getLanguageSection-analysis.md` | D5. 언어 선호 섹션 (조건부). |
+| `prompts/12-getOutputStyleSection-analysis.md` | D6. 출력 스타일 섹션 (조건부: Explanatory/Learning/Custom). |
+| `prompts/13-getMcpInstructionsSection-analysis.md` | D7. MCP 지침 (매 턴 재계산, uncached). 연결된 MCP 서버별 도구 안내. |
+| `prompts/14-getScratchpadInstructions-analysis.md` | D8. Scratchpad 디렉토리 (세션 격리 임시파일). |
+| `prompts/15-getFunctionResultClearingSection-analysis.md` | D9. 함수 결과 삭제 (오래된 도구 결과 자동 삭제 안내). |
+| `prompts/16-SUMMARIZE_TOOL_RESULTS_SECTION-analysis.md` | D10. 도구 결과 요약 (삭제 전 중요 정보 기록). |
+| `prompts/17-getAntModelOverrideSection-analysis.md` | D3. Anthropic 내부 모델 오버라이드. |
+| `prompts/18-numericLengthAnchors-analysis.md` | D11. 숫자 길이 앵커 (Ant 내부: 도구간 ≤25어, 최종 ≤100어). |
+| `prompts/19-tokenBudget-analysis.md` | D12. 토큰 예산 섹션 (기능 게이트). |
+| `prompts/20-getBriefSection-analysis.md` | D13. Brief/SendUserMessage 섹션 (KAIROS). |
+| `prompts/system-context-analysis.md` | 시스템 컨텍스트(git 상태) 조립 분석. systemContext vs userContext. |
+| `prompts/system-prompt.md` | 전체 시스템 프롬프트 원본 저장본 (또는 생성 샘플). |
+| `prompts/tools-prompt-translations-batch*.md` (6개) | 도구 설명서 번역 일괄 처리 (영→한). |
+
+#### **tools_info/ (도구 상세 분석)**
+
+| 파일명 | 주제 요약 |
+|--------|---------|
+| `toolcalling-performance.md` | 도구 호출 성능 분석. 레이턴시, 토큰 소비, 병렬화 이득. |
+| `toolcalling-loop-prevention.md` | 도구 루프 방지 메커니즘. maxTurns, maxBudgetUsd, 구조 출력 회수 제한. |
+| `tools_detail/*.md` (27개) | 도구별 상세 분석. Read, Grep, Bash, Edit, Task*, Agent, Brief, Config, WebSearch, MCP*, Sleep, REPL, NotebookEdit, Power Shell, Cron*, Skill, Send Message, Worktree*, Plan*, etc. |
+| `prompts/tools-prompt-translations-batch*.md` | (위 system_info 항목과 동일) |
+
+---
+
+### 섹션 2: 루트 레벨 md 파일 요약
+
+#### **근 루트 (3개)**
+
+| 파일명 | 주제 요약 |
+|--------|---------|
+| `/Users/seobi/jinsup_space/CC/CLAUDE.md` | 프로젝트 안내. 분석 범위, 소스 기반 검증 원칙, 4개 비교 레포. |
+| `/Users/seobi/jinsup_space/CC/배치-세계-전수도감.md` | isConcurrencySafe 도구 배치 전수 분석. 3색 분류(항상 병렬 21개, 항상 단독 4개, 진짜 조건부 2개). |
+| `/Users/seobi/jinsup_space/CC/md_group-교정-변경내역.md` | 135개 문서 전량 검증 결과. 89개 파일 296건 오류 교정. 교정 내역 상세 기록(개수, 메커니즘, 프롬프트 원문 정정). |
+
+---
+
+### 섹션 3: 메모리 관련 문서 상세 분석
+
+#### **발견 문서**
+
+**1개 전담 메모리 분석 문서:**
+
+**파일:** `/Users/seobi/jinsup_space/CC/md_group/system_info/prompts/09-loadMemoryPrompt-analysis.md`
+
+**파일 크기:** 약 110줄(읽은 부분 120줄)
+
+**핵심 구조:**
+
+```
+loadMemoryPrompt() — memdir.ts:419-507
+  ↓
+3가지 분기:
+  1. KAIROS 모드 (feature('KAIROS') &amp;&amp; autoEnabled &amp;&amp; getKairosActive())
+     → buildAssistantDailyLogPrompt() — 어시스턴트 데일리 로그
+  
+  2. TEAMMEM 모드 (feature('TEAMMEM') &amp;&amp; isTeamMemoryEnabled())
+     → buildCombinedMemoryPrompt() — private + team 이중 디렉토리
+  
+  3. 일반 모드 (isAutoMemoryEnabled())
+     → buildMemoryLines('auto memory', ...) — 단일 디렉토리, 개인 전용
+  
+  4. 비활성 (위 모두 해당 없음)
+     → null (프롬프트에 포함 안 됨)
+```
+
+**메모리 4타입 분류:**
+- `user`: 사용자의 역할, 목표, 책임, 지식
+- `feedback`: 사용자가 준 작업 방식 지침(교정 + 확인)
+- `project`: 코드/git에서 유도할 수 없는 진행 중 작업/목표/인시던트
+- `reference`: 외부 시스템의 정보 위치 포인터
+
+**금지 항목 (메모리에 저장하지 말 것):**
+- 코드 패턴, 컨벤션, 아키텍처, 파일 경로, 프로젝트 구조
+- git 히스토리, 최근 변경, 누가-무엇을-변경
+- 디버깅 솔루션이나 수정 레시피
+- CLAUDE.md에 이미 문서화된 것
+- 일시적 작업 세부사항: 진행 중 작업, 임시 상태, 현재 대화 컨텍스트
+
+**저장 방법:**
+1단계: 개별 파일로 저장(frontmatter 포맷)
+2단계: MEMORY.md 인덱스에 포인터 추가
+
+**접근 시점:**
+- 메모리가 관련 있어 보이거나 사용자가 이전 대화 작업 참조할 때
+- 사용자가 명시적으로 확인/기억/회상 요청할 때 반드시 접근
+- "무시하라"고 하면 MEMORY.md가 비어있는 것처럼 진행
+
+**소스 근거:**
+- 함수 위치: `src/memdir/memdir.ts:419-507`
+- 보조 파일: `src/memdir/memoryTypes.ts`, `src/memdir/paths.ts`, `src/memdir/teamMemPrompts.ts`
+- 호출 위치: `src/constants/prompts.ts:495` (systemPromptSection 래퍼)
+- 캐싱: 세션 당 1회 평가, 이후 캐시
+
+---
+
+#### **메모리 관련 언급 문서 (직접 분석 x)**
+
+메모리가 system_info 분석 문서(01-system_info.md)에서 **D2 섹션**으로 명시:
+```
+D2 | memory | 자동메모리/MEMORY.md·팀메모리·일일로그 | `:495` / `memdir.ts:419-`
+```
+
+메모리 구조는 prod/ 문서에서도 언급:
+- `00_개요_5대기둥과_운영레이어.md` — 메모리 "4타입" 명시
+- `04_기둥4_컨텍스트엔지니어링_ContextEngineering.md` — 컨텍스트 첨부물 일부로 메모리 포함
+
+---
+
+### 섹션 4: 전체 프로젝트 커버리지 한눈 요약
+
+#### **분석 완료 영역 (매우 상세)**
+
+| 주제 | 문서 수 | 커버리지 | 비고 |
+|-----|--------|--------|------|
+| **시스템 프롬프트 아키텍처** | 23개 | 🟢 완전 | 정적 7섹션 + 동적 13+ 섹션 + 캐시 경계. 영문 원본 + 한국어 분석. |
+| **도구 시스템** | 49개 | 🟢 완전 | 40개 도구 카탈로그 + 10단계 파이프라인 + MCP 통합 + 권한 시스템. |
+| **컨텍스트 관리** | 8개 | 🟢 완전 | 5단계 압축 파이프라인 상세. 도구 결과 오프로드, 메모리, 첨부. |
+| **메모리 시스템** | 1개(전담) + 다수(언급) | 🟡 부분 | `loadMemoryPrompt` 분석 완전. KAIROS/TEAMMEM 옵션 모드. 4타입 분류. |
+| **권한/HITL** | 6개 | 🟢 완전 | hasPermissionsToUseToolInner, 모드 3가지, race-to-resolve 채널. |
+| **캐싱/성능** | 10개 | 🟢 완전 | 프롬프트 캐시 경계 + global scope + KV 캐시 보존 + MCP deferred. |
+| **도구 설계 이론** | 7개 | 🟢 완전 | 3레이어 설계 + 도구 지침 4층 + 패턴 5종. |
+| **에이전트 설계 이론** | 12개(prod/) | 🟢 완전 | 5대 기둥 + 4개 운영 축. Planning, Tool Design, Verification, Context Eng., Safety. |
+| **소스 코드 분석** | 10개(cc-analysis/) | 🟢 완전 | 1902 파일 분석. 4계층 아키텍처, 핵심 5 설계 원칙. |
+| **CLI UX/세션** | 3개(비교) | 🟡 부분 | Gemini CLI vs CC 비교만. 단독 깊이 분석 x |
+| **아키텍처 패턴** | 8개 | 🟢 완전 | 투기적 실행, 공진화, 다중 방어, 언더커버 모드, race-to-resolve, 팀 모드 등. |
+| **에러 복구** | 5개 | 🟢 완전 | withhold 패턴, max_output_tokens 재시도, 컨텍스트 압축 에스컬레이션. |
+
+#### **매우 상세히 다룬 주제**
+
+1. **시스템 프롬프트 캐시 경계** — `__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__` 마커, `cacheScope: 'global'`, 정적/동적 분리, 2^N 파편화 방지
+2. **10단계 도구 실행 파이프라인** — JSON 검증 → 도구 검증 → LLM 분류기 → 입력 정규화 → 훅 → 권한 → 실행 → 결과 변환 → 텔레메트리 → 훅
+3. **컨텍스트 관리 5단계** — applyToolResultBudget → snipCompact → microcompact → contextCollapse → autocompact
+4. **도구 배치 스케줄링** — isConcurrencySafe 기준 3색 분류(21개 항상 병렬, 4개 항상 단독, 2개 조건부)
+5. **메모리 4타입** — user, feedback, project, reference (KAIROS, TEAMMEM, 일반 3가지 모드)
+6. **MCP 연결** — 5가지 transport(stdio, sse, http, ws, sdk), 4가지 거주지(별도 프로세스, 네트워크, In-Process, SDK 호스트)
+7. **권한 시스템** — allow/deny/ask 3가지, race-to-resolve(터미널/web/채널/훅/분류기 동시 송출)
+8. **첨부 시스템** — 30+ 종, 3그룹 수집(userInputAttachments → allThreadAttachments·mainThreadAttachments 병렬)
+9. **도구 설명서 패턴** — DO NOT 규칙, 실패 조건, 대안 제시, if/when 시나리오, 전제조건 내장
+10. **모델 공진화** — 모델 버전별 교정 지시(`@[MODEL LAUNCH]` 마커), false claim 데이터, 구조 보상
+
+#### **부분 또는 미흡한 영역**
+
+- **멀티에이전트 팀 모드** — 개요만, 세부 메커니즘 적음
+- **Skill/플러그인 시스템** — ToolSearch와 연계 선 정도만
+- **Electron/IDE 통합** — 언급만, 상세 분석 x
+- **성능 지표/Flywheel** — 개념 소개만, 구현 상세 x
+- **REPL/비대화형 모드** — 존재만 명시, 깊이 분석 x
+
+#### **문서 품질**
+
+- **소스 코드 근거**: ✅ 거의 모든 주장에 `file:line` 인용
+- **구체적 예시**: ✅ 실제 코드 스니펫, 데이터 예시 풍부
+- **검증 상태**: ✅ "md_group-교정-변경내역.md"에서 전량 교정됨 (135개 문서 검증, 89개 교정)
+- **일관성**: ✅ 같은 개념을 여러 문서에서 일관되게 설명
+- **한국어 품질**: ✅ 기술 용어 명확, 문장 구조 정확
+
+#### **HTML 시각화**
+
+- `html_group_v2/`: 138개 HTML 파일
+- 마크다운과 1:1 대응, 디자인 강화 버전
+- 내용은 md와 동일 (md 기반 LLM 분석 권장)
+
+---
+
+### 최종 평가
+
+이 프로젝트는 **Claude Code 내부 동작의 극도로 정밀하고 체계적인 분석 문서 집합**입니다.
+
+**강점:**
+- 모든 주장이 소스 코드 기반 (추측 배제)
+- 5대 기둥(Planning/Tool Design/Verification/Context Engineering/Safety)로 에이전트 설계 이론과 실제 구현 매핑
+- 매우 상세한 파이프라인 분석 (10단계, 5단계, 4단계 등)
+- 프로덕션 레벨 실전 가이드(prod/) 포함
+
+**커버리지:**
+- ✅ 시스템 프롬프트 아키텍처 (완전)
+- ✅ 도구 실행 파이프라인 (완전)
+- ✅ 컨텍스트 관리 (완전)
+- ✅ 권한/HITL (완전)
+- ✅ 메모리 시스템 (부분 — 1개 전담 문서)
+- ✅ 캐싱 전략 (완전)
+- ✅ MCP 통합 (완전)
+- 🟡 멀티에이전트 팀 모드 (개요만)
+- 🟡 성능 지표/Flywheel (개념만)
+
+**메모리 분석:**
+메모리는 시스템 프롬프트 동적 영역(D2 섹션)의 일부로 분석되었으며, 전담 문서(`09-loadMemoryPrompt-analysis.md`)에서 KAIROS/TEAMMEM/일반 3가지 모드와 4타입 분류를 상세히 설명합니다. 다만 고급 메모리 검색(grep 과거 컨텍스트) 등은 feature gate 뒤라 상세 분석 미흡.</result>
+<usage><subagent_tokens>76811</subagent_tokens><tool_uses>44</tool_uses><duration_ms>206042</duration_ms></usage>
+</task-notification>
+
+[ASSISTANT] 두 탐색이 모두 끝났습니다. 프로젝트 전체 파악 결과를 정리해 드립니다.
+
+## 전체 구조 — 3축
+
+| 축 | 내용 | 규모 |
+|---|---|---|
+| `md_group/` | 클로드코드 내부 동작 분석 마크다운 (루트 46개 + cc-analysis 10 + prod 12 + system_info 23 + tools_info 30+) | 약 135개 문서, 전량 교정 완료(`md_group-교정-변경내역.md`: 89개 파일 296건 교정) |
+| `html_group_v2/` | 위 md와 1:1 대응하는 사람용 시각화 HTML | 138개 |
+| `src/` | 클로드코드 원본 TypeScript 소스 미러 (디컴파일 흔적 없음 — `bun:bundle` feature flag, Biome 주석, 프로덕션급 코멘트 그대로) | 1,902개 파일 / 약 512,670줄 |
+
+루트에는 개별 주제 시각화 HTML(배치 스케줄링, KV 캐시, withhold 복구 등)과 `배치-세계-전수도감.md`가 흩어져 있습니다.
+
+## 문서 커버리지 (이미 분석 완료된 주제)
+
+- **완전 커버**: 시스템 프롬프트 아키텍처(정적 7섹션 + 동적 13섹션 + `__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__` 캐시 경계), 도구 실행 10단계 파이프라인, 컨텍스트 압축 5단계(applyToolResultBudget → snipCompact → microcompact → contextCollapse → autocompact), 권한/HITL, 프롬프트 캐싱·MCP deferred 전략, 도구 배치 스케줄링(`isConcurrencySafe` 3색 분류), 에러 복구(withhold 패턴)
+- **부분 커버**: 멀티에이전트 팀 모드, Skill/플러그인, REPL/비대화형 모드, 그리고 **메모리 시스템**
+
+## 소스 구조 핵심
+
+`src/` 는 utils(298파일) / components·hooks·ink(터미널 UI) / services(API·MCP·압축·세션메모리) / tools(42종) / commands(101종) / memdir(메모리) / bridge(원격 세션) 등으로 나뉘고, 최대 파일은 `src/main.tsx`(4,680줄)입니다.
+
+## 메모리 관련 현황 (세션명 "클코-메모리" 기준으로 특히 주목)
+
+소스에는 메모리가 **세 축**으로 존재합니다:
+
+1. **자동 메모리** — `src/memdir/` (8파일): `loadMemoryPrompt()`(memdir.ts:419-507), `MEMORY.md` 엔트리포인트(200줄/25KB 제한), 4타입 분류(user/feedback/project/reference), KAIROS 데일리로그·TEAMMEM 팀메모리 분기
+2. **세션 메모리** — `src/services/SessionMemory/` (3파일): 백그라운드 포크 에이전트가 자동 추출하는 10섹션 템플릿(Session Title~Worklog), 섹션당 2,000자 / 총 12,000토큰 제한, `tengu_session_memory` 게이트
+3. **컴팩션** — `src/services/compact/` (8파일, 총 ~4,000줄): `autoCompact`(임계값 = 유효 컨텍스트 − 13,000토큰 버퍼), `microCompact`, 그리고 **`sessionMemoryCompact.ts`(630줄)** 로 세션 메모리와 컴팩션이 연동
+
+반면 문서 쪽 전담 분석은 `md_group/system_info/prompts/09-loadMemoryPrompt-analysis.md` **1개뿐**이고, 이는 자동 메모리(1번 축)만 다룹니다. 즉 **세션 메모리(SessionMemory)와 sessionMemoryCompact 연동, findRelevantMemories 검색 로직은 아직 분석 문서가 없는 갭**입니다 — 이번 세션 주제가 메모리라면 여기가 파볼 지점으로 보입니다.
+
+전체 파악은 끝났습니다. 이어서 어떤 작업을 할지 말씀해 주시면 바로 진행하겠습니다 (예: 메모리 3축 심층 분석 문서 작성).
+
+[USER] 자동 메모리, 세션 메모리 가 뭐야?
+
+[ASSISTANT] 좋은 질문이라 소스로 직접 확인하고 정확히 답하겠습니다. 핵심 파일 세 개만 부분적으로 읽어볼게요.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/memdir/memdir.ts", "limit": 120}
+
+[도구결과] 1	import { feature } from 'bun:bundle'
+2	import { join } from 'path'
+3	import { getFsImplementation } from '../utils/fsOperations.js'
+4	import { getAutoMemPath, isAutoMemoryEnabled } from './paths.js'
+5	
+6	/* eslint-disable @typescript-eslint/no-require-imports */
+7	const teamMemPaths = feature('TEA
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/SessionMemory/prompts.ts", "limit": 120}
+
+[도구결과] 1	import { readFile } from 'fs/promises'
+2	import { join } from 'path'
+3	import { roughTokenCountEstimation } from '../../services/tokenEstimation.js'
+4	import { getClaudeConfigHomeDir } from '../../utils/envUtils.js'
+5	import { getErrnoCode, toError } from '../../utils/errors.js'
+6	import { logErro
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/SessionMemory/sessionMemory.ts", "limit": 130}
+
+[도구결과] 1	/**
+2	 * Session Memory automatically maintains a markdown file with notes about the current conversation.
+3	 * It runs periodically in the background using a forked subagent to extract key information
+4	 * without interrupting the main conversation flow.
+5	 */
+6	
+7	import { writeFile } from 'fs/p
+
+[ASSISTANT] 소스로 확인했습니다. 둘 다 "자동으로 유지되는 마크다운 메모리"지만, **살아있는 범위와 쓰는 주체가 완전히 다릅니다.**
+
+## 자동 메모리 (auto memory) — 세션을 넘는 장기 기억
+
+`src/memdir/` 가 담당합니다. 프로젝트별 디렉토리(`~/.claude/projects/<프로젝트-슬러그>/memory/`)에 **주제당 파일 1개 + `MEMORY.md` 인덱스** 구조로 저장되고, 다음 세션 시작 때 시스템 프롬프트에 다시 실려 들어옵니다.
+
+- **쓰는 주체가 메인 에이전트 본인**입니다. 대화 중 기억할 가치가 있는 사실이 나오면 모델이 직접 Write 도구로 파일을 만들고 인덱스에 한 줄 추가합니다.
+- 저장 대상은 4타입 — `user`(사용자가 누구인지), `feedback`(작업 방식 지침), `project`(코드에서 유도 불가한 진행 상황), `reference`(외부 리소스 포인터). 코드 구조나 git 히스토리처럼 레포가 이미 기록하는 건 저장 금지입니다 (`src/memdir/memoryTypes.ts`).
+- 인덱스는 매 세션 로드되므로 **200줄 / 25KB 캡**이 걸려 있고, 넘으면 잘라내고 경고를 붙입니다 (`src/memdir/memdir.ts:34-38`, `truncateEntrypointContent` 57행).
+
+실물 예시가 바로 지금 이 세션에 있습니다 — 제 시스템 프롬프트에 이 프로젝트의 `MEMORY.md`가 로드돼 있고, 거기에 "레포 2-머신 공유 · 경로는 ~ 중립 표기"라는 항목이 있죠. 이전 세션의 제가 저장해 둔 겁니다.
+
+## 세션 메모리 (Session Memory) — 이 대화 하나를 위한 노트
+
+`src/services/SessionMemory/` 가 담당합니다. 파일 헤더 주석이 정의를 그대로 말해줍니다: *"현재 대화에 대한 노트 마크다운 파일을 자동 유지하며, 포크된 서브에이전트가 백그라운드에서 주기적으로 실행되어 메인 대화 흐름을 방해하지 않고 핵심 정보를 추출한다"* (`sessionMemory.ts:1-5`).
+
+- **쓰는 주체가 메인 에이전트가 아닙니다.** 도구 호출 횟수가 임계값을 넘으면(`countToolCallsSince` → `hasMetUpdateThreshold`) 현재 대화를 통째로 복제한 포크 에이전트(`runForkedAgent`)가 백그라운드에서 돌아가 노트 파일을 Edit 도구로만 갱신하고 종료합니다. 메인 대화에는 이 과정이 전혀 보이지 않습니다.
+- 형식이 **고정 10섹션 템플릿**입니다: Session Title / Current State / Task specification / Files and Functions / Workflow / Errors & Corrections / Codebase and System Documentation / Learnings / Key results / Worklog (`prompts.ts:11-41`). 섹션당 ~2,000, 전체 12,000토큰 캡.
+- 존재 이유는 프롬프트에 명시돼 있습니다: *"Always update 'Current State' — this is critical for **continuity after compaction**"* (`prompts.ts:69`). 즉 컨텍스트가 꽉 차서 대화가 요약(컴팩션)으로 뭉개질 때, 이 노트가 유실 방지 백업 역할을 합니다. 그래서 `services/compact/sessionMemoryCompact.ts`(630줄)가 컴팩션과 직접 연동돼 있습니다.
+- GrowthBook feature gate `tengu_session_memory` 뒤에 있어 **모든 사용자에게 켜져 있는 기능은 아닙니다** (`sessionMemory.ts:80-82`).
+
+## 한눈 비교
+
+| | 자동 메모리 | 세션 메모리 |
+|---|---|---|
+| 수명 | 세션을 넘어 영속 (프로젝트 단위) | 현재 대화 1개 |
+| 작성자 | 메인 에이전트가 명시적으로 Write | 포크된 서브에이전트가 백그라운드 자동 추출 |
+| 형식 | 자유 주제 파일 + MEMORY.md 인덱스 | 고정 10섹션 템플릿, Edit만 허용 |
+| 용도 | 사용자·프로젝트에 대한 누적 지식 | 컴팩션 후 대화 연속성 보장 |
+| 제한 | 인덱스 200줄 / 25KB | 섹션 2,000 / 총 12,000토큰 |
+| 게이트 | 기본 경로 (KAIROS/TEAMMEM 분기 존재) | `tengu_session_memory` feature gate |
+
+비유하자면 자동 메모리는 "당신에 대해 알게 된 것을 적는 수첩"이고, 세션 메모리는 "지금 하는 작업이 기억 절벽(컴팩션)에서 떨어져도 복구할 수 있게 실시간으로 쓰는 작업 일지"입니다.
+
+[USER] 세션 메모리는 어디에 저장되는데?
+
+[도구호출 Bash] {"command": "grep -n \"getSessionMemoryDir\\|getSessionMemoryPath\\|session-memory\" /Users/seobi/jinsup_space/CC/src/utils/permissions/filesystem.ts | head -30", "description": "Find session memory p
+
+[도구결과] 259: * Path format: {projectDir}/{sessionId}/session-memory/
+261:export function getSessionMemoryDir(): string {
+262:  return join(getProjectDir(getCwd()), getSessionId(), 'session-memory') + sep
+267: * Path format: {projectDir}/{sessionId}/session-memory/summary.md
+269:export function getSessionMem
+
+[도구호출 Bash] {"command": "grep -n \"export function getProjectDir\" -A 10 /Users/seobi/jinsup_space/CC/src/utils/sessionStorage.ts", "description": "Check getProjectDir path construction"}
+
+[도구결과] (Bash completed with no output)
+
+[도구호출 Bash] {"command": "grep -rn \"getProjectDir\" /Users/seobi/jinsup_space/CC/src/utils/sessionStorage.ts | head -5; echo '---'; grep -n \"projects\" /Users/seobi/jinsup_space/CC/src/utils/sessionStorage.ts | 
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/sessionStorage.ts:203:  const projectDir = getSessionProjectDir() ?? getProjectDir(getOriginalCwd())
+/Users/seobi/jinsup_space/CC/src/utils/sessionStorage.ts:223:  const projectDir = getProjectDir(getOriginalCwd())
+/Users/seobi/jinsup_space/CC/src/utils/session
+
+[도구호출 Bash] {"command": "grep -rn \"function getProjectDir\" /Users/seobi/jinsup_space/CC/src/ | head -3", "description": "Find getProjectDir definition location"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/markdownConfigLoader.ts:234:export function getProjectDirsUpToHome(
+/Users/seobi/jinsup_space/CC/src/utils/cachePaths.ts:21:function getProjectDir(cwd: string): string {
+/Users/seobi/jinsup_space/CC/src/utils/sessionStoragePortable.ts:329:export function getPro
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/sessionStoragePortable.ts", "offset": 300, "limit": 45}
+
+[도구결과] 300	 * Makes a string safe for use as a directory or file name.
+301	 * Replaces all non-alphanumeric characters with hyphens.
+302	 * This ensures compatibility across all platforms, including Windows
+303	 * where characters like colons are reserved.
+304	 *
+305	 * For deeply nested paths that would e
+
+[ASSISTANT] 경로가 확정됐습니다. 실제 사용자 머신에도 있는지 실물 확인만 해보겠습니다.
+
+[도구호출 Bash] {"command": "ls ~/.claude/projects/-Users-seobi-jinsup-space-CC/ 2>/dev/null | head -8; echo '---'; find ~/.claude/projects -maxdepth 3 -type d -name 'session-memory' 2>/dev/null | head -5", "descript
+
+[도구결과] 3d3ea6d7-5686-4c61-a57d-e80e969e4323
+3d3ea6d7-5686-4c61-a57d-e80e969e4323.jsonl
+3e27f25a-a016-45ab-b9b7-c815b9da51d8.jsonl
+4a3cff0b-2a37-446a-b3eb-248a95130b05.jsonl
+725702dd-7cc0-4ecd-ba6a-c64b33f9d5e9
+725702dd-7cc0-4ecd-ba6a-c64b33f9d5e9.jsonl
+c36aeba7-7619-425b-b98f-6585ccf6794d
+c36aeba7-7619-425
+
+[ASSISTANT] 단일 파일 하나로 저장됩니다: **`~/.claude/projects/<프로젝트-슬러그>/<세션ID>/session-memory/summary.md`**
+
+소스 근거 (`src/utils/permissions/filesystem.ts:259-270`):
+
+```typescript
+// Path format: {projectDir}/{sessionId}/session-memory/
+export function getSessionMemoryDir(): string {
+  return join(getProjectDir(getCwd()), getSessionId(), 'session-memory') + sep
+}
+// Path format: {projectDir}/{sessionId}/session-memory/summary.md
+export function getSessionMemoryPath(): string {
+  return join(getSessionMemoryDir(), 'summary.md')
+}
+```
+
+`getProjectDir()`는 현재 작업 디렉토리 경로의 비영숫자 문자를 전부 하이픈으로 치환한 슬러그를 `~/.claude/projects/` 아래에 만듭니다 (`src/utils/sessionStoragePortable.ts:311-331`). 그래서 이 프로젝트, 지금 이 세션이라면 이론상 경로는:
+
+```
+~/.claude/projects/-Users-seobi-jinsup-space-CC/725702dd-7cc0-4ecd-ba6a-c64b33f9d5e9/session-memory/summary.md
+```
+
+자동 메모리와의 위치 관계가 딱 보입니다:
+
+```
+~/.claude/projects/-Users-seobi-jinsup-space-CC/
+├── memory/                      ← 자동 메모리 (프로젝트 레벨, 세션 간 공유)
+│   ├── MEMORY.md
+│   └── <주제>.md
+├── <세션ID>.jsonl               ← 대화 트랜스크립트
+└── <세션ID>/
+    └── session-memory/
+        └── summary.md           ← 세션 메모리 (세션ID 아래 격리)
+```
+
+같은 프로젝트 폴더지만 `memory/`는 세션 바깥에, `session-memory/`는 세션 UUID 안쪽에 있어서 수명 차이가 디렉토리 구조 그 자체로 드러납니다.
+
+실물 확인 결과 하나 덧붙이면 — 방금 이 머신의 `~/.claude/projects/`를 전부 뒤져봤는데 `session-memory/` 디렉토리는 **하나도 없습니다**. 세션 폴더와 트랜스크립트는 있는데 세션 메모리만 없는 건, 앞서 본 `tengu_session_memory` feature gate(기본값 `false`, `sessionMemory.ts:80-82`)가 이 계정엔 안 켜져 있다는 뜻으로 해석됩니다. 참고로 템플릿/프롬프트를 커스터마이즈하는 경로는 별도로 `~/.claude/session-memory/config/template.md`와 `prompt.md`입니다 (`prompts.ts:86-120`).
+
+[USER] 메모리.md랑 summary.md랑 같이 있는거구나
+
+[ASSISTANT] 맞습니다 — 같은 프로젝트 폴더 트리에 공존합니다. 다만 "같이"의 층위가 달라서, 둘이 실제로 어떻게 역할 분담하는지 컴팩션 연동 코드만 잠깐 확인해서 정확히 정리해 드릴게요.
+
+[도구호출 Bash] {"command": "grep -n \"summary.md\\|getSessionMemoryPath\\|readSessionMemory\\|sessionMemoryContent\\|SESSION_MEMORY\" /Users/seobi/jinsup_space/CC/src/services/compact/sessionMemoryCompact.ts | head 
+
+[도구결과] 16:import { getSessionMemoryPath } from '../../utils/permissions/filesystem.js'
+472:    const memoryPath = getSessionMemoryPath()
+===
+/**
+ * EXPERIMENT: Session memory compaction
+ */
+
+import type { AgentId } from '../../types/ids.js'
+import type { HookResultMessage, Message } from '../../types/messa
+
+[도구호출 Bash] {"command": "grep -n \"hasMetInitializationThreshold\\|hasMetUpdateThreshold\\|initializationThreshold\\|updateThreshold\\|DEFAULT_SESSION_MEMORY_CONFIG\\|toolCall\" /Users/seobi/jinsup_space/CC/src/s
+
+[도구결과] 28:  toolCallsBetweenUpdates: number
+32:export const DEFAULT_SESSION_MEMORY_CONFIG: SessionMemoryConfig = {
+35:  toolCallsBetweenUpdates: 3,
+40:  ...DEFAULT_SESSION_MEMORY_CONFIG,
+173:export function hasMetInitializationThreshold(
+184:export function hasMetUpdateThreshold(currentTokenCount: number):
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/SessionMemory/sessionMemory.ts", "offset": 130, "limit": 160}
+
+[도구결과] 130	
+131	  return toolCallCount
+132	}
+133	
+134	export function shouldExtractMemory(messages: Message[]): boolean {
+135	  // Check if we've met the initialization threshold
+136	  // Uses total context window tokens (same as autocompact) for consistent behavior
+137	  const currentTokenCount = tokenCou
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/SessionMemory/sessionMemoryUtils.ts", "offset": 20, "limit": 30}
+
+[도구결과] 20	   * Uses the same token counting as autocompact (input + output + cache tokens)
+21	   * to ensure consistent behavior between the two features. */
+22	  minimumMessageTokensToInit: number
+23	  /** Minimum context window growth (in tokens) between session memory updates.
+24	   * Uses the same toke
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/SessionMemory/sessionMemoryUtils.ts", "offset": 165, "limit": 35}
+
+[도구결과] 165	export function markSessionMemoryInitialized(): void {
+166	  sessionMemoryInitialized = true
+167	}
+168	
+169	/**
+170	 * Check if we've met the threshold to initialize session memory.
+171	 * Uses total context window tokens (same as autocompact) for consistent behavior.
+172	 */
+173	export function
+
+[ASSISTANT] 질문 세 개가 쌓였네요 — 순서대로, 방금 소스에서 확인한 내용으로 답하겠습니다.
+
+## 1. "MEMORY.md랑 summary.md랑 같이 있는 거구나" — 맞습니다, 층위만 다르게
+
+같은 `~/.claude/projects/<프로젝트-슬러그>/` 트리에 공존하는데, `memory/MEMORY.md`는 프로젝트 레벨(모든 세션 공유), `<세션ID>/session-memory/summary.md`는 세션 레벨입니다. 그리고 방금 `sessionMemoryCompact.ts`에서 확인한 재미있는 연결고리: 컴팩션이 일어날 때 LLM에게 새로 요약을 시키는 대신 **이미 백그라운드에서 써둔 summary.md를 요약본으로 재활용**하는 실험 기능이 있습니다 (`src/services/compact/sessionMemoryCompact.ts:1-3` — "EXPERIMENT" 표기, 최근 메시지는 최소 10,000토큰/최대 40,000토큰 보존하는 설정 포함). 즉 summary.md는 "쓰일 때를 대비해 미리 만들어두는 컴팩션 요약의 선납분"인 셈입니다.
+
+## 2. 세션 메모리는 언제 발동하나
+
+`registerPostSamplingHook`으로 등록된 훅이라 **모델 응답이 끝날 때마다** 검사되고, 실제 추출은 아래 조건을 전부 통과해야 합니다 (`src/services/SessionMemory/sessionMemory.ts:134-181, 272-289`):
+
+**전제 조건** — ① 메인 REPL 스레드일 것(서브에이전트·팀메이트 제외), ② `tengu_session_memory` 게이트 ON, ③ 초기화 임계값: 대화 컨텍스트가 **10,000토큰** 이상 (`minimumMessageTokensToInit`, sessionMemoryUtils.ts:33)
+
+**발동 조건** — 초기화 후에는 둘 중 하나:
+```
+(지난 추출 이후 컨텍스트 +5,000토큰 성장  AND  도구 호출 3회 이상)
+또는
+(+5,000토큰 성장  AND  마지막 어시스턴트 턴에 도구 호출 없음)  ← 자연스러운 대화 휴지점
+```
+토큰 성장 조건(`minimumTokensBetweenUpdate: 5000`)은 **항상 필수**입니다 — 도구를 아무리 많이 불러도 컨텍스트가 안 자랐으면 추출하지 않습니다 (주석에 "prevents excessive extractions"라고 명시, sessionMemory.ts:165-167). 조건이 맞으면 대화를 통째로 포크한 서브에이전트가 백그라운드에서 summary.md를 Edit하고 조용히 종료합니다.
+
+## 3. "컴팩션 = /compact 할 때 그거?" — 절반만 맞습니다
+
+`/compact`는 **수동 트리거**일 뿐이고, 같은 기계가 **자동으로도** 돕니다:
+
+- **수동**: `/compact` 커맨드 (`src/commands/compact/`) → `compactConversation()` 직접 호출
+- **자동 (autoCompact)**: 매 턴 컨텍스트가 임계값을 넘으면 사용자 개입 없이 발동. 임계값 = 모델 컨텍스트 윈도우 − 요약 출력 예약 20,000 − 버퍼 13,000토큰 (`src/services/compact/autoCompact.ts:30,62`). 200K 모델이면 대략 167K 부근에서 자동 발동합니다.
+- 그 아래에 더 가벼운 단계들도 매 턴 돌고 있습니다 — 오래된 도구 결과만 지우는 microcompact 등, 5단계 전처리(applyToolResultBudget → snipCompact → microcompact → contextCollapse → autocompact)의 마지막 수단이 autocompact입니다 (분석 문서: `md_group/cc-context-preprocessing-timing.md`).
+
+그래서 전체 그림을 이으면: **세션 메모리는 컨텍스트가 자라는 동안 5K토큰마다 백그라운드에서 노트를 갱신해 두고, 컨텍스트가 한계에 닿아 (자동이든 `/compact`든) 컴팩션이 터지는 순간 그 노트가 연속성 백업으로 쓰이는 구조**입니다.
+
+[USER] 컴팩션하면 그건 어디에 저장되는데?
+
+[ASSISTANT] 좋은 질문입니다 — 컴팩션 요약이 파일로 남는지, 대화 안에만 존재하는지 소스에서 확인해 보겠습니다.
+
+[도구호출 Bash] {"command": "grep -n \"createCompactBoundaryMessage\\|isCompactBoundary\\|compactMetadata\\|preCompact\\|transcript\\|writeFile\\|appendFile\\|saveSession\" /Users/seobi/jinsup_space/CC/src/services/c
+
+[도구결과] 61:  createCompactBoundaryMessage,
+66:  isCompactBoundaryMessage,
+306:  preCompactTokenCount?: number
+358:    compactMetadata: {
+359:      ...boundary.compactMetadata,
+401:    const preCompactTokenCount = tokenCountWithEstimation(messages)
+456:        preCompactTokenCount,
+473:          preCompactTo
+
+[도구호출 Bash] {"command": "grep -n \"compactBoundary\\|isCompactSummary\\|summary\" /Users/seobi/jinsup_space/CC/src/utils/messages.ts | head -20", "description": "Check compact boundary message structure in messag
+
+[도구결과] 65:  SystemMicrocompactBoundaryMessage,
+255: * Used by the UI to render a short summary instead of the full message.
+465:  isCompactSummary,
+480:  isCompactSummary?: true
+511:    isCompactSummary,
+2959:    // Tool use summary messages are SDK-only, ignore them in stream handling
+2960:    if (message
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/compact/compact.ts", "offset": 590, "limit": 140}
+
+[도구결과] 590	    })
+591	    // Execute SessionStart hooks after successful compaction
+592	    const hookMessages = await processSessionStartHooks('compact', {
+593	      model: context.options.mainLoopModel,
+594	    })
+595	
+596	    // Create the compact boundary marker and summary messages before the
+597	    
+
+[도구호출 Bash] {"command": "grep -n \"getCompactUserSummaryMessage\" -A 30 /Users/seobi/jinsup_space/CC/src/services/compact/prompt.ts | head -45", "description": "Read compact summary message builder in prompt.ts"}
+
+[도구결과] 337:export function getCompactUserSummaryMessage(
+338-  summary: string,
+339-  suppressFollowUpQuestions?: boolean,
+340-  transcriptPath?: string,
+341-  recentMessagesPreserved?: boolean,
+342-): string {
+343-  const formattedSummary = formatCompactSummary(summary)
+344-
+345-  let baseSummary = `This 
+
+[ASSISTANT] 확인 끝났습니다. 답은: **컴팩션 요약은 별도 파일로 저장되지 않고, 대화 자체에 메시지로 삽입된 뒤 세션 트랜스크립트 `.jsonl`에 함께 기록됩니다.**
+
+## 요약이 가는 곳
+
+컴팩션이 끝나면 두 개의 메시지가 만들어져 새 컨텍스트의 맨 앞에 놓입니다 (`src/services/compact/compact.ts:598-624`):
+
+1. **경계 마커** — `createCompactBoundaryMessage('auto' | 'manual', preCompactTokenCount, ...)`: 언제·왜 컴팩션됐는지 메타데이터를 담은 표식
+2. **요약 메시지** — LLM이 생성한 요약을 담은 user 메시지. `isCompactSummary: true` 플래그가 붙습니다
+
+이 메시지들도 일반 메시지와 똑같이 세션 트랜스크립트에 append되므로, 디스크상 위치는 결국:
+
+```
+~/.claude/projects/-Users-seobi-jinsup-space-CC/<세션ID>.jsonl   ← 여기
+```
+
+## 더 중요한 사실: 원본 대화는 안 지워집니다
+
+`.jsonl` 트랜스크립트는 append-only입니다. 컴팩션은 **API로 보내는 인메모리 컨텍스트만** 요약본으로 갈아끼우고, 디스크의 원본 메시지들은 전부 그대로 남습니다. 소스가 이걸 직접 증명하는데, 요약 메시지 본문에 이런 문장이 박혀 들어갑니다 (`src/services/compact/prompt.ts:349-351`):
+
+> *"If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: `{transcriptPath}`"*
+
+즉 컴팩션 후의 모델은 요약만 보는 게 아니라, **필요하면 Read 도구로 자기 과거 대화 원본을 다시 읽어 복구할 수 있는 경로**를 함께 받습니다. 요약은 손실 압축이지만, 원본으로 가는 포인터를 남겨 손실을 복구 가능하게 만든 설계입니다.
+
+## 지금까지 나온 저장소를 한 그림으로
+
+```
+~/.claude/projects/-Users-seobi-jinsup-space-CC/
+├── memory/MEMORY.md               ← 자동 메모리 (세션 간 영속)
+├── <세션ID>.jsonl                  ← 트랜스크립트: 원본 대화 전체
+│                                     + 컴팩션 경계 마커 + 요약 메시지 (append)
+└── <세션ID>/
+    └── session-memory/summary.md  ← 세션 메모리 (컴팩션 대비 백업 노트)
+```
+
+부가로, KAIROS(어시스턴트 모드) feature gate가 켜진 환경에서는 컴팩션 직전 메시지들의 축약 세그먼트를 별도 파일로 한 벌 더 쓰는 경로도 있습니다 (`compact.ts:713-717`) — 일반 CLI 사용자 경로는 아닙니다.
+
+[USER] 메모리에대한 내용들 .. 우리 나눈 대화들을 /visual-explainer 로 정리해서 남겨줘
+
+[도구호출 Skill] {"skill": "visual-explainer", "args": "클로드코드 메모리 시스템 — 자동 메모리 vs 세션 메모리 vs 컴팩션 (이번 대화에서 소스 검증한 내용 정리)"}
+
+[도구결과] Launching skill: visual-explainer
+
+[도구호출 Bash] {"command": "grep -n \"MAX_OUTPUT_TOKENS_FOR_SUMMARY\\|AUTOCOMPACT_BUFFER_TOKENS\\|WARNING_THRESHOLD_BUFFER\\|getAutoCompactThreshold\\|getEffectiveContextWindowSize\" /Users/seobi/jinsup_space/CC/src
+
+[도구결과] 30:const MAX_OUTPUT_TOKENS_FOR_SUMMARY = 20_000
+33:export function getEffectiveContextWindowSize(model: string): number {
+36:    MAX_OUTPUT_TOKENS_FOR_SUMMARY,
+62:export const AUTOCOMPACT_BUFFER_TOKENS = 13_000
+63:export const WARNING_THRESHOLD_BUFFER_TOKENS = 20_000
+72:export function getAutoCompac
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/클로드코드-메모리-시스템.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/클로드코드-메모리-시스템.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open /Users/seobi/jinsup_space/CC/클로드코드-메모리-시스템.html", "description": "Open the memory system visual explainer in browser"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 완성했습니다 — `클로드코드-메모리-시스템.html`을 프로젝트 루트에 저장하고 브라우저로 열었습니다.
+
+## 구성 요약
+
+| 항목 | 내용 |
+|---|---|
+| 컨셉 | **"기억의 지층"** — 수명이 다른 세 층(자동 메모리 = 영속 / 세션 메모리 = 세션 / 컨텍스트 = 휘발)이 쌓인 다크 아카이브 테마 |
+| 미학 | 딥 차콜 배경 + 미세 그리드 질감, 앰버(영속)·틸(세션)·로즈(휘발) 3색 코딩, Gothic A1 + IBM Plex Mono |
+| 파일 | 단일 HTML, 인라인 CSS/JS, 스크롤 진입 시 staggered reveal, 모바일 반응형 |
+
+## 섹션 (전부 이번 대화에서 소스 검증한 내용)
+
+1. **Hero — 3층 지층도**: 세 메모리 축의 수명 비교
+2. **두 개의 자동 기록 장치**: 자동 메모리 vs 세션 메모리 6항목 VS 비교 (수명·작성자·형식·캡·게이트·로드 시점)
+3. **디스크 지도**: `~/.claude/projects/` 트리 — `memory/`는 세션 밖, `session-memory/`는 세션 UUID 안
+4. **발동 4중 게이트**: 메인 스레드 → `tengu_session_memory` → 10K 초기화 → (+5K AND 도구 3회) OR (+5K AND 휴지점) 흐름도
+5. **컴팩션 트리거**: 수동 `/compact` vs 자동 레인 + 임계값 게이지(W − 20K − 13K) + 5단계 전처리 체인
+6. **요약은 어디로**: before/after — 경계 마커 + `isCompactSummary` 메시지 삽입, `.jsonl` append-only 보존, transcriptPath 포인터 인용
+7. **한 세션의 생애**: 성장 곡선 타임라인 — 5K마다 세션 메모리 점, 컴팩션 드롭, summary.md 재활용(EXPERIMENT), 바닥의 MEMORY.md 영속층
+
+각 섹션 하단에 `파일:line` 출처를 박아뒀습니다. 원하시면 이 HTML을 `html_group_v2/` 컨벤션에 맞춰 옮기거나, 같은 내용의 md 버전을 `md_group/`에 페어로 만들어 드릴 수 있습니다.
+
+[USER] 세션 메모리는 도대체 언제 트리거되는거야..
+
+[ASSISTANT] 핵심이 아직 안 잡히신 것 같으니, "정확히 어느 순간에 검사가 도는지"를 쿼리 루프에서 직접 확인해서 턴 단위 시뮬레이션으로 보여드리겠습니다.
+
+[도구호출 Bash] {"command": "grep -rn \"registerPostSamplingHook\\|runPostSamplingHooks\\|postSamplingHooks\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" --include=\"*.tsx\" -l | head; echo '==='; grep -n \"r
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/query.ts
+/Users/seobi/jinsup_space/CC/src/utils/forkedAgent.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks/postSamplingHooks.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks/skillImprovement.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks/apiQueryHookHelper.ts
+/Users
+
+[도구호출 Bash] {"command": "grep -n \"runPostSamplingHooks\\|postSamplingHook\" /Users/seobi/jinsup_space/CC/src/query.ts | head -8; echo '==='; sed -n '40,80p' /Users/seobi/jinsup_space/CC/src/utils/hooks/postSampl
+
+[도구결과] 92:import { executePostSamplingHooks } from './utils/hooks/postSamplingHooks.js'
+===
+}
+
+/**
+ * Execute all registered post-sampling hooks
+ */
+export async function executePostSamplingHooks(
+  messages: Message[],
+  systemPrompt: SystemPrompt,
+  userContext: { [k: string]: string },
+  systemContext: 
+
+[도구호출 Bash] {"command": "grep -n \"executePostSamplingHooks\" /Users/seobi/jinsup_space/CC/src/query.ts", "description": "Locate hook execution call site in query.ts"}
+
+[도구결과] 92:import { executePostSamplingHooks } from './utils/hooks/postSamplingHooks.js'
+992:      void executePostSamplingHooks(
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/query.ts", "offset": 955, "limit": 60}
+
+[도구결과] 955	
+956	        queryChainId: queryChainIdForAnalytics,
+957	        queryDepth: queryTracking.depth,
+958	      })
+959	
+960	      // 사용자 친화적 메시지로 이미지 크기/리사이즈 에러 처리
+961	      if (
+962	        error instanceof ImageSizeError ||
+963	        error instanceof ImageResizeError
+964	      ) {
+965	        yi
+
+[ASSISTANT] `query.ts`에서 정확한 발사 지점을 찾았습니다. 이번엔 "언제 검사되고, 언제 실제로 실행되는지"를 분리해서 턴 단위로 보여드릴게요.
+
+## 한 문장 답
+
+**검사는 모델 응답이 끝날 때마다 매번, 실행은 4중 게이트를 통과한 순간에만** 됩니다. 그리고 결정적으로 — **이 머신에서는 feature gate가 꺼져 있어서 영원히 실행되지 않습니다.** "도대체 언제?"라고 느껴지는 게 당연한 상황입니다.
+
+## 검사가 도는 정확한 위치
+
+`src/query.ts:990-1000` — 쿼리 루프에서 모델의 스트리밍 응답이 완료된 직후, 도구 실행으로 넘어가기 전에 발사됩니다:
+
+```typescript
+// 모델 응답이 완료된 후 포스트 샘플링 훅 실행
+if (assistantMessages.length > 0) {
+  void executePostSamplingHooks(...)   // ← void: 기다리지 않고 발사만
+}
+```
+
+포인트 세 가지:
+
+- **"턴"이 아니라 "API 응답"마다**입니다. 한 턴에 도구 배치가 3번 돌면 API 호출도 3번이고, 검사도 3번 됩니다.
+- **`void` — fire-and-forget**입니다. 메인 대화는 안 기다리고 바로 도구 실행으로 넘어가고, 추출은 뒤에서 `sequential()` 래퍼로 겹치지 않게 하나씩 돕니다 (`sessionMemory.ts:272`).
+- 검사가 매번 돈다고 추출이 매번 되는 건 아닙니다 — 아래 게이트에서 대부분 탈락합니다.
+
+## 턴 단위 시뮬레이션 (게이트가 어떻게 걸러내는지)
+
+게이트 ON인 계정 기준, 기본값(초기화 10K / 성장 5K / 도구 3회)으로:
+
+| 시점 | 컨텍스트 | 검사 결과 |
+|---|---|---|
+| 응답 #1 (인사) | 3K | ✕ 초기화 임계 10K 미달 → 아무 일 없음 |
+| 응답 #4 (탐색 중) | 9K | ✕ 아직 10K 미달 |
+| 응답 #5 (파일 읽음) | 12K | 초기화 마킹. 성장 +12K ≥ 5K, 도구 호출 4회 ≥ 3 → **첫 추출 발사** 🚀 |
+| 응답 #6 (도구 5회 연속) | 14K | ✕ 도구는 충분하지만 성장 +2K < 5K → 탈락 (토큰 성장은 **항상 필수**) |
+| 응답 #8 (도구 없이 답변만) | 18K | 성장 +6K ≥ 5K, 마지막 턴 무도구 = 자연 휴지점 → **추출** 🚀 |
+
+즉 체감상으로는 **"대화가 5K토큰쯤 자랄 때마다 한 번씩, 조용히"** 입니다. 화면엔 아무것도 안 보이고, 포크된 서브에이전트가 뒤에서 `summary.md`만 고치고 사라집니다.
+
+## 그런데 왜 한 번도 목격이 안 되냐면
+
+검사 순서상 게이트 2에서 매번 끝나기 때문입니다:
+
+```
+API 응답 완료 (query.ts:992)
+  → ① 메인 REPL 스레드? ✓
+  → ② tengu_session_memory 게이트? ✕ ← 이 계정은 여기서 매번 종료
+  → (③ 10K 초기화, ④ +5K AND 도구3회/휴지점 — 도달조차 못함)
+```
+
+앞서 실물 확인했듯 `~/.claude/projects/` 전체에 `session-memory/` 디렉토리가 0개인 게 그 증거입니다. GrowthBook 원격 설정(`tengu_session_memory`, 기본 `false`)이 켜준 계정에서만 작동하는 실험 기능이라, **코드는 매 응답마다 문을 두드리지만 이 머신에선 한 번도 문이 열린 적이 없는** 상태입니다.
+
+[USER] 4중게이트가 뭔지모르겠어?
+
+[ASSISTANT] 아, "4중 게이트"는 공식 용어가 아니라 제가 설명하려고 붙인 이름입니다. 헷갈리게 했네요. 실체는 그냥 **if문 4개가 순서대로 놓여 있는 것**이고, 하나라도 걸리면 그 자리에서 끝나는 구조입니다.
+
+공항 검색대에 비유하면 이렇습니다. "세션 메모리 노트를 갱신한다"는 비행기를 타려면 검문소 4개를 차례로 통과해야 합니다:
+
+**검문소 1 — "너 본 대화 맞아?"**
+이 검사 코드는 서브에이전트 대화에서도 똑같이 돌기 때문에, 먼저 "지금 이게 사용자와의 메인 대화인가?"부터 봅니다. 서브에이전트나 팀메이트 대화라면 노트를 만들 이유가 없으니 여기서 조용히 끝. (`querySource !== 'repl_main_thread'`면 return)
+
+**검문소 2 — "이 기능이 네 계정에 켜져 있어?"**
+세션 메모리는 실험 기능이라 Anthropic이 원격 스위치(`tengu_session_memory`)로 계정별로 켜고 끕니다. 꺼져 있으면 무조건 끝. **지금 이 머신은 매번 여기서 걸립니다** — 그래서 한 번도 작동한 적이 없는 겁니다.
+
+**검문소 3 — "대화가 노트를 만들 만큼 자랐어?"**
+방금 시작한 대화는 적을 내용이 없죠. 그래서 대화 전체가 **10,000토큰**을 넘기 전까지는 시작조차 안 합니다. 한 번 넘으면 "초기화됨"으로 표시되고 이 검문소는 이후 통과 상태 유지.
+
+**검문소 4 — "지난 노트 이후에 새로 쌓인 게 충분해?"**
+매번 노트를 고치면 낭비니까, 지난 갱신 이후 대화가 **+5,000토큰** 자랐을 때만 통과시킵니다 (이건 무조건 필수). 거기에 더해 "도구 호출이 3회 이상 있었거나" 또는 "방금 턴이 도구 없이 말로만 끝난 조용한 턴이거나" 중 하나면 OK.
+
+```
+모델 응답 끝날 때마다 →  [1] 메인 대화?  →  [2] 스위치 ON?  →  [3] 10K 넘었어?  →  [4] +5K 쌓였어?  →  🚀 노트 갱신
+                          ✕ 끝              ✕ 끝               ✕ 끝                ✕ 끝
+```
+
+4개를 다 통과한 순간에만, 대화를 복제한 백그라운드 에이전트가 `summary.md`를 고치고 사라집니다. 요컨대 "4중 게이트"라고 부른 건 **"조건 4개를 전부 만족해야 실행된다"**를 멋부려 말한 것뿐입니다.
+
+[USER] 그 세션메모리는 메인에이전트에서 만드는거야 ?
+
+[ASSISTANT] 핵심을 짚는 질문입니다 — "만드는 주체"가 정확히 누구인지 포크 실행 부분을 잠깐 확인하고 답할게요.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/SessionMemory/sessionMemory.ts", "offset": 290, "limit": 120}
+
+[도구결과] 290	    return
+291	  }
+292	
+293	  // Initialize config from remote (lazy, only once)
+294	  initSessionMemoryConfigIfNeeded()
+295	
+296	  if (!shouldExtractMemory(messages)) {
+297	    return
+298	  }
+299	
+300	  markExtractionStarted()
+301	
+302	  // Create isolated context for setup to avoid polluting p
+
+[도구호출 Bash] {"command": "grep -n \"createCacheSafeParams\\|export async function runForkedAgent\\|export function createSubagentContext\" -A 18 /Users/seobi/jinsup_space/CC/src/utils/forkedAgent.ts | head -60", "
+
+[도구결과] 127: * spread the result and override: `{ ...createCacheSafeParams(context), toolUseContext: clonedContext }`
+128- *
+129- * @param context - The REPLHookContext from the post-sampling hook
+130- */
+131:export function createCacheSafeParams(
+132-  context: REPLHookContext,
+133-): CacheSafeParams {
+134
+
+[ASSISTANT] 아니요 — **판단은 메인 루프가, 실제 작성은 메인 에이전트의 "복제본"이** 합니다. 방금 읽은 실행 코드로 정확히 나누면:
+
+## 역할 분담
+
+**트리거 판단** — 모델도 에이전트도 아닌 **하네스 코드**가 합니다. 메인 쿼리 루프가 응답 끝날 때마다 `shouldExtractMemory()`로 조건만 계산하는 거라(`sessionMemory.ts:296`), 메인 에이전트(LLM)는 이 판단에 관여하지 않고 인지도 못 합니다.
+
+**실제 작성** — 조건이 맞으면 `runForkedAgent()`로 **별도 에이전트를 포크**해서 걔가 씁니다 (`sessionMemory.ts:318-325`). 메인 에이전트 본인이 쓰는 게 아닙니다.
+
+## 그런데 "포크"가 핵심입니다 — 남이 아니라 분신
+
+`createCacheSafeParams()`가 넘기는 걸 보면 (`forkedAgent.ts:131-141`):
+
+```typescript
+return {
+  systemPrompt: context.systemPrompt,      // 메인과 동일한 시스템 프롬프트
+  forkContextMessages: context.messages,   // 메인 대화 전체를 그대로 복사
+  ...
+}
+```
+
+포크 에이전트는 **메인 에이전트와 똑같은 시스템 프롬프트 + 똑같은 대화 전체**를 받고, 거기에 "노트 파일을 갱신하라"는 지시 메시지 하나만 덧붙여진 상태로 출발합니다. 즉 "메인 에이전트가 지금까지 본 모든 것을 본 분신"이 다른 분기에서 숙제만 하고 사라지는 구조입니다.
+
+## 왜 메인이 직접 안 쓰고 분신을 시키나
+
+1. **대화 오염 방지** — 노트 작성 지시가 메인 대화에 들어가면 흐름이 깨집니다. 추출 프롬프트에 아예 *"이 지시를 노트 내용에 절대 언급하지 마라"*가 박혀 있습니다 (`prompts.ts:44-46`).
+2. **메인을 안 막음** — `void`로 발사하고 메인은 바로 도구 실행으로 넘어갑니다. 노트 작성은 뒤에서 병행.
+3. **비용이 거의 공짜** — 대화 prefix가 메인과 바이트 단위로 동일하므로 포크의 API 호출이 **프롬프트 캐시에 적중**합니다. 주석에 명시돼 있죠: *"runForkedAgent for prompt caching"* (`sessionMemory.ts:315`).
+4. **권한 잠금** — 포크에겐 `createMemoryFileCanUseTool(memoryPath)`가 걸려서 **summary.md 파일 하나만 Edit 가능**하고, 격리 컨텍스트라 메인 상태를 건드릴 수 없습니다 (`sessionMemory.ts:321`, `createSubagentContext`).
+
+요약하면: **"메인 에이전트가 만드나?" → "메인 에이전트의 기억을 통째로 물려받은 일회용 분신이 만든다"** 가 정확한 답입니다. 덤으로, `/summary` 커맨드로 게이트를 무시하고 수동 추출하는 경로도 있습니다 (`manuallyExtractSessionMemory`, `sessionMemory.ts:387`).
+
+[USER] 아아 만드는 건 서브에이전트지만 메인 히스토리 기준으로 만든다는거지?
+
+[ASSISTANT] 맞습니다, 정확히 이해하셨어요.
+
+- **재료** = 메인 대화 히스토리 전체 (`forkContextMessages: context.messages` — 시스템 프롬프트까지 메인과 동일하게 복사)
+- **일꾼** = 포크된 서브에이전트 (그 히스토리 끝에 "노트 갱신해라" 지시 하나만 붙여서 출발)
+- **산출물** = `summary.md` 하나만 Edit하고 종료. 이 과정 자체는 메인 히스토리에 아무 흔적도 안 남김
+
+그래서 노트 내용이 메인 대화의 실제 사건들(파일 경로, 에러, 사용자 교정 등)을 정확히 반영할 수 있는 거고요. 덤으로 히스토리가 메인과 바이트 단위로 같으니 API 프롬프트 캐시를 그대로 재활용해서 추출 비용도 거의 공짜에 가깝게 설계돼 있습니다.
+
+한 줄로 박제하면: **"메인의 기억으로, 메인 몰래, 메인을 위한 백업 노트를 쓰는 분신"** 입니다.
+
+[USER] 그래서 어느타이밍에 작성한다구?
+
+[ASSISTANT] 타이밍만 압축하면 이겁니다:
+
+**모델이 응답을 마친 직후** (도구 실행으로 넘어가기 전, `query.ts:992`) 매번 검사하고 → 조건이 맞으면 **그 즉시 백그라운드에서 작성 시작**합니다. 메인 대화는 안 기다리고 계속 진행되고요.
+
+"조건이 맞는 순간"을 체감으로 환산하면:
+
+```
+대화 시작 ──── 10K토큰 도달 ──→ 첫 작성 🖊
+                  이후 +5K 자랄 때마다 ──→ 갱신 🖊 ──→ 갱신 🖊 ──→ …
+                  (단, 도구 3회 이상 썼거나 / 방금 턴이 도구 없는 턴일 때)
+```
+
+즉 답은 한 줄로: **"응답이 끝날 때마다 기회를 보다가, 대화가 5K토큰쯤 자랐다 싶으면 그때 몰래 쓴다"** 입니다.
+
+- 턴 중간(도구 배치 사이)에도 API 응답이 끝나면 검사는 됩니다 — "턴마다"가 아니라 "API 응답마다"
+- 예외 2개: `/summary` 커맨드는 조건 무시하고 즉시 작성, 그리고 컴팩션 직전에는 최신 노트가 필요하니 진행 중인 추출을 기다리는 연동(`waitForSessionMemoryExtraction`)이 있습니다
+- 이 머신에서는 feature gate가 꺼져 있어 **실제로는 한 번도 안 씁니다**
+
+[USER] 10K 토큰 도달??
+
+[ASSISTANT] 그 10K가 "무엇의" 토큰인지 정확히 짚고 가겠습니다 — 측정 함수를 잠깐 확인할게요.
+
+[도구호출 Bash] {"command": "grep -n \"export function tokenCountWithEstimation\" -B 8 -A 25 /Users/seobi/jinsup_space/CC/src/utils/tokens.ts | head -45", "description": "Check how tokenCountWithEstimation measures c
+
+[도구결과] 218- * So the messages array looks like:
+219- *   [..., assistant(id=A), user(result), assistant(id=A), user(result), ...]
+220- * If we stop at the LAST assistant record, we only estimate the one tool_result
+221- * after it and miss all the earlier interleaved tool_results — which will ALL
+222- * be
+
+[ASSISTANT] "10K 토큰"은 **지금 모델 앞에 놓인 대화 컨텍스트 전체의 크기**입니다. 누적 사용량이 아니라 "현재 대화가 얼마나 커졌나"예요.
+
+## 무엇을 세는 건가
+
+`tokenCountWithEstimation(messages)`로 잽니다 (`src/utils/tokens.ts:226`). 동작 방식:
+
+1. 대화에서 **가장 최근 API 응답이 보고한 실측 토큰**(usage: input + cache + output — API가 응답마다 돌려주는 진짜 숫자)을 앵커로 잡고
+2. 그 뒤에 새로 쌓여서 아직 API에 안 보낸 것들(도구 결과 등)은 대략 추정해서 더합니다
+
+주석에 명시돼 있듯 autocompact와 **똑같은 잣대**입니다 (`sessionMemoryUtils.ts:20-22` — "Uses the same token counting as autocompact") — 그래야 "세션 메모리가 준비되기 전에 컴팩션이 먼저 터지는" 엇박자가 안 나니까요.
+
+## 10K가 체감으로 얼마냐면
+
+텍스트로 치면 영문 약 7,500단어(A4 열몇 장) 분량인데, **에이전트 대화에서는 도구 결과가 지배적**이라 훨씬 빨리 찹니다:
+
+```
+"이 파일 읽어줘" 한 마디
+  → Read 결과 500줄 = 그것만 수천 토큰
+  → 파일 2~3개 읽고 몇 턴 주고받으면 10K 도달 ✓
+```
+
+지금 우리 대화도 진작에 10K를 한참 넘었습니다. 그러니 10K는 높은 문턱이 아니라 **"인사만 하고 끝난 대화에 노트 만들지 마라" 수준의 최소 필터**입니다 — 적을 내용이 생길 만큼 자란 다음에야 노트를 개시하겠다는 거죠.
+
+정리하면:
+
+| 숫자 | 의미 | 체감 |
+|---|---|---|
+| 10,000 (초기화) | 컨텍스트가 이만큼 자라면 첫 노트 작성 | 실작업 시작하고 몇 턴이면 도달 |
+| +5,000 (갱신) | 지난 노트 이후 이만큼 더 자라면 갱신 | 파일 한두 개 읽을 때마다 꼴 |
+
+[USER] 그리고 여러섹션이 들어간다했는데 어떤 섹션들이고 그 메모리가 LLM에 어느타이밍에 인풋해? 시스템리마인더로 들어가나?
+
+[ASSISTANT] 두 가지 다 소스로 확인하겠습니다 — 특히 "언제, 어떤 형태로 LLM 입력에 들어가는지"는 `sessionMemoryCompact.ts`의 주입 부분을 직접 봐야 정확합니다.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/compact/sessionMemoryCompact.ts", "offset": 430, "limit": 120}
+
+[도구결과] 430	
+431	  return shouldUse
+432	}
+433	
+434	/**
+435	 * Create a CompactionResult from session memory
+436	 */
+437	function createCompactionResultFromSessionMemory(
+438	  messages: Message[],
+439	  sessionMemory: string,
+440	  messagesToKeep: Message[],
+441	  hookResults: HookResultMessage[],
+442	  tra
+
+[ASSISTANT] 둘 다 확인됐고, 마지막에 주신 말씀(MEMORY.md는 시스템 프롬프트)도 맞습니다 — 셋이 각각 **다른 채널**로 들어가는 게 포인트라서 같이 정리하겠습니다.
+
+## 1. 세션 메모리의 10개 섹션 (`prompts.ts:11-41`)
+
+| 섹션 | 담는 내용 |
+|---|---|
+| Session Title | 5~10단어 제목 (정보 밀도 최대) |
+| **Current State** | 지금 진행 중인 것 + 다음 스텝 — *컴팩션 후 연속성의 핵심이라 "항상 갱신하라" 명시* |
+| Task specification | 사용자가 뭘 요청했나, 설계 결정 |
+| Files and Functions | 중요 파일이 뭐고 왜 중요한지 |
+| Workflow | 자주 도는 bash 명령과 출력 해석법 |
+| Errors & Corrections | 에러와 해결, **사용자가 교정한 것, 실패해서 다시 시도하면 안 되는 접근** |
+| Codebase and System Documentation | 시스템 구성요소와 맞물림 |
+| Learnings | 잘된 것 / 안 된 것 / 피할 것 |
+| Key results | 사용자가 요청한 정확한 결과물(표·답변)을 그대로 복사 |
+| Worklog | 단계별 작업 로그 (초압축) |
+
+## 2. LLM 인풋 타이밍 — 시스템 리마인더 아닙니다
+
+세션 메모리는 **평소에는 LLM에 전혀 안 들어갑니다.** 매 턴 주입되는 게 아니라 디스크에서 잠자다가, **컴팩션이 터지는 그 순간 딱 한 번** 컨텍스트에 들어옵니다. 방금 읽은 주입 코드(`sessionMemoryCompact.ts:437-482`)를 보면 형태가 명확합니다:
+
+```typescript
+const summaryMessages = [
+  createUserMessage({              // ← user 메시지!
+    content: summaryContent,       //   summary.md 내용을 요약 틀에 담아서
+    isCompactSummary: true,
+    ...
+```
+
+즉 `<system-reminder>` 태그도, 시스템 프롬프트도 아니고 — **"This session is being continued from a previous conversation..." 로 시작하는 일반 user 메시지**가 되어 컴팩션 후 새 컨텍스트의 맨 앞(경계 마커 바로 뒤)에 놓입니다. LLM이 자기 요약 대신 미리 써둔 노트를 받는 거죠. 디테일 두 개:
+
+- 컴팩션 직전에 `waitForSessionMemoryExtraction()`으로 진행 중인 노트 갱신을 기다려서 최신본을 보장합니다 (`:527`)
+- 섹션이 너무 크면 잘라내고, 잘렸으면 *"full session memory can be viewed at: {memoryPath}"* 포인터를 덧붙여 원본 파일로 복구 가능하게 합니다 (`:461-474`)
+
+## 3. 말씀하신 대로 — 세 기억, 세 채널
+
+**MEMORY.md가 시스템 프롬프트에 들어간다는 건 정확합니다** (`loadMemoryPrompt()`, `memdir.ts:419-507` → `constants/prompts.ts:495`에서 시스템 프롬프트 동적 영역 D2 섹션으로 조립, 세션당 1회 평가 후 캐시). 그래서 채널이 이렇게 갈립니다:
+
+| 기억 | LLM 인풋 채널 | 타이밍 |
+|---|---|---|
+| MEMORY.md (자동 메모리) | **시스템 프롬프트** (동적 영역) | 세션 시작부터 항상 |
+| summary.md (세션 메모리) | **user 메시지** (`isCompactSummary`) | 컴팩션 순간에만 |
+| `<system-reminder>` | 첨부(attachment) 시스템의 채널 | 매 턴 상황별 주입 — 위 둘과는 별개 경로 |
+
+설계 의도가 읽히는 배치입니다: 항상 필요한 장기 기억은 캐시되는 시스템 프롬프트에, 비상용 백업 노트는 필요한 순간에만 대화에, 순간적 상태 알림은 리마인더로 — **수명에 맞는 채널을 골라 쓴** 구조입니다.
+
+[USER] 그러면 10K -> 5K(15K) -> 5K(20K) 이렇게 5K마다 갱신인거지?
+
+[ASSISTANT] 거의 맞는데, 두 가지 뉘앙스만 붙이면 정확해집니다.
+
+**기본 그림은 맞습니다**: 10K에서 첫 작성 → 이후 지난 작성 시점 대비 +5K 자랄 때마다 갱신. 실제로 작성이 끝날 때마다 `recordExtractionTokenCount()`로 **그 순간의 컨텍스트 크기를 새 기준점으로 기록**하고 (`sessionMemory.ts:344`), 다음 검사는 "기준점 + 5,000 넘었나"를 봅니다 (`hasMetUpdateThreshold`, `sessionMemoryUtils.ts:184-189`).
+
+다만 정확히 15K, 20K 눈금에서 딱딱 갱신되는 건 아닙니다:
+
+**뉘앙스 1 — 5K는 "최소 간격"이지 "눈금"이 아님.** 검사는 모델 응답이 끝나는 순간에만 도니까, 응답 하나가 컨텍스트를 한 번에 8K 불렸다면(큰 파일 Read 등) 다음 갱신은 15K가 아니라 18K에서 일어납니다. 그러면 기준점이 18K로 잡혀서 그다음은 23K 이후가 되고요. 즉:
+
+```
+이론:  10K → 15K → 20K → 25K
+실제:  10K → 18K → 23K → 31K   (응답 단위로 건너뛰며, 5K는 하한선)
+```
+
+**뉘앙스 2 — +5K를 넘어도 짝꿍 조건이 안 맞으면 미뤄집니다.** +5K는 필수 조건일 뿐이고, 추가로 "도구 호출 ≥3회" 또는 "마지막 턴이 도구 없는 턴"이어야 발사됩니다. 예컨대 +6K 자랐는데 도구를 2번만 썼고 방금 턴도 도구로 끝났다면 통과 못 하고, 다음 응답에서 다시 검사합니다.
+
+그래서 정확한 한 줄은: **"5K마다"가 아니라 "지난 작성 이후 최소 5K 이상 자란 상태에서, 조건 맞는 첫 응답 직후"** 입니다. 체감상 5K 근처마다 한 번씩이라는 감각은 유효하고요.
+
+[USER] isCompactSummary 이건 또 ㅜ머야..
+
+[ASSISTANT] 간단한 겁니다 — 메시지에 붙는 **꼬리표(플래그)** 하나예요. 어디서 읽어가는지만 확인하고 정확히 설명드릴게요.
+
+[도구호출 Bash] {"command": "grep -rn \"isCompactSummary\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" --include=\"*.tsx\" | grep -v \"isCompactSummary?: true\\|isCompactSummary,\" | head -20", "description":
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/QueryEngine.ts:566:            msg.isCompactSummary)
+/Users/seobi/jinsup_space/CC/src/bridge/initReplBridge.ts:286:          msg.isCompactSummary ||
+/Users/seobi/jinsup_space/CC/src/bridge/bridgeMessaging.ts:104:  if (m.type !== 'user' || m.isMeta || m.toolUseResult 
+
+[ASSISTANT] 별거 아닙니다 — 메시지 객체에 붙는 **불리언 꼬리표** 하나입니다. `isCompactSummary: true` = **"이 user 메시지는 사람이 타이핑한 게 아니라, 컴팩션이 끼워 넣은 요약이다"** 라는 표식이에요.
+
+## 왜 이런 꼬리표가 필요하냐면
+
+API 규격상 대화는 user/assistant 메시지의 교대라서, 시스템이 끼워 넣는 요약문도 **둘 중 하나의 역할을 빌려야** 합니다 (그래서 user 메시지로 위장). 그런데 겉모습이 진짜 사용자 발화와 똑같아지니까, 하네스 내부에서 "진짜 사용자 입력"과 구분할 도장이 필요한 거죠. 우편물의 "관제 우편" 도장 같은 겁니다 — 모델에게는 그냥 user 메시지로 보이지만, 하네스끼리는 알아봅니다.
+
+## 실제로 누가 이 도장을 확인하나 (방금 grep한 소비처)
+
+| 소비처 | 용도 |
+|---|---|
+| `components/Message.tsx:159` | 터미널 UI에서 일반 사용자 말풍선처럼 안 그리고 특별 렌더링 |
+| `components/MessageSelector.tsx:780` | Esc-Esc "이 지점으로 되감기" 목록에서 제외 — 사용자가 요약 메시지로 되감으면 이상하니까 |
+| `utils/sessionStorage.ts:1752` | `--resume` 세션 목록의 제목을 뽑을 때 건너뜀 — 요약문이 세션 제목이 되는 걸 방지 |
+| `services/compact/compact.ts:798` | **다음 컴팩션** 때 "이건 지난번 요약이구나"를 식별 |
+| `hooks/useAwaySummary.ts:19` | "마지막 진짜 사용자 메시지가 뭐였나" 판정에서 제외 |
+
+같은 자리에서 봤던 `isVisibleInTranscriptOnly: true`도 동종의 꼬리표입니다 (트랜스크립트 보기에서만 노출).
+
+요컨대 컴팩션 요약의 정체성이 이 한 줄로 정리됩니다: **모델에게는 user 메시지, 하네스에게는 `isCompactSummary` 도장이 찍힌 시스템 산출물.** 세션 메모리 경로(`sessionMemoryCompact.ts:479`)든 일반 LLM 요약 경로(`compact.ts:621`)든 똑같이 이 도장을 찍습니다.
+
+[USER] 음... 저 유저 프롬프트가 엔터칠떄 같이들어가? 그럼 질문과 별개의 인풋으로들어가겟네? 배열로치면 최소 원소 2개?
+
+[ASSISTANT] 좋은 직관입니다 — 거의 맞고, 실제로는 2개보다 더 많습니다. 경계 마커가 API로도 나가는지만 확인하고 정확히 답할게요.
+
+[도구호출 Bash] {"command": "grep -rn \"isCompactBoundaryMessage\\|compact_boundary\" /Users/seobi/jinsup_space/CC/src/utils/messages.ts /Users/seobi/jinsup_space/CC/src/services/claude.ts 2>/dev/null | head -15; ech
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/messages.ts:4539:    subtype: 'compact_boundary',
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:4569:    subtype: 'microcompact_boundary',
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:4608:export function isCompactBoundaryMessage(
+/Users/seobi/jinsup
+
+[ASSISTANT] 정확한 직관입니다. 확인 결과까지 얹어서 정리하면:
+
+## "엔터칠 때 같이 들어가?" — 자동 컴팩션이면 사실상 그렇습니다
+
+autocompact 검사는 **엔터 친 후, API 호출 직전**의 5단계 전처리에서 돕니다. 그래서 그 엔터로 임계값을 넘긴 경우 순서는:
+
+```
+엔터 ↵
+ → 내 질문이 배열에 append
+ → 루프 시작: 전처리에서 임계값 초과 감지
+ → 배열 재구성 (요약 메시지 삽입, 옛 메시지 제거)
+ → API 호출  ← 요약과 내 질문이 "같은 요청"에 실려 나감
+```
+
+단, 항상 엔터 순간인 건 아닙니다 — 긴 턴 중간(도구 배치 사이)에 임계값을 넘으면 사용자 입력 없이도 터집니다.
+
+## "별개의 인풋? 배열 최소 원소 2개?" — 맞고, 실제론 더 많습니다
+
+요약은 내 질문에 합쳐지는 게 아니라 **독립된 user 메시지 원소**입니다. 컴팩션 직후의 API messages 배열은 대략:
+
+```
+[
+  { role: 'user', content: '이 세션은 이전 대화에서 이어짐... (요약)' },  ← isCompactSummary
+  { role: 'user', content: '(보존된 최근 메시지들, 있다면)' },
+  { role: 'user', content: '(SessionStart 훅 · 재주입된 파일 첨부)' },
+  { role: 'user', content: '내가 방금 친 질문' },                        ← 진짜 입력
+]
+```
+
+user 메시지가 연달아 있어도 API는 허용합니다 (연속 동일 역할은 한 턴으로 합쳐 해석). 그러니 "최소 2개"는 맞고, 훅·첨부까지 치면 보통 그 이상입니다. `compact.ts:637-642`에서 결과 컨텍스트 크기를 셀 때도 정확히 이 조합(`boundaryMarker + summaryMessages + postCompactFileAttachments + hookMessages`)을 합산하죠.
+
+## 한 가지 반전 — 경계 마커는 API로 안 나갑니다
+
+방금 확인했는데 경계 마커는 `type: 'system'`입니다 (`messages.ts:4537-4550`, role이 user/assistant가 아닌 하네스 내부 타입). API messages 배열엔 user/assistant만 실리므로, 마커는 **UI 표시("Conversation compacted")·되감기·텔레메트리용으로 하네스 안에만** 남고, 모델이 실제로 받는 건 요약 user 메시지부터입니다.
+
+그래서 모델 입장에서 컴팩션 직후 첫 요청은 이렇게 보입니다: *"(요약이라는 이름의 user 발화) + (진짜 질문 user 발화)"* — 마치 처음 보는 대화인데 앞사람이 브리핑을 남겨둔 것처럼요.
+
+[USER] 경계마커는 무슨말이야 아무튼 그.. 18K에서 저 세션메모리를 만들었다치자.. 만드는순간 알아서 들어가?
+
+[ASSISTANT] ## 경계 마커부터 — 그냥 "여기서 컴팩션 일어났음" 표지판입니다
+
+대화 메시지 목록 사이에 꽂아두는 책갈피예요. 내용은 딱 `"Conversation compacted"` 한 줄 + 메타데이터(자동이었나 수동이었나, 컴팩션 직전 몇 토큰이었나 등)입니다 (`messages.ts:4537-4550`). 용도는 하네스 내부용 — 터미널 UI에 "Conversation compacted" 표시를 띄우고, 되감기·재개 기능이 "어디서 컴팩션됐는지" 알아보는 데 씁니다. 모델한테는 안 보내는, 순수 관리용 표식입니다. 이게 전부예요.
+
+## 본론 — "18K에서 노트 만들면 그 순간 컨텍스트에 들어가?"
+
+**아니요, 안 들어갑니다.** 그게 이 설계의 핵심 포인트입니다.
+
+18K 시점에 일어나는 일은 **디스크 쓰기가 전부**입니다. 포크 에이전트가 `summary.md`를 고치고 사라질 뿐, 메인 대화의 메시지 배열에는 아무것도 추가되지 않아요. 메인 모델은 노트가 갱신됐다는 사실 자체를 모릅니다.
+
+```
+컨텍스트   18K ──── 23K ──── 31K ──── ... ──── 167K(임계값)
+            │        │        │                  │
+디스크      🖊 갱신   🖊 갱신   🖊 갱신            │
+            (조용히 덮어쓰기만 반복, 컨텍스트 무변화)  │
+                                                 ▼
+                                          💥 컴팩션 발동
+                                          이때 비로소 summary.md를 읽어서
+                                          user 메시지로 컨텍스트에 투입
+```
+
+즉 **쓰는 시점과 쓰이는 시점이 완전히 분리**돼 있습니다:
+
+- **쓰기 (18K, 23K, 31K...)**: 백그라운드 저축. 매번 같은 파일을 최신 상태로 덮어씀
+- **읽기 (컴팩션 순간, 딱 1회)**: `trySessionMemoryCompaction()`이 그제서야 파일을 읽어(`getSessionMemoryContent()`) user 메시지로 만들어 새 컨텍스트 맨 앞에 넣음. 진행 중인 갱신이 있으면 끝날 때까지 기다려서(`waitForSessionMemoryExtraction`, `sessionMemoryCompact.ts:527`) 최신본을 보장
+
+비유하면 **보험**입니다. 보험료(노트 갱신)는 5K마다 꼬박꼬박 내지만 아무 일도 안 일어나고, 사고(컴팩션)가 터지는 순간에만 보험금(노트 내용)이 지급되는 거죠. 컴팩션이 한 번도 안 터지고 세션이 끝나면? 노트는 한 번도 읽히지 않은 채 디스크에 남습니다.
+
+[USER] 컴팩션 순간?..?????
+
+[ASSISTANT] 아, 추상적으로 말해서 헷갈리게 했네요. "컴팩션 순간"은 신비한 게 아니라 — **클로드코드 쓰다가 화면에 "Compacting conversation..." 뜨면서 잠깐 멈추는 바로 그때**입니다. 하단에 "Context left until auto-compact: 8%" 같은 게시지가 점점 줄어들다가 0 되면 터지는 그거요. 직접 보신 적 있을 겁니다.
+
+그 순간을 초 단위로 풀면:
+
+```
+[평소] 대화 계속 → 컨텍스트 165K... 166K... (임계값 ≈167K 접근)
+
+[그 순간]
+ 1. 엔터를 치거나 도구 배치가 끝나서 다음 API 호출을 준비하는데
+ 2. 전처리가 "어? 임계값 넘었네" 감지          ← 이게 발동
+ 3. 화면에 "Compacting conversation..." 표시, 대화 잠깐 정지
+ 4. 요약본 마련:
+    · 일반 경로   = LLM한테 "지금까지 대화 요약해줘" 별도 호출 (몇 초 걸림)
+    · 세션메모리 경로 = 미리 써둔 summary.md를 그냥 읽음 (즉시) ← EXPERIMENT
+ 5. 메시지 배열 통갈이: 옛 대화 수백 개 원소 제거
+    → [요약 user 메시지, 보존된 최근 메시지들]로 교체
+ 6. 대화 재개 — 이후 모델은 요약본을 앞에 두고 계속
+
+[이후] 컨텍스트 30K 수준에서 새 출발, 다시 자라기 시작
+```
+
+그러니까 지난 답변의 "쓰이는 시점 = 컴팩션 순간"을 다시 연결하면:
+
+- 18K, 23K, 31K... 에서 summary.md는 **조용히 저축만** 되고 있다가
+- 위 4번 단계, 즉 **"Compacting..." 이 뜨는 그 몇 초 안에** 처음으로 읽혀서 요약 user 메시지로 변신해 새 컨텍스트에 실리는 겁니다
+
+`/compact`를 손으로 치면 임계값 무시하고 3~6번을 즉시 실행하는 거고요.
+
+덤: 세션메모리 경로가 실험 기능인 이유도 여기서 보입니다 — 일반 경로는 컴팩션 순간마다 LLM 요약 호출 비용(대화 전체 input + 요약 output)이 드는데, 세션메모리 경로는 미리 분산 저축해둔 노트를 읽기만 하면 되니 그 순간이 공짜에 가깝고 빠릅니다.
+
+[USER] 뭐야 그냥 실험기능 정도구나?
+
+[ASSISTANT] 맞습니다 — **세션 메모리에 한해서는** "게이트 뒤의 실험 기능"이 정확한 위치입니다. 다만 오늘 본 것 전체가 실험은 아니라서, 선만 그어드리면:
+
+| 기능 | 상태 |
+|---|---|
+| 자동 메모리 (MEMORY.md → 시스템 프롬프트) | **정식** — 기본 경로로 작동 (지금 이 세션에서도 실제 작동 중) |
+| 컴팩션 (자동 임계값 + `/compact`) + LLM 요약 | **정식** — 모든 사용자의 기본 동작 |
+| 트랜스크립트 보존 + transcriptPath 포인터 | **정식** |
+| 세션 메모리 추출 (summary.md 백그라운드 저축) | 실험 — `tengu_session_memory`, 기본 OFF |
+| 세션 메모리로 컴팩션 대체 | 실험 중의 실험 — 파일 첫 줄부터 `EXPERIMENT` 주석 |
+
+그러니까 오늘 파본 걸 한 문장으로 접으면: **지금의 표준은 "컴팩션 순간에 LLM이 즉석 요약"이고, 세션 메모리는 그 즉석 요약을 "미리 분산 저축해둔 노트 읽기"로 바꾸려는 차세대 후보**입니다.
+
+하나만 덧붙이면 — 클로드코드에서 "실험 기능"은 사소하다는 뜻이 아니라 **출시 파이프라인의 한 단계**입니다. `tengu_*` GrowthBook 플래그로 일부 코호트에 켜서 텔레메트리(`tengu_session_memory_extraction` 이벤트 같은)로 효과를 재고, 좋으면 기본값을 뒤집는 방식이죠. 지금 정식인 기능들도 대부분 이 관문을 통과해서 나온 것들이라, 세션 메모리도 어느 날 조용히 켜질 수 있는 대기열에 있는 셈입니다.
+
+[USER] 그러면 중요한게 세션메모리가 아니라 메인에이전트가 만드는 메모리곘네?
+
+[ASSISTANT] 실무적으로는 그 결론이 맞습니다 — **지금 실제로 복무 중인 건 자동 메모리(MEMORY.md)** 쪽이고, 이 세션에서도 살아 움직이고 있죠 (제 시스템 프롬프트에 로드돼 있고, 기억할 가치가 생기면 제가 직접 파일을 씁니다).
+
+다만 "중요도"로 줄 세우기 전에 하나만 — 둘은 **경쟁 관계가 아니라 다른 문제를 푸는 장치**입니다:
+
+| | 자동 메모리 | 세션 메모리 |
+|---|---|---|
+| 푸는 문제 | "다음 세션의 나는 이 사용자를 모른다" | "컴팩션 후의 나는 방금 일을 잊는다" |
+| 수혜자 | **다음 세션**의 에이전트 | **컴팩션 직후**의 에이전트 |
+| 현재 해법 | 자동 메모리가 정식 해법 | LLM 즉석 요약이 정식 해법, 세션 메모리는 교체 후보 |
+
+그래서 정확히 접으면: **"세션 간 기억" 문제는 자동 메모리가 정식으로 풀고 있고, "컴팩션 생존" 문제는 지금도 정식으로 풀리고 있는데(즉석 요약), 세션 메모리는 그 두 번째 문제의 더 싸고 빠른 풀이 후보**입니다. 문제 자체가 사라진 게 아니라 풀이법이 실험 중인 거죠.
+
+에이전트 설계를 리서치하시는 입장에서 가져갈 패턴으로 정리하면:
+
+1. **자동 메모리** = "기억 관리를 모델에게 위임" 패턴 — 하네스는 디렉토리와 200줄 인덱스 캡만 제공하고, 뭘 기억할지·언제 쓸지는 LLM이 판단. 지침(4타입, 금지 목록)으로만 조종
+2. **세션 메모리** = "절벽 대비 분산 저축" 패턴 — 큰 비용이 한 번에 터지는 지점(컴팩션 요약)을 5K마다의 백그라운드 소액 갱신으로 분산, 프롬프트 캐시 재활용으로 비용 상쇄
+3. 공통 인프라 = **포크 서브에이전트 + 파일 시스템** — 메모리를 모델 가중치나 벡터DB가 아니라 그냥 마크다운 파일로, 갱신은 대화 복제본에게
+
+셋 다 헤르메스 같은 자체 에이전트에 이식 가능한 아이디어들입니다. 원하시면 이 대화 전체를 반영해서 아까 만든 시각화 HTML에 "발동 타이밍 상세"와 "정식 vs 실험" 구분을 업데이트해 드릴까요?
+
+[USER] 자동메모리가 적힌건 항상  질문할때마다 인풋이되게네?
+
+[ASSISTANT] 네, 정확합니다 — **MEMORY.md는 시스템 프롬프트에 실리므로 매 API 요청, 즉 모든 질문에 함께 들어갑니다.** 다만 설계를 뜯어보면 "전부 다 항상"은 아니고, 딱 그걸 감당 가능하게 만든 2단 구조입니다:
+
+## 항상 타는 것 vs 부를 때만 오는 것
+
+```
+매 요청마다 탑승 (시스템 프롬프트)          부르면 옴 (디스크 대기)
+┌─────────────────────────────┐          ┌──────────────────────────┐
+│ MEMORY.md — 인덱스만          │          │ memory/레포-2머신-공유.md   │
+│ "- [제목](파일.md) — 한 줄 훅" │  ─Read→  │ memory/<주제2>.md          │
+│ 200줄 / 25KB 캡              │          │ (본문 상세는 여기에)         │
+└─────────────────────────────┘          └──────────────────────────┘
+```
+
+- **인덱스(MEMORY.md)만** 상시 탑승 — 그래서 한 줄짜리 포인터만 적으라는 규칙이 있고, 200줄/25KB 캡이 강제됩니다 (`memdir.ts:34-38`). 매 요청의 영구 승객이니 몸집을 못 불리게 한 거죠.
+- **주제 파일 본문**은 안 탑니다. 인덱스의 한 줄 훅을 보고 "관련 있겠다" 싶을 때 모델이 Read 도구로 그때그때 읽어옵니다. 기억의 목차는 항상, 내용은 주문형.
+
+## "매번 인풋 = 매번 과금"은 아닙니다
+
+이게 상시 탑승이 가능한 경제적 이유인데, MEMORY.md는 세션 시작 시 1회 평가되어 시스템 프롬프트에 고정됩니다 (세션당 1회 평가 후 캐시 — `md_group/system_info/prompts/09-loadMemoryPrompt-analysis.md`). 세션 내내 같은 바이트가 같은 자리에 있으니 **API 프롬프트 캐시에 적중**해서, 2번째 요청부터는 정가가 아니라 캐시 읽기 요금(약 1/10)으로 실려 다닙니다.
+
+부수 효과 하나: 세션 도중에 새 메모리를 저장해도 **이번 세션의 시스템 프롬프트는 안 바뀝니다** — 새 항목은 다음 세션부터 인덱스에 실립니다. (지금 제가 뭘 저장해도 이 대화에서 제 프롬프트가 갱신되진 않는 것처럼요.)
+
+그래서 설계 원칙을 한 줄로 뽑으면: **"항상 실리는 건 최소한의 목차로, 상세는 필요할 때만, 그리고 항상 실리는 건 캐시에 태워라"** — 컨텍스트 비용 관점에서 자동 메모리가 공짜에 가깝게 유지되는 비결입니다.
+
+[USER] 이 내용까지 반영해서 아까 만든 HTML 업데이트해줘
+
+[ASSISTANT] 대화에서 새로 확인된 내용(검사 위치, 5K 하한선, 포크 해부, isCompactSummary, 세 가지 인풋 채널, 2단 구조, 정식 vs 실험)을 반영해 전면 업데이트하겠습니다. 구조가 많이 바뀌어서 파일을 새로 쓰는 게 깔끔합니다.
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/클로드코드-메모리-시스템.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/클로드코드-메모리-시스템.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open /Users/seobi/jinsup_space/CC/클로드코드-메모리-시스템.html", "description": "Open updated memory system HTML in browser"}
+
+[도구결과] (Bash completed with no output)
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md", "content": "# 클로드코드 메모리 시스템 — 자동 메모리 · 세션 메모리 · 컴팩션 전수 분석\n\n> **작성 근거**: 본 문서의 모든 주장은 로컬 소스 미러(`src/`)에서 grep/Read로 직접 검증했다.\n>
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 둘 다 완료했습니다.
+
+## 1. HTML 업데이트 — `클로드코드-메모리-시스템.html` (브라우저로 열림)
+
+기존 6개 섹션을 9개로 확장하고 대화에서 새로 확인된 내용을 전부 반영했습니다:
+
+- **03 발동 게이트**: 검사 위치(`query.ts:992`, 매 API 응답 직후, void 발사) 스트립 추가 + "5K는 눈금이 아니라 하한선" 스킵 다이어그램(10K→18K→23K) + `/summary` 우회
+- **04 신규 — 포크 분신 해부**: 메인 히스토리 통째 복사 좌우 대비도, 캐시 적중·권한 잠금·오염 방지 3팩트
+- **06 요약은 어디로**: `isCompactSummary` 관제 우편 도장 + 소비처 4개 카드 + "모델이 실제로 받는 배열"(요약과 질문은 별개 원소) + 경계 마커는 API로 안 나감
+- **07 신규 — 세 기억, 세 채널**: MEMORY.md(시스템 프롬프트 상시) vs summary.md(컴팩션 1회) vs system-reminder(별개) + 자동 메모리 2단 구조(인덱스 상시/본문 주문형)와 캐시 경제
+- **09 신규 — 정식 vs 실험 상태판**: GrowthBook 롤아웃 파이프라인 + "이 머신 session-memory 0개" 실물 증거
+- Hero 지층에도 정식/실험 뱃지 부착, 08 타임라인은 보험 메타포로 재구성
+
+## 2. 상세 md — `md_group/클로드코드-메모리-시스템.md` (신규)
+
+프로젝트 컨벤션대로 `md_group/`에 LLM 판독용 정본을 작성했습니다. 10개 장 구성:
+
+세 층 개관 → 자동 메모리(캡·4타입·시스템 프롬프트 탑승·캐시 경제) → 세션 메모리(10섹션 템플릿, 검문소 4개, 토큰 측정 방식, 포크 분신 해부, 보험 구조) → **세션 메모리의 현실**(게이트 기본 OFF, 이 머신 실물 0개, "실험 = 출시 파이프라인" 해석, 정식/실험 구분표) → 컴팩션(임계값 공식, 경계 마커, isCompactSummary 소비처 전수, API 배열, append-only 보존, 부수 처리) → SM-컴팩션 EXPERIMENT 흐름 → 인풋 채널 총정리 → 디스크 지도 → 이식 가능한 설계 패턴 7개 → 출처 전체 목록(파일:라인 전수).
+
+참고: `html_group_v2/`에 넣을 시각화 사본이 필요하면 말씀 주세요 — 지금 HTML은 다른 루트 시각화들과 같은 위치(프로젝트 루트)에 있습니다.
+
+[USER] 자동메모리 섹션에대해 잘 설명하고 그 각 섹션의 효과까지좀 알려주라
+
+[ASSISTANT] 좋은 주제입니다. 자동 메모리의 "섹션"은 시스템 프롬프트에 주입되는 지침 블록들로 구성돼 있는데, 정확한 구성과 각각의 의도를 소스(`memoryTypes.ts` + `buildMemoryPrompt`)에서 직접 읽고 설명드리겠습니다.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/memdir/memoryTypes.ts"}
+
+[도구결과] 1	/**
+2	 * Memory type taxonomy.
+3	 *
+4	 * Memories are constrained to four types capturing context NOT derivable
+5	 * from the current project state. Code patterns, architecture, git history,
+6	 * and file structure are derivable (via grep/git/CLAUDE.md) and should NOT
+7	 * be saved as memories.
+8	
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/memdir/memdir.ts", "offset": 120, "limit": 180}
+
+[도구결과] 120	
+121	/**
+122	 * Ensure a memory directory exists. Idempotent — called from loadMemoryPrompt
+123	 * (once per session via systemPromptSection cache) so the model can always
+124	 * write without checking existence first. FsOperations.mkdir is recursive
+125	 * by default and already swallows EEXIST
+
+[ASSISTANT] 마지막 조각 — 끝에 붙는 `buildSearchingPastContextSection`이 뭔지만 확인하겠습니다.
+
+[도구호출 Bash] {"command": "grep -n \"buildSearchingPastContextSection\" -A 40 /Users/seobi/jinsup_space/CC/src/memdir/memdir.ts | head -55", "description": "Read the searching-past-context section builder"}
+
+[도구결과] 263:  lines.push(...buildSearchingPastContextSection(memoryDir))
+264-
+265-  return lines
+266-}
+267-
+268-/**
+269- * Build the typed-memory prompt with MEMORY.md content included.
+270- * Used by agent memory (which has no getClaudeMds() equivalent).
+271- */
+272-export function buildMemoryPrompt(params
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/memdir/memdir.ts", "offset": 375, "limit": 45}
+
+[도구결과] 375	export function buildSearchingPastContextSection(autoMemDir: string): string[] {
+376	  if (!getFeatureValue_CACHED_MAY_BE_STALE('tengu_coral_fern', false)) {
+377	    return []
+378	  }
+379	  const projectDir = getProjectDir(getOriginalCwd())
+380	  // Ant-native builds alias grep to embedded ugrep
+
+[ASSISTANT] 확인 완료했습니다. 자동 메모리가 시스템 프롬프트에 싣는 지침은 **8개 섹션의 고정 조립**이고 (`buildMemoryLines`, `memdir.ts:236-265`), 더 재미있는 건 — **각 섹션의 효과가 소스 주석에 평가(eval) 점수로 기록돼 있다**는 점입니다. 순서대로 풀겠습니다.
+
+## 자동 메모리 프롬프트의 섹션 구조와 각각의 효과
+
+### ① 선언부 — "너에겐 파일 기반 영속 메모리가 있다"
+
+`# auto memory` 헤더 + 디렉토리 경로 + *"이 디렉토리는 이미 존재한다 — mkdir나 존재 확인 없이 바로 Write 하라"*(`DIR_EXISTS_GUIDANCE`).
+
+**효과**: 마지막 문장이 왜 있는지 주석이 직접 말합니다 — *"Claude was burning turns on `ls`/`mkdir -p` before writing"* (`memdir.ts:111-115`). 모델이 저장 전에 확인 턴을 낭비하던 실측 문제를 문장 하나로 제거. (지금 제 시스템 프롬프트에도 이 문장이 그대로 실려 있습니다.)
+
+### ② 목적 + 명시 지시 처리
+
+"시간에 걸쳐 축적해서 미래 대화가 사용자의 완전한 그림을 갖게 하라" + **"기억해달라 하면 즉시 저장, 잊으라 하면 찾아서 삭제"**.
+
+**효과**: 저장을 선택적 행동이 아니라 축적 의무로 프레이밍. 명시 요청은 무조건 이행 규칙으로 못 박음.
+
+### ③ `## Types of memory` — 4타입 분류 체계 (`memoryTypes.ts:113-178`)
+
+각 타입이 `<description>` `<when_to_save>` `<how_to_use>` `<examples>`(few-shot 2~3개) 구조의 XML 블록입니다. 타입별로 심어둔 장치와 효과:
+
+| 타입 | 심어둔 장치 | 노리는 효과 |
+|---|---|---|
+| `user` | "부정적 판단으로 보일 수 있거나 작업과 무관한 것은 저장 금지" | 사용자 맞춤화(시니어 vs 초보 다르게 협업)를 얻으면서 감시 로그화 방지 |
+| `feedback` | **"Record from failure AND success"** — 교정뿐 아니라 확인("yes exactly")도 저장하라, "확인은 조용해서 놓치기 쉽다" | 교정만 모으면 검증된 접근에서 멀어지고 **과잉 신중해지는 드리프트** 방지 |
+| `feedback`/`project`의 `<body_structure>` | 규칙 → **Why:** → **How to apply:** 순서 강제 | "이유를 알아야 맹목적 준수 대신 **엣지케이스 판단**이 가능" (원문 그대로) |
+| `project` | **상대 날짜 → 절대 날짜 변환** ("Thursday" → "2026-03-05") | 시간이 지난 뒤 읽어도 해석 가능한 기억 |
+| `reference` | 외부 시스템 포인터 (Linear 프로젝트, Grafana 보드) | 프로젝트 디렉토리 밖 정보의 "어디를 보면 되는지" 기억 |
+
+### ④ `## What NOT to save` — 저장 금지 목록 (`memoryTypes.ts:183-195`)
+
+코드 패턴·아키텍처·파일 경로(grep으로 유도 가능), git 히스토리(`git log`가 정본), 디버깅 레시피(커밋에 있음), CLAUDE.md 중복, 일시적 작업 상태.
+
+**효과 (eval 검증)**: 마지막 불릿이 백미입니다 — *"사용자가 명시적으로 저장해달라고 해도 이 제외는 적용된다. PR 목록을 저장해달라면 '뭐가 놀라웠는지' 되물어라."* 주석에 측정치가 있습니다: **eval case 3에서 0/2 → 3/3** — "이번 주 PR 목록 저장해줘" 요청이 활동로그 노이즈로 쌓이는 것을 이 문장이 막았다는 기록 (`:192-194`).
+
+### ⑤ `## How to save memories` — 2단계 저장 절차 (`memdir.ts:218-234`)
+
+Step 1 파일 작성(frontmatter: name/description/type) → Step 2 인덱스에 한 줄 포인터. 그리고: "MEMORY.md는 인덱스지 메모리가 아니다, 한 줄 150자 이내, 본문 절대 금지, 200줄 이후 잘린다", "연대순이 아니라 **의미 기반으로 조직**", "**중복 금지 — 새로 쓰기 전에 기존 것 갱신 가능한지 먼저 확인**", "틀린 기억은 갱신/삭제".
+
+**효과**: 매 요청의 영구 승객(인덱스)을 슬림하게 유지 + 기억 중복·부패 방지. §2.4에서 본 "목차는 항상, 본문은 주문형" 2단 구조가 여기서 행동 규칙으로 강제됩니다.
+
+### ⑥ `## When to access memories` — 회상 시점 (`memoryTypes.ts:216-222`)
+
+관련 있어 보일 때 / 명시 요청 시 **MUST** / **"무시하라"면 MEMORY.md가 빈 것처럼** / 드리프트 경고.
+
+**효과 (실패 사례가 주석에 기록됨)**: "ignore" 불릿의 존재 이유 — *"실패 모드: 사용자가 '메모리의 X는 무시해'라고 하면, 코드는 제대로 읽고서도 '메모리에 적힌 Y가 아니라…'라고 언급함 — ignore를 '인정한 뒤 무시'로 해석"* (branch-pollution evals #22856). 이 안티패턴에 **이름을 붙여 명시**한 게 해결책이었다는 기록 (`:208-212`). 드리프트 경고(`MEMORY_DRIFT_CAVEAT`)는 "기억은 기록 시점의 진실 — 충돌하면 지금 관찰한 것을 믿고, 스테일 기억은 갱신/삭제하라"로 회상의 신선도 문제를 처리.
+
+### ⑦ `## Before recommending from memory` — 회상 후 검증 (`memoryTypes.ts:240-256`)
+
+"파일 경로를 언급하는 기억 → 존재 확인, 함수/플래그 → grep, 사용자가 행동 직전이면 → 검증 먼저. **'기억이 X가 있다고 말한다' ≠ 'X가 지금 있다'**."
+
+**효과 (이 파일에서 가장 정밀한 계측)**: 주석의 eval 기록 (`:228-244`):
+- H1 (함수/파일 주장 검증): **0/2 → 3/3**. 그런데 같은 내용을 "When to access" 밑에 불릿으로 묻으면 **0/3** — **독립 섹션이라는 '위치' 자체가 효과의 조건**
+- 헤더 문구 실험: 본문은 동일한데 헤더만 바꿔서 — "Before recommending from memory"(행동 시점 큐) **3/3** vs "Trusting what you recall"(추상적) **0/3**
+- H5 (스냅샷 기억으로 '최근 상태' 질문에 답하기 거부): 0/2 → 3/3
+- **Known gap도 정직하게 기록**: 슬래시 커맨드 관련 주장은 0/3 — "모델의 온톨로지에서 슬래시 커맨드는 파일도 함수도 아니라서"
+
+### ⑧ `## Memory and other forms of persistence` — 경계 설정 (`memdir.ts:254-257`)
+
+"구현 접근 합의는 Plan으로, 현재 대화의 작업 분해·진행 추적은 Tasks로. 메모리는 **미래 대화에 유용한 것 전용**."
+
+**효과**: 메모리가 태스크 트래커나 플랜 저장소로 오용되며 비대해지는 것 방지.
+
+### (⑨) `## Searching past context` — 게이트 뒤 옵션 (`memdir.ts:375-407`)
+
+`tengu_coral_fern` 플래그(기본 OFF)가 켜진 경우에만: 메모리 디렉토리 grep → 트랜스크립트 `.jsonl` grep(최후 수단, "크고 느림"), "넓은 키워드 말고 에러 메시지·파일 경로 같은 좁은 검색어로".
+
+**효과**: 인덱스에 안 실린 과거 기억·과거 대화까지 검색으로 복구하는 경로. 역시 실험 단계.
+
+---
+
+## 메타 관찰 — 이 파일이 보여주는 것
+
+이 섹션 구조에서 가져갈 가장 큰 통찰은 내용이 아니라 **방법론**입니다: 시스템 프롬프트의 문장 하나하나가 가설(H1~H6)로 명명되고, eval로 측정되고(0/2 → 3/3), 실패한 배치(불릿으로 묻으면 0/3)와 실패한 헤더(추상 문구 0/3), 아직 못 푼 갭(슬래시 커맨드 0/3)까지 주석으로 남습니다. **"프롬프트는 감으로 쓰는 게 아니라 계측으로 다듬는다"**는 걸 소스가 스스로 증언하는 드문 사례입니다.
+
+이 내용을 `md_group/클로드코드-메모리-시스템.md`의 §2(자동 메모리)에 추가해 둘까요? 문서의 자동 메모리 파트가 상대적으로 얇았는데, 이 섹션별 효과 분석이 들어가면 균형이 맞습니다.
+
+[USER] 자동메모리, 세션메모리, 컴팩션으로 만드는 메모리 이렇게 3개의 종류의 메모리가 있다. 자동메모리는 4개의 섹션으로 만드는 프로젝트전용이고 세션메모리는 해당 세션만을 위한 메모리다. 세션 메모리는 메인 에이전트 히스토리로 작성되나 작성은 서브에이전트가 진행하며 실험기능에 속하는 편이다. 
+컴팩션은 /compact를 사용했을때 그때 완성되는 요약 내용이다. 
+
+
+이거 설명맞는지도 알려주라
+
+[ASSISTANT] 채점해 드리면 — **크게 맞고, 정확히 두 군데만 고치면 됩니다.**
+
+## 맞은 것 ✅
+
+- **3종류 프레임** — 자동 메모리 / 세션 메모리 / 컴팩션 요약, 이 세 층 구분 맞습니다
+- **자동 메모리 = 프로젝트 전용** — 맞습니다. `~/.claude/projects/<프로젝트-슬러그>/memory/`에 살고, 그 프로젝트의 모든 세션이 공유합니다
+- **세션 메모리 = 해당 세션만을 위한 메모리** — 정확합니다
+- **"메인 에이전트 히스토리로 작성되나 작성은 서브에이전트가 진행"** — 완벽한 요약입니다. 재료는 메인 히스토리 통째 복사, 일꾼은 포크 분신
+- **실험 기능** — 맞습니다. "속하는 편"이 아니라 확실하게 실험입니다 (`tengu_session_memory` 게이트 기본 OFF, 이 머신에선 한 번도 실행된 적 없음)
+
+## 고칠 것 ✏️ 두 군데
+
+**1. "자동메모리는 4개의 섹션으로" → 4개의 '타입'입니다.**
+자동 메모리에는 섹션이 없습니다. `user / feedback / project / reference`는 저장하는 기억의 **분류(타입)**이고, 실제 저장 형태는 "주제당 파일 1개 + MEMORY.md 인덱스"입니다. **섹션 10개짜리는 세션 메모리** 쪽이에요 (Session Title ~ Worklog 고정 템플릿). 방금 살펴본 "자동 메모리의 8개 섹션"은 메모리 자체가 아니라 시스템 프롬프트에 실리는 **지침의 구성**이고요. 셋이 헷갈리기 쉬운 지점입니다:
+
+| 무엇의 구조? | 실체 |
+|---|---|
+| 자동 메모리의 **저장물** | 주제 파일들 + 인덱스 (섹션 없음, 타입 4개로 분류) |
+| 자동 메모리의 **지침** | 시스템 프롬프트 속 8섹션 (Types, What NOT to save, …) |
+| 세션 메모리의 **저장물** | summary.md 고정 10섹션 |
+
+**2. "컴팩션은 /compact를 사용했을 때" → 자동이 주력, /compact는 수동 옵션입니다.**
+`/compact` 없이도 컨텍스트가 임계값(컨텍스트 윈도우 − 33K, 200K 모델 기준 약 167K)에 닿으면 **자동으로** 발동합니다. 실사용에서 마주치는 컴팩션은 대부분 이 자동 쪽이에요. 그리고 "요약 내용"이 완성되면 별도 파일이 아니라 **user 메시지로 대화에 삽입**되고(`isCompactSummary` 도장), 트랜스크립트 `.jsonl`에 함께 기록됩니다.
+
+## 교정본 (이대로 기억하시면 정확합니다)
+
+> 메모리는 3층이다. **자동 메모리**는 4개 타입(user/feedback/project/reference)으로 분류해 주제별 파일 + 인덱스로 저장하는 **프로젝트 전용** 영속 기억이고, 매 질문마다 시스템 프롬프트로 입력된다. **세션 메모리**는 해당 세션만을 위한 10섹션 노트로, 메인 히스토리를 복사받은 서브에이전트가 백그라운드에서 작성하는 **실험 기능**이며, 컴팩션 순간에만 입력된다. **컴팩션 요약**은 컨텍스트가 임계값에 닿으면 자동으로(또는 `/compact`로 수동) 만들어져 옛 대화를 대체하는 user 메시지다 — 원본은 트랜스크립트에 남는다.
+
+[USER] 이 내용을 md_group/클로드코드-메모리-시스템.md의 §2(자동 메모리)에 추가해 둘까요? <- 응
+
+[ASSISTANT] 문서에 추가하겠습니다 — §2 끝에 새 하위 절(2.5)로 넣고, 출처 목록도 갱신합니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md", "old_string": "설계 원칙: **\"항상 실리는 건 최소한의 목차로, 상세는 주문형으로, 항상 실리는 건 캐시에 태워라.\"**\n\n---\n\n## 3. 세션 메모리 (Sess
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md", "old_string": "| 자동 메모리 캡·truncate | `src/memdir/memdir.ts:34-38, 57-103, 111-119` |\n| loadMemoryPrompt 3
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md", "old_string": "*변경이력: 2026-07-10 최초 작성 (세션 \"클코-메모리\" — 소스 검증 대화 기반). 시각화 페어: `클로드코드-메모리-시스템.html` (프로젝트 루
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/md_group/클로드코드-메모리-시스템.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 추가 완료했습니다. `md_group/클로드코드-메모리-시스템.md`에 세 가지를 반영했습니다:
+
+1. **§2.5 신설** — "시스템 프롬프트 지침 — 8섹션 조립과 각 섹션의 '측정된' 효과":
+   - 서두에 용어 혼동 방지 표 (저장물엔 섹션 없음·타입 4개 / 지침 8섹션 / 세션 메모리 10섹션) — 아까 헷갈리셨던 그 지점입니다
+   - ①선언부(mkdir 턴 낭비 제거)부터 ⑧persistence 경계(Plan/Tasks 구분), 게이트 뒤 ⑨Searching past context까지 섹션별 장치와 효과
+   - eval 계측 기록 전부 포함: H2(명시 저장 게이트 0/2→3/3), H6(ignore 안티패턴), H1(검증 0/2→3/3 + 위치 민감성 + 헤더 문구 실험 3/3 vs 0/3), H5, known gap(슬래시 커맨드 0/3)
+   - 메타 관찰로 마무리: "프롬프트는 감이 아니라 계측으로 다듬는다"
+
+2. **§10 출처 표 갱신** — `buildMemoryLines` 조립부와 `memoryTypes.ts`의 구간별 라인(타입/금지/접근/검증) 추가
+
+3. **변경이력** — §2.5 추가 기록
+
+이로써 문서의 자동 메모리 파트가 세션 메모리 파트와 균형이 맞는 깊이가 됐습니다. HTML 쪽에도 이 8섹션 내용을 반영하고 싶으시면 말씀 주세요.
+
+[USER] auto memory 가 갱신되는 타이밍이언제야
+
+[ASSISTANT] 좋은 질문입니다 — 세션 메모리처럼 자동 트리거가 있는지, 아니면 순수하게 모델 판단인지가 관건인데, 아까 grep에서 `extractMemories`라는 post-sampling 훅이 하나 더 보였어요. 그것까지 확인하고 정확히 답하겠습니다.
+
+[도구호출 Bash] {"command": "sed -n '1,80p' /Users/seobi/jinsup_space/CC/src/services/extractMemories/extractMemories.ts; echo '==='; grep -n \"registerPostSamplingHook\\|shouldExtract\\|feature(\\|getFeatureValue\\|
+
+[도구결과] /**
+ * Extracts durable memories from the current session transcript
+ * and writes them to the auto-memory directory (~/.claude/projects/<path>/memory/).
+ *
+ * It runs once at the end of each complete query loop (when the model produces
+ * a final response with no tool calls) via handleStopHooks in 
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/extractMemories/extractMemories.ts", "offset": 520, "limit": 110}
+
+[도구결과] 520	        })
+521	      }
+522	    }
+523	  }
+524	
+525	  // --- Public entry point (captured by extractor) ---
+526	
+527	  async function executeExtractMemoriesImpl(
+528	    context: REPLHookContext,
+529	    appendSystemMessage?: AppendSystemMessageFn,
+530	  ): Promise<void> {
+531	    // Only run for 
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/services/extractMemories/extractMemories.ts", "offset": 340, "limit": 90}
+
+[도구결과] 340	    const newMessageCount = countModelVisibleMessagesSince(
+341	      messages,
+342	      lastMemoryMessageUuid,
+343	    )
+344	
+345	    // Mutual exclusion: when the main agent wrote memories, skip the
+346	    // forked agent and advance the cursor past this range so the next
+347	    // extracti
+
+[ASSISTANT] 확인 완료 — 답이 재미있게 나왔습니다. **자동 메모리의 갱신 경로는 두 개**고, 타이밍이 서로 다릅니다.
+
+## 경로 1 — 메인 에이전트의 인라인 저장 (정식, 주력)
+
+**정해진 타이밍이 없습니다.** 세션 메모리 같은 임계값·스케줄이 아예 없고, 대화 중 **모델 스스로 "기억할 가치가 있다"고 판단하는 그 순간** 일반 Write 도구 호출로 저장합니다. 판단 기준은 §2.5에서 본 지침이 조종합니다:
+
+- 각 타입의 `<when_to_save>` — 사용자가 접근을 교정/확인하는 순간(feedback), 역할·전문성을 알게 된 순간(user), 누가-뭘-왜-언제까지를 알게 된 순간(project), 외부 리소스를 알게 된 순간(reference)
+- **명시 요청은 즉시**: *"If the user explicitly asks you to remember something, save it immediately"* (`memdir.ts:243`)
+
+즉 "언제 갱신되냐"의 답이 **"트리거가 코드에 있지 않고 모델의 판단에 위임돼 있다"** 입니다. 지금 이 대화에서도 제가 저장할 가치가 있는 걸 발견하면 그 자리에서 쓰는 식이죠.
+
+## 경로 2 — 백그라운드 추출 (실험, `tengu_passport_quail` 기본 OFF)
+
+방금 확인한 `src/services/extractMemories/extractMemories.ts` — 자동 메모리에도 세션 메모리처럼 포크 분신 추출 경로가 있는데, **타이밍이 다릅니다**:
+
+> *"It runs once **at the end of each complete query loop** (when the model produces a final response **with no tool calls**) via handleStopHooks"* (`:5-7`)
+
+- **세션 메모리는 "매 API 응답 후"**, 이건 **"턴이 완전히 끝난 후"** (도구 호출 없는 최종 응답 = stop hook 시점)
+- 통과 조건: 메인 에이전트만(agentId 없음) → 게이트 ON → 자동 메모리 활성 → 원격 모드 아님 (`:531-552`)
+- 스로틀: N턴마다 1회 (`tengu_bramble_lintel`, 기본 1 = 매 턴, `:374-386`)
+- **상호 배제가 백미**: 커서 이후 메인 에이전트가 이미 메모리 파일을 직접 썼으면 포크를 스킵하고 커서만 전진 — *"skipping — conversation already wrote to memory files"* (`:345-360`). 두 경로가 같은 걸 이중 저장하는 사고 방지
+- 겹침 처리: 추출 진행 중 새 요청이 오면 최신 컨텍스트만 스태시해 뒀다가 후행 실행 (`:554-564`)
+- 포크 사양: 메모리 디렉토리만 쓰기 가능한 권한 잠금, `maxTurns: 5`("검증 토끼굴 방지" 주석), 기존 메모리 목록(manifest)을 미리 주입해 `ls` 턴 절약, 종료 시 60초 드레인 대기 (`:415-427, 579-586, 611-615`)
+
+## 한눈 비교 — 세 가지 "갱신 타이밍"
+
+| | 트리거 | 주기/조건 |
+|---|---|---|
+| 자동 메모리 (인라인, **정식**) | 모델의 판단 + 사용자 명시 요청 | 없음 — 대화 중 아무 때나, 즉시 |
+| 자동 메모리 (백그라운드 추출, 실험) | 턴 종료 (stop hook) | N턴마다(기본 매 턴), 메인이 직접 썼으면 스킵 |
+| 세션 메모리 (실험) | 매 API 응답 후 (post-sampling hook) | 10K 초기화 + 성장 5K + 도구 3회/휴지점 |
+
+그리고 반영 시점은 전과 동일합니다 — **디스크에는 즉시, 시스템 프롬프트에는 다음 세션부터** (세션당 1회 평가·캐시).
+
+설계 관점 관전평: Anthropic이 "메모리를 모델 판단에 맡기기(인라인)"와 "하네스가 주기적으로 짜내기(백그라운드)"를 **동시에 게이트 뒤에서 A/B 중**이고, 두 경로가 충돌하지 않게 상호 배제 커서까지 깔아둔 상태입니다. 이 내용도 md 문서 §2에 추가해 둘까요?
+
+[USER] 자동메모리가 저정도만 기록하는데.. 의미가 잇는건가? 그 이유는?
+
+[ASSISTANT] 핵심을 찌르는 질문입니다. 결론부터: **"저 정도만" 기록하는 게 약점이 아니라 이 설계의 요체**입니다. 이유를 소스 근거와 함께 풀면:
+
+## 1. 금지 목록의 공통점 — "이미 다른 정본이 있는 것"
+
+저장 금지 항목을 다시 보면 패턴이 보입니다: 코드 패턴은 **grep이 정본**, git 히스토리는 **`git log`가 정본**(소스 원문: "authoritative"), 컨벤션은 **CLAUDE.md가 정본**, 디버깅 해법은 **코드와 커밋 메시지가 정본**. 전부 **매 세션 도구로 다시 파생 가능한(derivable) 정보**입니다.
+
+이걸 메모리에 복사하면 정본이 둘이 됩니다. 코드는 바뀌는데 메모리는 안 바뀌니 반드시 낡고, 낡은 기억은 단순 무용이 아니라 **적극적으로 해롭습니다** — 그래서 소스에 `MEMORY_DRIFT_CAVEAT`과 "Before recommending from memory"(기억이 X가 있다고 말한다 ≠ X가 지금 있다) 같은 방어 섹션이 겹겹이 있는 거고요. **낡을 수밖에 없는 건 아예 안 적는 게 1차 방어, 검증 규칙은 2차 방어**인 구조입니다.
+
+## 2. 4타입의 공통점 — "대화가 끝나면 영영 소실되는 것"
+
+반대로 4타입을 보면: 사용자가 누구인지(user), 어떤 방식을 교정/확인했는지(feedback), 이 일을 **왜** 하는지 — 컴플라이언스 때문인지 기술부채 때문인지(project), 정보가 외부 어디에 있는지(reference). 이건 **코드를 아무리 grep해도 안 나옵니다.** 대화 속에만 존재하고, 세션이 끝나면 복구 불가능한 유일한 정보죠.
+
+즉 자동 메모리는 "많이 기억하기"가 아니라 **"재파생 불가능한 정보만 골라 기억하기"**로 스코프가 잡혀 있습니다. 도구로 다시 얻을 수 있는 건 도구에게, 다시 얻을 수 없는 것만 메모리에게 — 저장소 간 분업입니다.
+
+## 3. 노이즈의 해악이 실측돼 있음
+
+"더 많이 기록하면 더 좋지 않나"에 대한 반증이 eval 기록에 있습니다:
+
+- H2: "이번 주 PR 목록 저장해줘" 같은 요청을 그대로 저장하면 **활동로그 노이즈**가 됨 — 되묻기 게이트로 차단 (0/2 → 3/3)
+- H5: 스냅샷성 기억으로 "최근 상태" 질문에 답하는 **오답 사례**가 실제 실패 모드로 계측됨
+
+즉 메모리는 잘못 쓰면 0이 아니라 **마이너스**가 되는 기능이고, Anthropic은 그 마이너스를 측정해 본 상태에서 스코프를 좁힌 겁니다.
+
+## 4. 경제성 — 좁아서 상시 탑승이 가능하다
+
+MEMORY.md는 매 요청의 영구 승객입니다(200줄/25KB 캡). 코드 지식까지 쌓으면 인덱스가 즉시 비대해져서 캡에 걸리고, 컨텍스트를 오염시키고, 캐시 경제도 무너집니다. **스코프가 좁기 때문에 "항상 실린다"는 특권을 유지할 수 있는** 거죠.
+
+## 5. 그런데 레버리지는 큽니다 — 실물 증거
+
+이 프로젝트의 자동 메모리에는 딱 한 줄이 있습니다: *"레포 2-머신 공유 · 경로는 ~ 중립 표기"*. 정보량으로는 초라하지만, 이게 없으면 매 세션의 제가 문서에 절대경로를 박아서 **pull 충돌이 계속 재발**합니다. 실제로 한 번 겪고 저장된 기억이고요(git 로그의 "goldenplanet/seobi 머신 간 pull 충돌 방지" 커밋이 그 흔적).
+
+- feedback 한 줄 = 같은 교정을 두 번 받지 않음
+- user 한 줄 = 모든 설명의 톤과 깊이가 조정됨
+- project 한 줄 = "왜"를 알고 하는 제안과 모르고 하는 제안의 차이
+
+**저장량은 적지만 세션 전체의 행동을 바꾸는 정보들**이라 바이트당 효과가 극대화돼 있습니다.
+
+## 요약
+
+비유하면 자동 메모리는 "지식 베이스"가 아니라 **유능한 컨설턴트의 고객 수첩**입니다. 두 번째 미팅에서 코드베이스를 기억할 필요는 없어요 — 다시 읽으면 되니까. 기억해야 할 건 "이 고객이 뭘 싫어했고, 왜 이 프로젝트를 하고, 자료가 어디 있는지"뿐입니다. RAG처럼 다 집어넣는 접근과 정반대의 베팅이고, 그 베팅의 근거(도구는 싸고 정확하다 + 노이즈는 측정된 해악이다)까지 소스에 남아 있는 셈입니다.
+
+[USER] <command-message>visual-explainer</command-message>
+<command-name>/visual-explainer</command-name>
+
+[ASSISTANT] 직전 대화 주제인 **자동 메모리 딥다이브**(갱신 2경로 + 지침 8섹션과 eval 효과 + "왜 저정도만 기록하나")를 시각화하겠습니다. 내용은 모두 이번 대화에서 소스 검증을 마쳤으므로 바로 빌드합니다. 메타포는 **"신호만 담는 필터 — 적게 기록하는 것이 설계다"**, 기존 메모리 페이지와 같은 디자인 언어(다크 아카이브)에 앰버 지배색으로 갑니다.
+
+[USER] [Request interrupted by user]
+
+[USER] 그니까 너의말은 대화 컨텍스트로 모를만한 일을 적ㅇ는다는건가
+
+[ASSISTANT] 거의 맞는데, 방향이 딱 반대입니다. **"대화 컨텍스트로 모를 일"이 아니라 "대화 컨텍스트에만 있는 일"**을 적는 겁니다.
+
+축을 정확히 그리면 이렇습니다:
+
+|  | 코드/git/파일을 다시 읽으면 알 수 있음 | 다시 읽어도 알 수 없음 |
+|---|---|---|
+| **대화에서 알게 됨** | 저장 ❌ (코드가 정본 — "integration 테스트 구조가 이렇구나") | 저장 ⭕ **← 여기가 4타입** ("mock 금지야, 작년에 데였어") |
+| 대화에 안 나옴 | 애초에 알 수 없으니 해당 없음 | 〃 |
+
+포인트는 **"다음 세션의 나"의 시점**입니다. 다음 세션의 저는:
+
+- **코드는 다시 읽을 수 있습니다** — grep, git log, CLAUDE.md 전부 그대로 있으니까. 그래서 이건 저장 안 함
+- **오늘 이 대화는 다시 읽을 수 없습니다** — 세션이 끝나면 컨텍스트가 사라지니까. 그래서 대화 속에서만 존재했던 정보(당신이 데이터 사이언티스트라는 것, "요약 좀 그만해"라는 교정, 이 리팩토링이 컴플라이언스 때문이라는 배경)는 지금 안 적으면 영영 소실
+
+그래서 한 줄로 정리하면:
+
+> **"대화에서 배웠지만, 대화가 사라지면 어디서도 복구할 수 없는 것"만 적는다.**
+
+예를 들어 이번 대화라면 — "세션 메모리는 `tengu_session_memory` 게이트 뒤에 있다"는 저장 대상이 아닙니다(다음에 소스 열면 또 나오니까). 반면 "이 사용자는 클로드코드 내부를 리서치 중이고, 개념을 잡을 때 비유+표 방식 설명을 선호한다" 같은 건 대화에만 존재하는 정보라 저장 후보가 되는 거죠.
+
+아까 중단하신 시각화 작업, 이 정리(2×2 축)까지 반영해서 이어갈까요?
+
+[USER] 내요지는 저정도만 기록하냐라긴보다 왜 저걸 기록하냐랄까
+
+[USER] 그리고 왜 4타입이면 충분하달까
+
+[ASSISTANT] 아, 질문의 결이 다르네요 — "양이 적은 게 맞냐"가 아니라 **"하필 저 네 가지인 근거가 뭐냐"**. 좋은 질문이고, 답의 실마리가 소스에 있습니다.
+
+## 1. 왜 "저걸" 기록하나 — 목적 문장과 4타입이 1:1로 맞물립니다
+
+지침 ②의 목적 선언(`memdir.ts:241`)을 다시 보면:
+
+> "future conversations can have a complete picture of **who the user is**, **how they'd like to collaborate with you, what behaviors to avoid or repeat**, and **the context behind the work**"
+
+이 문장을 분해하면 그대로 타입이 됩니다:
+
+| 협업의 질문 | 타입 | 이게 없을 때의 구체적 실패 |
+|---|---|---|
+| **WHO** — 누구와 일하나 | `user` | 시니어에게 기초를 설명하고, 초보에게 맥락을 생략 — 매 세션 캘리브레이션 실패 |
+| **HOW** — 어떻게 일하길 원하나 | `feedback` | 교정받은 실수를 다음 세션에 반복 — 사용자가 같은 걸 매번 다시 가르쳐야 함 |
+| **WHY** — 이 일을 왜 하나 | `project` | 국소적으로 맞지만 전역적으로 틀린 제안 (컴플라이언스가 동기인데 개발 편의를 최적화) |
+| **WHERE** — 정보가 어디 있나 | `reference` | 레포 밖(Linear, Grafana, Slack)의 조직 컨텍스트에 접근 불가 |
+
+즉 4타입은 임의의 카테고리가 아니라 **"세션 기억상실 에이전트가 겪는 실패 모드 목록"의 역상**입니다. 각 타입이 반복 발생하는 실패 하나씩을 정확히 겨냥합니다.
+
+## 2. 왜 4개면 충분한가 — WHAT이 빠져 있기 때문입니다
+
+협업에 필요한 지식을 축으로 나열하면 WHO / HOW / WHY / WHERE / **WHAT**(작업물 자체)인데, 파일 헤더 주석(`memoryTypes.ts:4-7`)이 마지막 축의 행방을 말해줍니다:
+
+> "Memories are constrained to four types capturing context **NOT derivable from the current project state**. Code patterns, architecture, git history... are derivable (via grep/git/CLAUDE.md)"
+
+**WHAT은 도구가 담당**합니다(grep/git/Read가 정본). 그걸 빼고 나면 남는 재파생 불가능한 축이 정확히 4개고, 그 4개를 전부 커버하니 "충분"한 겁니다. 임의로 4개를 고른 게 아니라 **5축 중 도구가 못 하는 것 전부**인 거죠.
+
+## 3. 충분함의 실전적 근거 두 가지
+
+**① 타입마다 "읽을 때의 사용법"이 다릅니다.** 분류는 서랍 정리용이 아니라 회상 시 행동 지침입니다 — user는 톤·깊이 캘리브레이션에, feedback은 행동 제약에, project는 의도 해석에(+ "빨리 낡으니 신선도 확인" 프로파일까지 타입에 내장), reference는 "가서 봐라" 트리거에. `<how_to_use>`가 타입마다 다르게 적혀 있는 이유입니다. **5번째 타입이 정당화되려면 5번째 사용 패턴이 있어야 하는데**, 위 4개로 안 덮이는 사용 패턴이 잘 없습니다.
+
+**② 부족해졌을 때 Anthropic이 타입을 안 늘렸다는 증거.** 요구가 커졌을 때 실제로 한 일을 보면 — 팀 공유가 필요하자 타입 추가가 아니라 **스코프 축**을 추가했고(TEAMMEM: 같은 4타입에 private/team 스코프만 부여), 일상 기록이 필요하자 **별도 메커니즘**을 만들었고(KAIROS 데일리 로그), 세션 내 연속성이 필요하자 역시 별도 메커니즘(세션 메모리 10섹션)을 만들었습니다. **타입 축은 4개로 고정한 채 다른 축(스코프·수명)만 변주**하고 있다는 것 자체가, 이 분류가 안정적이라는 운영상의 방증입니다.
+
+## 정직한 한계
+
+4타입이 정보이론적으로 완전하다는 증명은 없습니다 — 이건 **프로덕트 베팅**입니다. 애매한 경계도 있어요: 예컨대 "우리가 Postgres를 고른 이유" 같은 아키텍처 결정 배경은 project로 넣을 수도 있지만, 설계 의도는 그런 건 CLAUDE.md/ADR(사람이 관리하는 버전 관리 문서)로 보내는 쪽입니다. 즉 4타입의 진짜 정의는 "지식의 완전한 분류"가 아니라 **"도구도, CLAUDE.md도 못 담는 관계적·의도적 잔여물의 분류"**이고, 그 잔여물의 형태가 경험상 WHO/HOW/WHY/WHERE 네 가지로 수렴한다는 게 이 설계의 주장인 셈입니다.
+
+[USER] <command-message>visual-explainer</command-message>
+<command-name>/visual-explainer</command-name>
+<command-args>위 내용들 세세히 적어! 빠짐없이!</command-args>
+
+[ASSISTANT] 직전 대화의 자동 메모리 딥다이브 내용 전부 — 2×2 저장 축, WHO/HOW/WHY/WHERE 매핑, 4타입 충분성 논증, 갱신 2경로, 지침 8섹션과 eval 계측, 좁은 스코프의 경제학 — 를 빠짐없이 담아 빌드합니다. 전부 이번 대화에서 소스 검증된 내용입니다.
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/자동메모리-딥다이브.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, i
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/자동메모리-딥다이브.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open /Users/seobi/jinsup_space/CC/자동메모리-딥다이브.html", "description": "Open auto memory deep-dive HTML in browser"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 완성했습니다 — `자동메모리-딥다이브.html`을 프로젝트 루트에 저장하고 브라우저로 열었습니다.
+
+## 구성 요약
+
+| 항목 | 내용 |
+|---|---|
+| 컨셉 | **"적게 적는 것이 설계다"** — 앰버 지배색 다크 아카이브 (메모리 시스템 페이지와 같은 디자인 패밀리, 자동 메모리 전용 딥다이브) |
+| 파일 | 단일 HTML, 인라인 CSS/JS, 스크롤 reveal, 반응형 |
+
+## 섹션 (직전 대화 내용 전부 반영)
+
+1. **무엇을 적나 — 2×2 매트릭스**: "대화에서 알게 됨 × 재파생 가능?" 축으로, 방금 정정한 그 지점("대화로 모를 일"이 아니라 "대화에만 있는 일") + 저장 대상/비대상 실례
+2. **왜 저걸 적나**: `memdir.ts:241` 목적 문장 원문에 4타입을 인라인 매핑 + WHO/HOW/WHY/WHERE 4카드 (각각 "없을 때의 실패 모드" 포함)
+3. **왜 4타입이면 충분한가**: 5축 분해도 (WHAT은 취소선 — 도구가 담당) + 충분함의 근거 2개(타입별 사용법 상이, 부족 시 타입이 아니라 축을 늘림: TEAMMEM/KAIROS/세션메모리) + 정직한 한계 노트(프로덕트 베팅)
+4. **갱신 타이밍 2경로**: 인라인(트리거 없음, 모델 판단) vs 백그라운드 extractMemories(턴 종료 stop hook, 스로틀, 포크 사양) + 상호 배제 커서 🔒 + 세션 메모리까지 3행 비교표
+5. **지침 8섹션 스택**: ①선언부~⑨Searching past context, 각 블록에 효과 뱃지
+6. **eval 계측 막대 차트**: H1 위치 실험(3/3 vs 0/3), 헤더 문구 실험(3/3 vs 0/3), H2·H5(0/2→3/3), known gap(0/3) — 점수를 실제 막대로 시각화
+7. **좁은 스코프의 경제학**: 정본 분업표(grep/git/CLAUDE.md vs 메모리) + 4기둥 카드 + **실물 레버리지 before/after** (절대경로 하드코딩 → "레포 2-머신 공유" 한 줄 메모리)
+
+모든 섹션 하단에 `파일:line` 출처를 박았습니다. 원하시면 이 딥다이브 내용(2×2 축, WHO/HOW/WHY/WHERE 매핑, 4타입 충분성 논증)도 `md_group/클로드코드-메모리-시스템.md` §2에 마저 반영해 드릴 수 있습니다.
+
+[USER] 근데 실제 파일보니까 MEMORY.md 은인덱싱처럼 되어있고 나머지 문서로 나뉘어져 상세내용처럼되어있어 마치 LLM 위키같은건가
+
+[ASSISTANT] 정확한 관찰입니다 — 그게 바로 이 설계의 정체입니다. "LLM 위키"라는 표현이 얼마나 맞는지, 미러 소스에 위키링크 지침까지 있는지 잠깐 확인해 볼게요.
+
+[도구호출 Bash] {"command": "grep -rn '\\[\\[' /Users/seobi/jinsup_space/CC/src/memdir/ | head -5; echo '---'; grep -rn 'semantically\\|wiki' /Users/seobi/jinsup_space/CC/src/memdir/*.ts | head -5", "description": "C
+
+[도구결과] ---
+/Users/seobi/jinsup_space/CC/src/memdir/teamMemPrompts.ts:38:        '- Organize memory semantically by topic, not chronologically',
+/Users/seobi/jinsup_space/CC/src/memdir/teamMemPrompts.ts:55:        '- Organize memory semantically by topic, not chronologically',
+/Users/seobi/jinsup_space/CC/s
+
+[ASSISTANT] 네, **정확히 위키입니다.** 그리고 방금 확인해 보니 이 비유가 생각보다 더 깊게 맞습니다.
+
+## 구조가 위키와 1:1로 대응합니다
+
+| 위키 | 자동 메모리 | 근거 |
+|---|---|---|
+| 대문/목차 페이지 | MEMORY.md 인덱스 | "MEMORY.md는 인덱스지 메모리가 아니다" (`memdir.ts:227`) |
+| 개별 문서 | 주제당 파일 1개 | 파일명도 주제 기반 (`user_role.md`, `feedback_testing.md`) |
+| 문서 메타데이터 (infobox) | frontmatter — name/description/type | `description`은 "미래 대화에서 관련성 판단용" — 검색 스니펫 역할 |
+| "한 주제 = 한 문서" 원칙 | 중복 금지 — 새로 쓰기 전 기존 문서 갱신 확인 | `memdir.ts:233` |
+| **주제 중심 조직** | *"Organize memory semantically by topic, **not chronologically**"* | `memdir.ts:214` — 로그(시간순)가 아니라 위키(주제순)를 명시적으로 강제 |
+| 문서 수정/삭제 (편집 모델) | "틀리거나 낡은 기억은 갱신/삭제" | append-only 로그가 아니라 update-in-place |
+
+## 결정적 증거 — 라이브 버전엔 "red link"까지 있습니다
+
+재미있는 발견인데, 미러 소스에는 없지만 **지금 이 세션의 제 시스템 프롬프트**(미러보다 최신 버전의 클로드코드)에는 이런 지침이 있습니다:
+
+> "관련 메모리를 `[[name]]`으로 연결하라. **아직 존재하지 않는 메모리를 가리키는 `[[name]]`도 괜찮다 — 에러가 아니라 '나중에 쓸 가치가 있다'는 표시다.**"
+
+이건 위키피디아의 **red link** 개념 그대로입니다 — 아직 안 쓰인 문서로의 링크가 "이 문서를 만들어라"는 신호가 되는 것. 방금 grep으로 확인했듯 미러 소스(`src/memdir/`)에는 `[[` 지침이 없으므로, **미러 스냅샷 이후 위키화가 한 단계 더 진행된 것**으로 보입니다. (이 프로젝트 관점에서 기록해 둘 만한 버전 차이입니다.)
+
+## 왜 하필 위키 형태인가 — LLM에 맞게 번역하면
+
+- **위키의 하이퍼링크 클릭 = LLM의 Read 도구 호출.** 목차만 상시 탑재(200줄 캡)하고 본문은 링크 따라 lazy loading — 위키의 탐색 모델이 그대로 컨텍스트 경제가 됩니다
+- **description 프론트매터 = 검색 스니펫.** `findRelevantMemories`가 본문을 다 읽지 않고 description으로 관련성을 판단합니다
+- **plain markdown = 사람도 편집 가능.** 사용자가 직접 파일을 열어 고칠 수 있는, 사람-LLM 공동 편집 위키인 셈이죠
+
+## 덤 — 클로드코드의 기억들을 문서 장르로 나누면
+
+| 기억 | 문서 장르 | 조직 원리 |
+|---|---|---|
+| 자동 메모리 | **위키** | 주제 중심, 갱신형 |
+| 세션 메모리 (summary.md) | 고정 양식 작업일지 | 10섹션 템플릿, 덮어쓰기 |
+| KAIROS 데일리 로그 | 일기 | 시간 중심 |
+| 트랜스크립트 (.jsonl) | 속기록 | append-only, 불변 |
+
+정보의 성질(영속 지식 / 진행 상태 / 일상 / 원본 기록)에 따라 **문서 장르를 다르게 고른 것**까지 포함해서, "LLM 위키"는 비유가 아니라 사실상 정확한 아키텍처 명칭입니다.
+
+[USER] 위키처럼 되어있다는건.. 프론트메타를 읽어서 상황에맞게 유저프롬프트에 시스템리마인더에 들어갈거 같은데 맞아??
+
+[ASSISTANT] 좋은 가설입니다 — 마침 아직 안 읽은 `findRelevantMemories.ts`(관련 메모리 검색)가 그 답일 가능성이 높아요. 누가 호출하고 결과가 어디로 들어가는지 확인하겠습니다.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/memdir/findRelevantMemories.ts"}
+
+[도구결과] 1	import { feature } from 'bun:bundle'
+2	import { logForDebugging } from '../utils/debug.js'
+3	import { errorMessage } from '../utils/errors.js'
+4	import { getDefaultSonnetModel } from '../utils/model/model.js'
+5	import { sideQuery } from '../utils/sideQuery.js'
+6	import { jsonParse } from '../utils
+
+[도구호출 Bash] {"command": "grep -rn \"findRelevantMemories\\|relevantMemories\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" --include=\"*.tsx\" -l | grep -v memdir | head -8", "description": "Find callers o
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/attachments.ts
+/Users/seobi/jinsup_space/CC/src/utils/collapseReadSearch.ts
+/Users/seobi/jinsup_space/CC/src/utils/transcriptSearch.ts
+/Users/seobi/jinsup_space/CC/src/utils/claudemd.ts
+/Users/seobi/jinsup_space/CC/src/components/messages/CollapsedReadSearchCon
+
+[도구호출 Bash] {"command": "grep -n \"findRelevantMemories\" -B 15 -A 40 /Users/seobi/jinsup_space/CC/src/utils/attachments.ts | head -90", "description": "See how attachments.ts injects relevant memories"}
+
+[도구결과] 217-  isAutoCompactEnabled,
+218-} from '../services/compact/autoCompact.js'
+219-import { getFeatureValue_CACHED_MAY_BE_STALE } from '../services/analytics/growthbook.js'
+220-import {
+221-  hasInstructionsLoadedHook,
+222-  executeInstructionsLoadedHooks,
+223-  type HookBlockingError,
+224-  type Instr
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "offset": 2234, "limit": 75}
+
+[도구결과] 2234	    .slice(0, 5)
+2235	
+2236	  const memories = await readMemoriesForSurfacing(selected, signal)
+2237	
+2238	  if (memories.length === 0) {
+2239	    return []
+2240	  }
+2241	  return [{ type: 'relevant_memories' as const, memories }]
+2242	}
+2243	
+2244	/**
+2245	 * Scan messages for past relevant_me
+
+[도구호출 Bash] {"command": "grep -rn \"relevant_memories\" /Users/seobi/jinsup_space/CC/src/utils/messages.ts | head -5; echo '---'; grep -n \"relevant_memories\" -A 25 /Users/seobi/jinsup_space/CC/src/utils/message
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/messages.ts:3708:    case 'relevant_memories': {
+---
+3708:    case 'relevant_memories': {
+3709-      return wrapMessagesInSystemReminder(
+3710-        attachment.memories.map(m => {
+3711-          // Use the header stored at attachment-creation time so the
+3712
+
+[도구호출 Bash] {"command": "grep -rn \"getRelevantMemoriesAttachment\\|RelevantMemoriesAttachment\" /Users/seobi/jinsup_space/CC/src/utils/attachments.ts | head -5; echo '---'; grep -n \"tengu_\" /Users/seobi/jinsup
+
+[도구결과] ---
+20:2412:      logEvent('tengu_memdir_prefetch_collected', {
+---
+
+[도구호출 Bash] {"command": "sed -n '2150,2205p' /Users/seobi/jinsup_space/CC/src/utils/attachments.ts; echo '==='; sed -n '2380,2420p' /Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "description": "Read sur
+
+[도구결과] // file still exists and the model just read it. VS Code
+        // auto-save/format-on-save hits this race especially often.
+        // See regression analysis on PR #18525.
+        if (isENOENT(err)) {
+          toolUseContext.readFileState.delete(filePath)
+        }
+        return null
+      }
+  
+
+[도구호출 Bash] {"command": "sed -n '2340,2382p' /Users/seobi/jinsup_space/CC/src/utils/attachments.ts; echo '---'; grep -n \"RELEVANT_MEMORIES_CONFIG\" -A 8 /Users/seobi/jinsup_space/CC/src/utils/attachments.ts | he
+
+[도구결과] *
+ * Disposable: query.ts binds with `using`, so [Symbol.dispose] fires on all
+ * generator exit paths (return, throw, .return() closure) — aborting the
+ * in-flight request and emitting terminal telemetry without instrumenting
+ * each of the ~13 return sites inside the while loop.
+ */
+export type M
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/자동메모리-딥다이브.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, i
+
+[... 이후 절단됨 ...]

@@ -1,0 +1,90 @@
+[
+  {
+    "tech": "codex",
+    "n_convos": 6,
+    "recall": 0.944,
+    "by_category": {
+      "사실결정": 1,
+      "기술디테일": 0.958,
+      "의도선호": 0.833,
+      "미결다음": 0.917
+    },
+    "hallucination_rate": 0,
+    "compression": 0.255,
+    "terms_preserved_avg": 10,
+    "languages": [
+      "en",
+      "en",
+      "en",
+      "en",
+      "en",
+      "en"
+    ]
+  },
+  {
+    "tech": "claude-code",
+    "n_convos": 6,
+    "recall": 0.965,
+    "by_category": {
+      "사실결정": 1,
+      "기술디테일": 0.979,
+      "의도선호": 1,
+      "미결다음": 0.833
+    },
+    "hallucination_rate": 0,
+    "compression": 0.567,
+    "terms_preserved_avg": 10,
+    "languages": [
+      "en",
+      "en",
+      "mixed",
+      "mixed",
+      "mixed",
+      "mixed"
+    ]
+  },
+  {
+    "tech": "grok",
+    "n_convos": 6,
+    "recall": 0.958,
+    "by_category": {
+      "사실결정": 1,
+      "기술디테일": 0.979,
+      "의도선호": 0.958,
+      "미결다음": 0.833
+    },
+    "hallucination_rate": 0,
+    "compression": 0.31,
+    "terms_preserved_avg": 10,
+    "languages": [
+      "en",
+      "en",
+      "en",
+      "mixed",
+      "mixed",
+      "ko"
+    ]
+  },
+  {
+    "tech": "openclaw",
+    "n_convos": 6,
+    "recall": 0.972,
+    "by_category": {
+      "사실결정": 0.958,
+      "기술디테일": 0.958,
+      "의도선호": 1,
+      "미결다음": 1
+    },
+    "hallucination_rate": 0,
+    "compression": 0.135,
+    "terms_preserved_avg": 9.833,
+    "languages": [
+      "ko",
+      "ko",
+      "ko",
+      "ko",
+      "ko",
+      "ko"
+    ]
+  }
+]

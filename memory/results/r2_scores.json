@@ -1,0 +1,1115 @@
+{
+  "convo": "conv2-01",
+  "total_chars": 753972,
+  "n_chunks": 11,
+  "summary": [
+    {
+      "tech": "claude-code",
+      "recall": 0.182,
+      "by_difficulty": {
+        "핵심": 0.182,
+        "지엽": 0.182
+      },
+      "by_position": {
+        "초반": 0.0,
+        "중반": 0.062,
+        "후반": 0.583
+      },
+      "by_category": {
+        "사실결정": 0.167,
+        "기술디테일": 0.188
+      },
+      "hallucinations": 0,
+      "unknowns": 16,
+      "compression": 0.0607,
+      "final_chars": 45785,
+      "terms_preserved": 4,
+      "language": "ko",
+      "final_chars_real": 26183,
+      "compression_real": 0.0347,
+      "efficiency": 5.24
+    },
+    {
+      "tech": "openclaw",
+      "recall": 0.614,
+      "by_difficulty": {
+        "핵심": 0.864,
+        "지엽": 0.364
+      },
+      "by_position": {
+        "초반": 0.375,
+        "중반": 0.75,
+        "후반": 0.75
+      },
+      "by_category": {
+        "사실결정": 0.917,
+        "기술디테일": 0.5
+      },
+      "hallucinations": 0,
+      "unknowns": 4,
+      "compression": 0.0378,
+      "final_chars": 28465,
+      "terms_preserved": 9,
+      "language": "ko",
+      "final_chars_real": 28465,
+      "compression_real": 0.0378,
+      "efficiency": 16.24
+    },
+    {
+      "tech": "codex",
+      "recall": 0.568,
+      "by_difficulty": {
+        "핵심": 0.818,
+        "지엽": 0.318
+      },
+      "by_position": {
+        "초반": 0.375,
+        "중반": 0.562,
+        "후반": 0.833
+      },
+      "by_category": {
+        "사실결정": 0.917,
+        "기술디테일": 0.438
+      },
+      "hallucinations": 0,
+      "unknowns": 7,
+      "compression": 0.1133,
+      "final_chars": 85422,
+      "terms_preserved": 8,
+      "language": "ko",
+      "final_chars_real": 53064,
+      "compression_real": 0.0704,
+      "efficiency": 8.07
+    },
+    {
+      "tech": "grok",
+      "recall": 0.295,
+      "by_difficulty": {
+        "핵심": 0.409,
+        "지엽": 0.182
+      },
+      "by_position": {
+        "초반": 0.062,
+        "중반": 0.25,
+        "후반": 0.667
+      },
+      "by_category": {
+        "사실결정": 0.5,
+        "기술디테일": 0.219
+      },
+      "hallucinations": 0,
+      "unknowns": 12,
+      "compression": 0.0412,
+      "final_chars": 31052,
+      "terms_preserved": 3,
+      "language": "ko",
+      "final_chars_real": 18535,
+      "compression_real": 0.0246,
+      "efficiency": 11.99
+    }
+  ],
+  "detail": [
+    {
+      "tech": "claude-code",
+      "reached_round": 11,
+      "complete": true,
+      "final_chars": 45785,
+      "final_file": "/Users/seobi/jinsup_space/research/memory/runs2/claude-code/round11.md",
+      "compression": 0.0607,
+      "answers": [
+        {
+          "probe_id": "c1-p1",
+          "answer": "모름 (round11.md 요약본에는 '배치-단독-개념-소스증명.md' 문서나 그 생성 경위에 대한 언급이 없습니다.)"
+        },
+        {
+          "probe_id": "c1-p3",
+          "answer": "모름 (round11.md에는 Agent 도구의 isConcurrencySafe가 true를 반환한다는 내용은 있지만, Edit/Write 등 쓰기 도구의 기본값이나 Tool.ts:759 관련 내용은 나오지 않습니다.)"
+        },
+        {
+          "probe_id": "c2-p1",
+          "answer": "모름 (round11.md에는 .claude/rules/*.md의 조건부 지연 주입 방식에 대한 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c2-p3",
+          "answer": "모름 (round11.md에는 FileReadTool.ts나 nestedMemoryAttachmentTriggers 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c3-p1",
+          "answer": "모름 (round11.md에는 <user-prompt-submit-hook> 태그나 getHooksSection 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c3-p3",
+          "answer": "모름 (round11.md에는 getSessionSpecificGuidanceSection이나 SYSTEM_PROMPT_DYNAMIC_BOUNDARY 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c4-p1",
+          "answer": "모름 (round11.md에는 세션 인풋 스냅샷 md 파일명이나 2026/2027 오타 정정 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c4-p3",
+          "answer": "모름 (round11.md에는 ToolSearch 점수표의 구체적 점수 배점 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c5-p1",
+          "answer": "모름 (round11.md에는 '큐 웨이크' 경로 전수조사나 그 개수/목록에 대한 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c5-p3",
+          "answer": "모름 (round11.md에는 POLL_INTERVAL_MS나 백그라운드 태스크 폴링 주기 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c6-p1",
+          "answer": "모름 (round11.md에는 ToolSearch가 스킬을 못 찾는 이유나 EXPERIMENTAL_SKILL_SEARCH 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c6-p3",
+          "answer": "부분적으로만 확인됩니다. round11.md에는 '기술부채287건'이라는 총 건수만 언급되어 있고, 몇 개의 에이전트·도구 호출·소요 시간·결과물 3개 파일명에 대한 구체적 내용은 없어 그 부분은 모름."
+        },
+        {
+          "probe_id": "c7-p1",
+          "answer": "모름 (round11.md에는 verification 에이전트나 builtInAgents.ts 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c7-p3",
+          "answer": "모름 (round11.md에는 task_reminder나 TODO_REMINDER_CONFIG 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c8-p1",
+          "answer": "모름 (round11.md에는 CLAUDE.md 18번째 줄이나 헤르메스(Hermes Agent) 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c8-p3",
+          "answer": "모름 (round11.md에는 addCacheBreakpoints나 markerIndex, skipCacheWrite 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c9-p1",
+          "answer": "부분적으로만 확인됩니다. round11.md에는 '도구호출-순서설계-하드소프트.md'와 '도구호출-순서설계-하드소프트.html' 두 파일 형식(md 문서 + html 짝꿍)으로 만들어졌다는 것은 나오지만, 정확한 저장 디렉토리 경로는 명시되어 있지 않아 그 부분은 모름."
+        },
+        {
+          "probe_id": "c9-p3",
+          "answer": "모름 (round11.md에는 FileEditTool의 errorCode나 readFileState 판정 조건식에 대한 구체적 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c10-p1",
+          "answer": "하드·소프트 2층 구조로 재편되었습니다. round11.md에 따르면 사용자가 '3층(물리/하드/소프트)' 구조를 '동어반복'이라 지적하며 L1(물리 층)을 통삭제했고, 이후 '2층(하드/소프트)'으로 재구조화되었습니다."
+        },
+        {
+          "probe_id": "c10-p3",
+          "answer": "부분적으로만 확인됩니다. round11.md에는 '비용 경사'라는 표현이 사용자 반박으로 '출력 부피 경사'로 정정되었다는 사실은 나오고, Glob에 대해서는 GlobTool.ts:50의 100개 잘림 상한이 근거로 언급됩니다. 그러나 Grep과 Read 각각의 출력량 상한 근거 파일:라인은 round11.md에 나오지 않아 그 부분은 모름."
+        },
+        {
+          "probe_id": "c11-p1",
+          "answer": "부분적으로만 확인됩니다. round11.md에 따르면 '대체지침'(예: find 대신 Glob)이 소프트 규칙에서 빠져 별도의 '§04 도구 주의사항'으로 재분류되었다는 것은 나옵니다(사용자가 AskUserQuestion을 거부하고 직접 재구성안을 제시, 어시스턴트가 즉시 수용해 md·html 양쪽 반영). 다만 최종 문서 전체의 섹션 구조(§00~§06 전체 목록)는 round11.md에 나오지 않아 그 부분은 모름."
+        },
+        {
+          "probe_id": "c11-p3",
+          "answer": "100개까지만 반환합니다(GlobTool.ts:50). 결과가 잘렸을 때 끝에 붙는 안내 문구는 \"(Results are truncated. Consider using a more specific path or pattern.)\"입니다."
+        }
+      ],
+      "grades": [
+        {
+          "probe_id": "c1-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. 정답(배치-단독-개념-소스증명.md, CC 루트)을 제시하지 못함."
+        },
+        {
+          "probe_id": "c1-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. Tool.ts:759 기본값 false를 제시하지 못함."
+        },
+        {
+          "probe_id": "c2-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. paths frontmatter 방식 미제시."
+        },
+        {
+          "probe_id": "c2-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. FileReadTool.ts:848 nestedMemoryAttachmentTriggers.add 미제시."
+        },
+        {
+          "probe_id": "c3-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. getHooksSection 1회 언급/생성코드 0곳 미제시."
+        },
+        {
+          "probe_id": "c3-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. prompts.ts:371-372 주석 원문 미제시."
+        },
+        {
+          "probe_id": "c4-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. 2026-07-11 파일명/오타정정 미제시."
+        },
+        {
+          "probe_id": "c4-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. ToolSearch 점수(12/10/2) 미제시."
+        },
+        {
+          "probe_id": "c5-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. 큐 웨이크 6개 확정 내용 미제시."
+        },
+        {
+          "probe_id": "c5-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. POLL_INTERVAL_MS=1000 미제시."
+        },
+        {
+          "probe_id": "c6-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. isDeferredTool 관할/EXPERIMENTAL_SKILL_SEARCH 미제시."
+        },
+        {
+          "probe_id": "c6-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "총 287건만 정확히 확인하고 나머지(47 에이전트/918 도구호출/26분/파일 3개)는 '모름'. 정답의 총건수 부분만 부분 일치."
+        },
+        {
+          "probe_id": "c7-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. verification 에이전트 기본 비활성화(2게이트) 미제시."
+        },
+        {
+          "probe_id": "c7-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. TODO_REMINDER_CONFIG 10/10 조건 미제시."
+        },
+        {
+          "probe_id": "c8-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. CLAUDE.md:18 LangGraph→자체하네스 정정 미제시."
+        },
+        {
+          "probe_id": "c8-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. markerIndex 계산식/skipCacheWrite 이유 미제시."
+        },
+        {
+          "probe_id": "c9-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "md+html 두 파일 형식과 파일명은 정확히 확인, 저장 디렉토리(/Users/seobi/jinsup_space/CC/)는 '모름'. 형식·파일명 부분 일치."
+        },
+        {
+          "probe_id": "c9-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "'모름'으로 응답. errorCode 6/조건식 미제시."
+        },
+        {
+          "probe_id": "c10-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "하드·소프트 2층 구조로 재편됨을 정확히 답변. L1 물리층 통삭제 경위까지 일치."
+        },
+        {
+          "probe_id": "c10-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "Glob(GlobTool.ts:50 100개 잘림)만 정확히 확인, Grep(GrepTool.ts:104-107)·Read(FileReadTool.ts:181)는 '모름'. 3종 중 1종 일치."
+        },
+        {
+          "probe_id": "c11-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "대체지침이 소프트 규칙에서 빠져 §04 도구 주의사항(별도 범주·수단선택)으로 재분류됨을 정확히 확인. 다만 최종 섹션구조 §00~§06 전체 목록은 '모름'. 핵심 재배치는 일치하나 전체 구조 미제시."
+        },
+        {
+          "probe_id": "c11-p3",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "100개 상한(GlobTool.ts:50)과 잘림 안내 문구 원문 '(Results are truncated. Consider using a more specific path or pattern.)'를 정확히 답변."
+        }
+      ],
+      "fidelity": {
+        "terms_preserved": 4,
+        "artifact_language": "ko",
+        "notes": "요약본(round11.md)은 한국어 산문에 영문 코드 식별자가 섞인 전형적 ko 문서. terms 10개 중 보존 확인: isConcurrencySafe(line 59·74 원형 등장), 배치-단독-개념-소스증명.md(line 132 원형 등장), ToolSearch(다수 등장), nested_memory(지연 주입 rule)(line 4 '유령메시지/지연주입' 의미동등 보존). 미보존: skill_listing, UserPromptSubmit 훅, 컨텍스트-주입-4트랙-시각설명.html, <user-prompt-submit-hook>, getHooksSection(), 세션인풋-시스템프롬프트-도구-전문.md — round11 요약본에 원형/의미동등 모두 부재. 수험자는 요약본만 근거로 대부분 '모름'을 정직 표기했고, 요약본에 실제로 남아있는 항목(2층 재편, Glob 100개 잘림·문구, 287건, 대체지침 §04 재분류, md/html 형식)만 정확·부분 정확히 답해 hallucination 0건."
+      }
+    },
+    {
+      "tech": "openclaw",
+      "reached_round": 11,
+      "complete": true,
+      "final_chars": 28465,
+      "final_file": "/Users/seobi/jinsup_space/research/memory/runs2/openclaw/round11.md",
+      "compression": 0.0378,
+      "answers": [
+        {
+          "probe_id": "c1-p1",
+          "answer": "새로 작성한 문서는 /Users/seobi/jinsup_space/CC/배치-단독-개념-소스증명.md 이다. 저장 위치는 CC 워크스페이스 루트이며, 기존 '배치-세계-전수도감.md' 옆에 자매 문서로 두는 것이 이 세션의 관례(요약본 Constraints: 새 분석 문서는 기존 도감류 문서 옆에 자매 문서로 작성)이므로 그 옆에 작성된 것으로 보인다."
+        },
+        {
+          "probe_id": "c1-p3",
+          "answer": "부분 정보만 있음. 요약본에는 Edit 등 쓰기 도구가 isConcurrencySafe를 override하지 않으면 false로 취급되어(=병렬안전이 아니라서) 직렬 처리된다는 내용만 있고(\"Edit 등 쓰기도구는 false=직렬\"), 정확한 기본값 표기 방식이나 그 기본값이 정의된 소스 파일:라인(Tool.ts:759 등)은 요약본에 없다. 모름."
+        },
+        {
+          "probe_id": "c2-p1",
+          "answer": "부분 정보만 있음. 요약본에는 \"rules 조건부로딩\"이 소스검증 완료되었고, rules/skills/agents/slash 4종 공통으로 \"색인 상시노출·본문 방아쇠지연\" 2단 패턴이 있다는 것, 관련 소스 위치가 src/utils/claudemd.ts:250-279,688-778,1198-1253,1369-1395 라는 것만 나와 있다. YAML frontmatter의 paths: 글롭 패턴 선언, match-all(**) 처리, nested_memory 어태치먼트 명칭 같은 구체적 메커니즘은 요약본에 명시되어 있지 않다. 모름(세부 문법)."
+        },
+        {
+          "probe_id": "c2-p3",
+          "answer": "모름. 요약본에 Read 도구의 nestedMemoryAttachmentTriggers 관련 코드 한 줄이나 FileReadTool.ts의 해당 라인 번호에 대한 언급이 없다."
+        },
+        {
+          "probe_id": "c3-p1",
+          "answer": "요약본에 따르면 <user-prompt-submit-hook> 태그는 \"잔재론\" 트랙으로 소스검증이 완료되어 있다(훅안내문단·<user-prompt-submit-hook> 잔재론 — 전부 소스검증 완료). 관련 소스 위치는 훅안내문단 src/constants/prompts.ts:127-129,444,560-576 이다. 이는 이 태그가 실제로 태그를 생성하는 코드 없이 시스템 프롬프트 문구 속 잔재로만 남아있다는 결론을 시사하나, \"정확히 몇 회 등장하는지\", \"실제 훅 출력 포장 방식(<system-reminder> 등)\" 같은 세부 내용은 요약본에 직접 서술되어 있지 않다. 부분 정보까지만 답함."
+        },
+        {
+          "probe_id": "c3-p3",
+          "answer": "부분 정보만 있음. 요약본에는 getSessionSpecificGuidanceSection이 prompts.ts:352-400에 위치하고 \"캐시경계 밖\" 트랙으로 소스검증이 완료되었다는 것만 나와 있다. 이 함수가 SYSTEM_PROMPT_DYNAMIC_BOUNDARY 뒤쪽(동적 파트)에 있어야 하는 이유를 설명하는 소스 코드 주석 원문은 요약본에 없다. 모름(주석 원문)."
+        },
+        {
+          "probe_id": "c4-p1",
+          "answer": "최종 파일명은 2026-07-11-시스템프롬프트및도구내용-최신본.md 이다(html 짝꿍 문서 포함). 다만 사용자가 처음 요청한 이름이 이와 왜 달라졌는지에 대한 경위(예: 연도 오타 정정 등)는 요약본에 서술되어 있지 않다. 그 부분은 모름."
+        },
+        {
+          "probe_id": "c4-p3",
+          "answer": "모름. 요약본에는 toolsearch-생애주기-소스분석.md/.html에 ToolSearch \"점수표\"가 있고 이것이 소스검증 완료되었다는 사실만 있을 뿐, MCP 도구 이름 조각 정확일치 점수나 일반 도구 설명문 매치 점수 같은 구체적 숫자는 나와 있지 않다."
+        },
+        {
+          "probe_id": "c5-p1",
+          "answer": "최종 6개 경로로 확정되었다: ①로컬 백그라운드 태스크 완료 ②Stop 훅 차단 ③원격 입력(bridge/CCR) ④스케줄 작업 ⑤비동기 에이전트 결과의 숨은 프롬프트 재진입 ⑥고아 권한 응답. 산출물은 큐웨이크-엔터없는-진입-소스분석.md이다."
+        },
+        {
+          "probe_id": "c5-p3",
+          "answer": "모름. 요약본에 백그라운드 태스크 폴링 주기(ms), 상수명, 정의 위치에 대한 언급이 없다."
+        },
+        {
+          "probe_id": "c6-p1",
+          "answer": "ToolSearch의 검색 대상은 isDeferredTool 전용, 즉 '도구'만이고 스킬은 관할 밖이기 때문에 묻힌 스킬을 다시 찾아주지 못한다. 스킬 재고지는 sentSkillNames가 결정하며, 스킬을 못 찾는 로스트인더미들 케이스에는 소극적 3종(표지판/유저명시호출/compact 우연 리프레시)만 있다고 확인되었고, 이 구멍을 메우는 진행중인 실험적 해법은 EXPERIMENTAL_SKILL_SEARCH이다."
+        },
+        {
+          "probe_id": "c6-p3",
+          "answer": "기술부채 전수스캔은 Workflow 백그라운드(wf_89574a3c-93a)로 47개 에이전트, 918회 도구 호출을 거쳐 총 287건의 부채를 확정했다. 결과물은 클로드코드-기술부채-대장.md, 클로드코드-기술부채-대장.html, 클로드코드-기술부채-대장-전체287건.json 3개 파일이다. 다만 정확히 몇 분이 걸렸는지는 요약본에 나와 있지 않아 그 부분은 모름."
+        },
+        {
+          "probe_id": "c7-p1",
+          "answer": "아니다. verification 에이전트는 빌트인 정의(코드)는 존재하지만 기본적으로 비활성화되어 있으며, feature('VERIFICATION_AGENT') && getFeatureValue_CACHED_MAY_BE_STALE('tengu_hive_evidence', false) 라는 이중 게이트를 둘 다 통과해야 하므로 기본비활성 상태이고 Anthropic 내부 A/B 테스트 전용이다."
+        },
+        {
+          "probe_id": "c7-p3",
+          "answer": "task_reminder는 TODO_REMINDER_CONFIG = {TURNS_SINCE_WRITE: 10, TURNS_BETWEEN_REMINDERS: 10} 설정값을 기준으로 발행된다(attachments.ts:254-256). 즉 마지막 Todo/Task 도구 사용 후 10턴, 그리고 마지막 리마인더 후 10턴이라는 주기적 조건일 것으로 보인다. 컨텍스트 주입 3경로 중 ②번(주기적 task_reminder)에 해당한다."
+        },
+        {
+          "probe_id": "c8-p1",
+          "answer": "원래 CLAUDE.md 18번째 줄 내용은 hermes-agent를 \"LangGraph supervisor\"로 서술한 것이었는데(요약본 표현: hermes-agent \"LangGraph supervisor\" 오추천 자인·철회), 실제 소스 검증 결과 langgraph/langchain 의존성이 0건이고 오케스트레이션은 while True + tool_calls (ReAct) 방식으로 확인되어, \"프레임워크 없는 raw SDK 위 커스텀 하네스\"라는 결론으로 정정되었다. /Users/seobi/jinsup_space/CC/CLAUDE.md:18에 Edit으로 정정 완료되었다."
+        },
+        {
+          "probe_id": "c8-p3",
+          "answer": "모름. 요약본에는 addCacheBreakpoints 함수(services/api/claude.ts:3062-3106)의 존재와 역할(캐시 브레이크포인트는 API 요청 1건당 정확히 1개, 항상 메시지배열 마지막)만 나와 있을 뿐, markerIndex의 정확한 계산식이나 skipCacheWrite=true일 때 마커 위치를 옮기는 구체적 이유는 요약본에 서술되어 있지 않다."
+        },
+        {
+          "probe_id": "c9-p1",
+          "answer": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md 와 /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html 두 벌(md+html)이다. 작성일은 2026-07-22로 기록되어 있다."
+        },
+        {
+          "probe_id": "c9-p3",
+          "answer": "부분 정보만 있음. 요약본에는 Read→Edit readFileState 상태머신이 5겹 장치(사전경고/게이트1 미독차단/게이트2 mtime변경차단/성공후 자가갱신/Write에도 동일게이트)로 확정되었고, 정의가 \"안 읽은 파일 금지\"가 아니라 \"지금 디스크의 그 버전을 본 적 없으면 금지\"라는 내용만 있다. 아직 읽지 않은 파일을 수정하려 할 때 반환되는 정확한 errorCode 번호와 조건식 원문은 요약본에 없다. 모름(정확한 errorCode 값)."
+        },
+        {
+          "probe_id": "c10-p1",
+          "answer": "하드·소프트 2층 구조로 재편되었다. 기존 물리·하드·소프트 3층 규칙에서 물리(레이어1) 층을 들어내고 하드·소프트 2층으로 재편했으며, 문서 제목도 '도구 호출 순서 설계 — 하드·소프트 2층 규칙'으로 바뀌었다."
+        },
+        {
+          "probe_id": "c10-p3",
+          "answer": "Glob은 GlobTool.ts:50(100개 잘림, \"limited to 100 files\"), Grep은 GrepTool.ts:104-107(head_limit 기본상한), Read는 FileReadTool.ts:181(2000줄+토큰 초과 에러)이 근거다."
+        },
+        {
+          "probe_id": "c11-p1",
+          "answer": "'대체지침'은 순서 규칙이 아니라 도구 주의사항(수단 선택 규칙)이라는 이유로 소프트 규칙에서 빠지고 신규 §04 \"도구 주의사항\"으로 재배치되었다. 최종 문서 섹션 구조는: §00 스펙트럼(하드/소프트 2행) → §01 하드 → §02 소프트A(입장권 설계) → §03 소프트B(문구 3갈래: 탈출구/결과넛지/리마인더) → §03-1 결과넛지가족전수 → §04 도구 주의사항(대체지침 이동됨) → §05 결정흐름 → §06 프롬프트 한국어 대역이다."
+        },
+        {
+          "probe_id": "c11-p3",
+          "answer": "Glob은 매칭 파일이 아무리 많아도 100개까지만 반환한다(GlobTool.ts:50, \"limited to 100 files\"). 다만 결과가 잘렸을 때 끝에 붙는 정확한 안내 문구 원문은 요약본에 인용되어 있지 않다. 모름(정확한 문구 원문)."
+        }
+      ],
+      "grades": [
+        {
+          "probe_id": "c1-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "파일명(배치-단독-개념-소스증명.md)과 저장 위치(CC 루트, 배치-세계-전수도감.md 자매)를 정답대로 맞춤."
+        },
+        {
+          "probe_id": "c1-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "기본값이 false(직렬)임은 맞혔으나 소스 파일:라인(Tool.ts:759)은 모른다고 함. 부분 정답."
+        },
+        {
+          "probe_id": "c2-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "핵심 답(YAML frontmatter의 paths 글롭 선언)을 제시하지 못하고 세부 문법은 모른다고 함."
+        },
+        {
+          "probe_id": "c2-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "FileReadTool.ts:848 nestedMemoryAttachmentTriggers.add 코드를 모른다고 함."
+        },
+        {
+          "probe_id": "c3-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "태그가 시스템 프롬프트 문구 속 잔재로만 남고 생성 코드가 없다는 핵심 결론과 prompts.ts 위치를 맞춤."
+        },
+        {
+          "probe_id": "c3-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "prompts.ts:371-372 주석 원문을 모른다고 함."
+        },
+        {
+          "probe_id": "c4-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "최종 파일명(2026-07-11...md+html)은 맞혔으나 이름이 달라진 경위(2027 오타 정정)는 모른다고 함. 부분 정답."
+        },
+        {
+          "probe_id": "c4-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "점수표 구체 숫자(12/10/2점)를 모른다고 함."
+        },
+        {
+          "probe_id": "c5-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "최종 6경로를 정답과 동일하게 나열함."
+        },
+        {
+          "probe_id": "c5-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "폴링 주기·상수명·위치를 모른다고 함."
+        },
+        {
+          "probe_id": "c6-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "isDeferredTool 전용이라 스킬은 관할 밖이라는 이유와 EXPERIMENTAL_SKILL_SEARCH 실험 해법을 맞춤."
+        },
+        {
+          "probe_id": "c6-p3",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "47에이전트·918도구호출·287건·3개 파일명을 정확히 맞춤. 소요 분만 정직하게 유보."
+        },
+        {
+          "probe_id": "c7-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "기본 비활성 + 이중 게이트(VERIFICATION_AGENT & tengu_hive_evidence=false) + 내부 A/B 전용을 맞춤."
+        },
+        {
+          "probe_id": "c7-p3",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "TODO_REMINDER_CONFIG 값(10/10), 위치, 두 조건을 맞춤."
+        },
+        {
+          "probe_id": "c8-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "원래 LangGraph 서술 → langgraph 0의존·while True+tool_calls ReAct·프레임워크 없는 커스텀 하네스로 정정, CLAUDE.md:18 Edit을 맞춤."
+        },
+        {
+          "probe_id": "c8-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "markerIndex 계산식과 이동 이유를 모른다고 함."
+        },
+        {
+          "probe_id": "c9-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "md+html 두 벌 산출물 경로를 맞춤."
+        },
+        {
+          "probe_id": "c9-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "errorCode 6 값과 조건식을 모른다고 함."
+        },
+        {
+          "probe_id": "c10-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "물리층 삭제 후 하드·소프트 2층 재편과 제목 변경을 맞춤."
+        },
+        {
+          "probe_id": "c10-p3",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "Glob/Grep/Read 세 도구별 소스 파일:라인을 정확히 맞춤."
+        },
+        {
+          "probe_id": "c11-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "대체지침이 §04 도구 주의사항으로 이동한 이유와 최종 섹션 구조를 상세히 맞춤."
+        },
+        {
+          "probe_id": "c11-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "100개 상한과 GlobTool.ts:50은 맞혔으나 잘림 안내 문구 원문은 모른다고 함. 부분 정답."
+        }
+      ],
+      "fidelity": {
+        "terms_preserved": 9,
+        "artifact_language": "ko",
+        "notes": "요약본은 한국어 산문에 영문 코드 식별자를 섞은 형태(주 언어 ko). terms 10개 중 9개 보존: isConcurrencySafe, skill_listing, 배치-단독-개념-소스증명.md, ToolSearch, <user-prompt-submit-hook>, 컨텍스트-주입-4트랙-시각설명.html은 원형 그대로; nested_memory→'rules 조건부로딩', UserPromptSubmit 훅→'<user-prompt-submit-hook> 잔재론', 세션인풋-시스템프롬프트-도구-전문.md→'세션인풋 시스템프롬프트/도구 전문 md'로 의미동등 보존. getHooksSection()만 요약본에 부재(훅안내문단으로만 지칭). 수험자 답변 무응답들은 전부 정직한 '모름'이라 환각 0건."
+      }
+    },
+    {
+      "tech": "codex",
+      "reached_round": 11,
+      "complete": true,
+      "final_chars": 85422,
+      "final_file": "/Users/seobi/jinsup_space/research/memory/runs2/codex/round11.md",
+      "compression": 0.1133,
+      "answers": [
+        {
+          "probe_id": "c1-p1",
+          "answer": "요약본에 따르면 산출물은 \"/Users/seobi/jinsup_space/CC/배치-단독-개념-소스증명.md\"이며 CC 레포 루트에 생성되어 \"완성\" 상태로 기록되어 있다. 다만 이 문서가 어떤 기존 문서의 자매 문서인지 등 세부 맥락은 요약본에 없어 그 부분은 모름."
+        },
+        {
+          "probe_id": "c1-p3",
+          "answer": "모름. 요약본에는 \"배치파티셔닝(isConcurrencySafe per-tool)\"이 toolOrchestration.ts:95-116을 근거로 다뤄졌다는 정도만 나오고, isConcurrencySafe의 기본값이나 Tool.ts:759 같은 구체적 정의 위치는 언급되어 있지 않다."
+        },
+        {
+          "probe_id": "c2-p1",
+          "answer": "모름. 요약본에는 컨텍스트 주입 4트랙 중 하나로 \"conditional rules\"와 \"frontmatter\"가 언급될 뿐, .claude/rules/*.md의 frontmatter에 paths 글롭을 선언해 조건부로 만드는 구체적 방법(claudemd.ts:254-279 등)은 나와 있지 않다."
+        },
+        {
+          "probe_id": "c2-p3",
+          "answer": "모름. 요약본에 Read 도구가 조건부 rule 지연 주입 트리거를 등록하는 코드나 FileReadTool.ts:848 관련 내용은 전혀 언급되어 있지 않다."
+        },
+        {
+          "probe_id": "c3-p1",
+          "answer": "부분적으로만 확인됨. 요약본은 \"UserPromptSubmit훅\" 관련 근거 좌표로 hooks.ts:7,977 / prompts.ts:127-129를 제시하지만, <user-prompt-submit-hook> 태그가 소스 전체에서 정확히 1회만(문장 속 언급으로만) 등장하고 이를 실제로 생성하는 코드가 0곳이라는 세부 사실은 요약본에 없다. 이 부분은 모름."
+        },
+        {
+          "probe_id": "c3-p3",
+          "answer": "부분적으로만 확인됨. 요약본은 prompts.ts:371-372를 \"캐시경계\" 관련 좌표로 언급하지만, isForkSubagentEnabled()가 getIsNonInteractiveSession()을 읽기 때문에 반드시 boundary 뒤쪽에 있어야 한다는 정확한 주석 원문은 요약본에 없다. 이 부분은 모름."
+        },
+        {
+          "probe_id": "c4-p1",
+          "answer": "최종 파일명은 \"2026-07-11-시스템프롬프트및도구내용-최신본.md\"(및 짝꿍 .html)이다. 요약본에 \"2027→2026 오타정정\" 관행이 여러 차례 언급되며, 사용자가 \"2027\"로 요청했으나 어시스턴트가 오늘 날짜(2026-07-11) 및 문서 내용과 맞지 않는 오타로 판단해 2026으로 정정했다고 나와 있다. 다만 이후 사용자의 확답은 아직 받지 못한 낮은 우선순위 잔존 항목으로 기록되어 있다."
+        },
+        {
+          "probe_id": "c4-p3",
+          "answer": "모름. 요약본은 ToolSearch가 \"BM25 아닌 필드가중 불리언+합산정렬\" 방식임을 여러 차례 확인하지만, MCP 도구 12점/일반 도구 10점, 설명문 매치 2점 같은 구체적 점수표(ToolSearchTool.ts:266-291)는 나와 있지 않다."
+        },
+        {
+          "probe_id": "c5-p1",
+          "answer": "최종 6개로 확정되었다. 요약본에 \"큐웨이크 6개 도어('4개→6개' 자기정정)\"라고 명시되어 있고, 근거 좌표로 LocalMainSessionTask.ts:262 / hooks.ts:225-245 / messageQueueManager.ts:120-193 / task/framework.ts / query.ts:1564-1621이 제시된다. 다만 6개 각각이 정확히 무엇인지(백그라운드 태스크, Stop 훅, 원격입력 등 개별 항목명)는 요약본에 나열되어 있지 않아 그 세부 목록은 모름."
+        },
+        {
+          "probe_id": "c5-p3",
+          "answer": "모름. 요약본에 POLL_INTERVAL_MS나 1초 폴링, framework.ts:22 관련 내용이 전혀 언급되어 있지 않다."
+        },
+        {
+          "probe_id": "c6-p1",
+          "answer": "확인됨. 요약본에 \"스킬 vs ToolSearch 로스트인더미들 비대칭('소극적 3종뿐'=기본모드의 인정된 구멍, EXPERIMENTAL_SKILL_SEARCH가 메우는중)\"이라고 나와 있고, 좌표로 attachments.ts:2685-2697(EXPERIMENTAL_SKILL_SEARCH)이 제시된다. ToolSearch의 검색대상이 정확히 tools.filter(isDeferredTool)로 스킬을 관할 밖에 두기 때문이라는 서술은 별도로 명시되어 있지 않지만, isDeferredTool(prompt.ts:62-108)이 관련 좌표로 함께 등장한다."
+        },
+        {
+          "probe_id": "c6-p3",
+          "answer": "부분적으로 확인됨. 요약본에 따르면 \"기술부채 대장\" Workflow는 1,884파일·13샤드·47개 에이전트로 전체 소스를 스캔해 287건의 기술부채를 확정했고, 산출물은 클로드코드-기술부채-대장.md(222줄)/.html/-전체287건.json 세 파일이다. 다만 918회 도구 호출, 약 26분 소요라는 구체적 시간/횟수는 요약본에 없어 그 부분은 모름."
+        },
+        {
+          "probe_id": "c7-p1",
+          "answer": "아니다, 기본적으로 활성화되어 있지 않다. 요약본에 \"VERIFICATION_AGENT 이중게이트(기본비활성)\"라고 명시되어 있으며, 좌표로 tools/AgentTool/built-in/verificationAgent.ts:134 / builtInAgents.ts:65-68 / constants.ts:4가 제시된다. 다만 두 게이트의 정확한 이름(feature flag명, GrowthBook 플래그명 tengu_hive_evidence 등)은 요약본에 없어 그 세부는 모름."
+        },
+        {
+          "probe_id": "c7-p3",
+          "answer": "부분적으로 확인됨. 요약본은 TaskCreate→LLM컨텍스트 피드백 조사에서 최종적으로 \"10턴 방치시만\"이라는 조건과 \"Task계열만 카운트\"로 정정되었다고 밝히며, 관련 좌표로 utils/attachments.ts:254-256이 제시되어(gold의 TODO_REMINDER_CONFIG 위치와 일치) 있다. 다만 TODO_REMINDER_CONFIG라는 정확한 상수명이나 TURNS_BETWEEN_REMINDERS 조건, block.name==='TodoWrite' 카운트 방식 등 세부 내용은 요약본에 없어 그 부분은 모름."
+        },
+        {
+          "probe_id": "c8-p1",
+          "answer": "확인됨. 요약본에 따르면 키움증권 AI PB 프로젝트 킥오프 중 \"LangGraph 추천 검증없는 비약을 사용자 반박에 즉시 철회·재조사(순수 ReAct 확인)\", \"CLAUDE.md:18 오기 자인·Edit정정\"이 있었다고 나오며, hermes-agent 검증지점으로 pyproject.toml:15-16 / agent/gemini_native_adapter.py:956가 제시된다. 즉 원래는 LangGraph 기반이라고 서술돼 있었으나, 실제 소스 검증 결과 LangGraph가 아닌 자체 하네스(ReAct 툴콜 루프) 기반임이 확인되어 정정되었다. 다만 원문/정정문의 정확한 워딩은 요약본에 없어 그 자구는 모름."
+        },
+        {
+          "probe_id": "c8-p3",
+          "answer": "모름. 요약본에는 KV캐시 갱신이 \"API 요청 1건당 1개\"(claude.ts:3062-3106)라는 내용만 있을 뿐, addCacheBreakpoints의 markerIndex 계산식이나 skipCacheWrite 관련 내용은 전혀 언급되어 있지 않다."
+        },
+        {
+          "probe_id": "c9-p1",
+          "answer": "확인됨. 파일 경로는 \"/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md\"와 그 짝꿍 \"/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html\" 두 벌이다. 요약본 여러 곳에서 이 문서가 반복 언급되며 최종적으로 \"완결\" 상태로 기록되어 있다."
+        },
+        {
+          "probe_id": "c9-p3",
+          "answer": "모름. 요약본은 \"Read→Edit 5겹 신선도추적\"을 규명했고 좌표로 FileEditTool/prompt.ts:4-5, FileEditTool.ts:275-281(게이트1), :292-306(게이트2), :519-522(자가갱신), FileWriteTool.ts:198-216을 제시하지만, errorCode 6번이나 readFileState.isPartialView 조건식 등 구체적 내용은 나와 있지 않다."
+        },
+        {
+          "probe_id": "c10-p1",
+          "answer": "하드·소프트 2층 구조로 재편되었다. 요약본에 \"'물리 층' 통삭제, 3층→하드/소프트 2층 재편(당연한 소리라는 사용자 지적, 행동시그널14)\"이라고 명시되어 있다."
+        },
+        {
+          "probe_id": "c10-p3",
+          "answer": "확인됨. \"비용 경사\" 표현을 철회한 뒤 실재하는 출력량 상한 근거는 Glob 100개 잘림(GlobTool.ts:50), Grep head_limit 기본상한(GrepTool.ts:104-107), Read 2000줄+토큰상한(FileReadTool.ts:181)으로, 요약본에 이 세 좌표가 정확히 이 형태로 제시되어 있다."
+        },
+        {
+          "probe_id": "c11-p1",
+          "answer": "확인됨. '대체지침'은 신규 §04 \"(별도 기준) 도구 주의사항\"으로 이관되었다. 최종 문서 섹션 구조는 §00 스펙트럼(하드/소프트 2층) → §01 하드 → §02 소프트A(입장권설계) → §03 소프트B(문구장치) → §04 (별도 기준) 도구 주의사항 → §05 결정흐름 → §06 프롬프트전문 순서로 확정되었다."
+        },
+        {
+          "probe_id": "c11-p3",
+          "answer": "확인됨. Glob 도구는 100개까지만 반환하며(GlobTool.ts:50), 결과가 잘렸을 때 \"Results are truncated. Consider using a more specific path or pattern.\"라는 문구가 붙는다. 요약본은 이를 '성공 넛지'로 분류한 근거로 다루고 있다."
+        }
+      ],
+      "grades": [
+        {
+          "probe_id": "c1-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "파일명(배치-단독-개념-소스증명.md)과 저장 위치(CC 루트)를 정확히 맞힘. 질문 핵심(파일명+위치) 충족. 자매 문서 세부만 모른다고 했으나 이는 핵심 밖."
+        },
+        {
+          "probe_id": "c1-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "기본값 false·Tool.ts:759을 답하지 못하고 '모름'으로 처리."
+        },
+        {
+          "probe_id": "c2-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "frontmatter paths 글롭 선언 방법을 답하지 못하고 '모름'."
+        },
+        {
+          "probe_id": "c2-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "FileReadTool.ts:848 nestedMemoryAttachmentTriggers.add 코드를 답하지 못하고 '모름'."
+        },
+        {
+          "probe_id": "c3-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "'정확히 1회만 등장, 생성 코드 0곳'이라는 정답 핵심을 서술하긴 했으나 요약본에 없다며 '모름'으로 하향 프레이밍. 부분 인정."
+        },
+        {
+          "probe_id": "c3-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "주석 원문(verbatim)은 못 주지만 isForkSubagentEnabled가 getIsNonInteractiveSession을 읽어 post-boundary여야 한다는 의미와 prompts.ts:371-372 좌표를 정확히 전달. 부분."
+        },
+        {
+          "probe_id": "c4-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "최종 파일명 2026-07-11-시스템프롬프트및도구내용-최신본.md, 2027→2026 오타 정정 경위까지 정답과 일치."
+        },
+        {
+          "probe_id": "c4-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "MCP 12/일반 10, 설명문 2점 점수표를 답하지 못하고 '모름'."
+        },
+        {
+          "probe_id": "c5-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "최종 6개(4→6 자기정정) 개수는 맞혔으나 각 6개 항목 목록은 모른다고 함. 질문이 '각각 무엇인가'를 요구하므로 부분."
+        },
+        {
+          "probe_id": "c5-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "1000ms·POLL_INTERVAL_MS·framework.ts:22를 답하지 못하고 '모름'."
+        },
+        {
+          "probe_id": "c6-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "스킬이 tools.filter(isDeferredTool) 관할 밖이라는 이유와 EXPERIMENTAL_SKILL_SEARCH(attachments.ts:2685-2697) 실험 해법을 모두 정확히 제시."
+        },
+        {
+          "probe_id": "c6-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "47에이전트·287건·산출물 3파일은 맞혔으나 918회 도구호출·약26분은 모른다고 함. 부분."
+        },
+        {
+          "probe_id": "c7-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "'기본 비활성'이라는 핵심 답을 정확히 맞힘(이중게이트, verificationAgent.ts:134 등). 게이트 명칭 세부만 모름."
+        },
+        {
+          "probe_id": "c7-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "'10턴 방치시만'·'Task계열만 카운트'·attachments.ts:254-256을 맞혔으나 TODO_REMINDER_CONFIG 상수명·이중조건·TodoWrite 카운트 세부는 모름. 부분."
+        },
+        {
+          "probe_id": "c8-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "원래 LangGraph 기반→소스검증 후 자체 하네스(ReAct 툴콜 루프)로 정정된 사실을 정확히 서술. 정답 핵심 일치."
+        },
+        {
+          "probe_id": "c8-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "markerIndex=skipCacheWrite?length-2:length-1 계산식을 답하지 못하고 '모름'."
+        },
+        {
+          "probe_id": "c9-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "도구호출-순서설계-하드소프트.md/.html 두 경로를 정확히 제시."
+        },
+        {
+          "probe_id": "c9-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "errorCode 6·isPartialView 조건식을 답하지 못하고 '모름'."
+        },
+        {
+          "probe_id": "c10-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "하드·소프트 2층 구조 재편을 정확히 맞힘."
+        },
+        {
+          "probe_id": "c10-p3",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "Glob GlobTool.ts:50 / Grep head_limit GrepTool.ts:104-107 / Read FileReadTool.ts:181 세 좌표를 정확히 제시."
+        },
+        {
+          "probe_id": "c11-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "대체지침의 §04 '(별도 기준) 도구 주의사항' 이관과 §00~§06 최종 섹션 구조를 정답대로 서술."
+        },
+        {
+          "probe_id": "c11-p3",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "Glob 100개 상한(GlobTool.ts:50)과 잘림 안내 문구 'Results are truncated. Consider using a more specific path or pattern.'를 정확히 제시."
+        }
+      ],
+      "fidelity": {
+        "terms_preserved": 8,
+        "artifact_language": "ko",
+        "notes": "요약본은 한국어 주도(코드/식별자만 영어). terms 10개 중 보존 8개: isConcurrencySafe(원형), skill_listing(원형), 배치-단독-개념-소스증명.md(원형), nested_memory(의미동등 'conditional rules'/지연주입 rule), UserPromptSubmit 훅(원형), 컨텍스트-주입-4트랙-시각설명.html(원형), 세션인풋-시스템프롬프트-도구-전문.md(의미동등 '세션인풋 스냅샷'/2026-07-11 문서), ToolSearch(원형). 미보존 2개: <user-prompt-submit-hook>(리터럴 태그 부재), getHooksSection()(함수명 부재). nested_memory와 세션인풋 파일명은 원형 미등장·의미동등으로 인정한 경계 사례. 채점 대상 답변들은 요약본 기반으로, 요약본에 없는 지엽 기술디테일(c1-p3,c2-p1/p3,c4-p3,c5-p3,c8-p3,c9-p3)은 정직하게 '모름' 처리해 환각 0건."
+      }
+    },
+    {
+      "tech": "grok",
+      "reached_round": 11,
+      "complete": true,
+      "final_chars": 31052,
+      "final_file": "/Users/seobi/jinsup_space/research/memory/runs2/grok/round11.md",
+      "compression": 0.0412,
+      "answers": [
+        {
+          "probe_id": "c1-p1",
+          "answer": "요약본에는 '배치-단독-개념-소스증명.md'라는 파일명만 언급되어 있습니다(round5부터 열려있던 제안인 '그 짝꿍 HTML 시각화'가 여전히 미요청 상태라는 맥락에서 등장). 정확한 저장 위치(디렉토리 경로)는 이 요약본에 명시되어 있지 않아 모름."
+        },
+        {
+          "probe_id": "c1-p3",
+          "answer": "모름 (이 요약본에는 isConcurrencySafe의 기본값이나 그것이 정의된 소스 파일:라인에 대한 내용이 없습니다. round11에서는 AgentTool.tsx:1270-1280의 'isConcurrencySafe() { return true }'만 언급되어 있을 뿐, override하지 않을 때의 기본값(false)이나 Tool.ts 관련 라인은 나오지 않습니다.)"
+        },
+        {
+          "probe_id": "c2-p1",
+          "answer": "모름 (이 요약본에는 .claude/rules/*.md의 조건부 로딩, paths frontmatter, nested_memory 등에 대한 내용이 전혀 없습니다.)"
+        },
+        {
+          "probe_id": "c2-p3",
+          "answer": "모름 (이 요약본에는 FileReadTool.ts:848의 nestedMemoryAttachmentTriggers 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c3-p1",
+          "answer": "모름 (이 요약본에는 <user-prompt-submit-hook> 태그 검색이나 getHooksSection 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c3-p3",
+          "answer": "모름 (이 요약본에는 getSessionSpecificGuidanceSection이나 SYSTEM_PROMPT_DYNAMIC_BOUNDARY 관련 주석 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c4-p1",
+          "answer": "모름 (이 요약본에는 세션 인풋 스냅샷 md 파일명(2026-07-11-시스템프롬프트및도구내용-최신본.md 등)이나 2027→2026 정정 관련 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c4-p3",
+          "answer": "모름 (이 요약본에는 ToolSearch 점수표의 구체적 점수(MCP/일반 도구 이름 매치 점수, 설명문 매치 점수 등)에 대한 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c5-p1",
+          "answer": "부분 정보만 있습니다: 요약본은 '큐웨이크 6경로'로 최종 확정되었다고만 언급합니다(pre-round9 완전 규명 완료 항목 목록 중). 6개 각각이 무엇인지(백그라운드 태스크, Stop 훅 등 세부 목록)는 이 요약본에 나와 있지 않아 모름."
+        },
+        {
+          "probe_id": "c5-p3",
+          "answer": "모름 (이 요약본에는 폴링 주기(POLL_INTERVAL_MS)나 관련 소스 위치에 대한 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c6-p1",
+          "answer": "모름 (이 요약본에는 ToolSearch가 스킬을 찾지 못하는 이유나 EXPERIMENTAL_SKILL_SEARCH 관련 내용이 없습니다. '스킬 lost-in-the-middle'이라는 주제명만 목록에 언급될 뿐 세부 내용은 없습니다.)"
+        },
+        {
+          "probe_id": "c6-p3",
+          "answer": "부분 정보만 있습니다: 최종 '기술부채 287건'이 확정되었다는 사실과, 산출물로 '클로드코드-기술부채-대장.md/.html' 파일이 언급됩니다. 하지만 에이전트 수, 도구 호출 횟수, 소요 시간, 그리고 세 번째 산출물(전체287건 json 파일명) 등 세부 수치는 이 요약본에 없어 모름."
+        },
+        {
+          "probe_id": "c7-p1",
+          "answer": "부분 정보만 있습니다: 요약본에는 'verification 에이전트 이중게이트'라는 주제가 이전 라운드에서 이미 완전히 규명된 항목으로만 언급되어 있어, 두 개의 게이트(자물쇠) 조건이 있다는 것은 짐작할 수 있으나, 그 게이트들이 정확히 무엇인지, 그리고 기본 활성화 여부(Yes/No)에 대한 구체적 서술은 이 요약본에 없어 모름."
+        },
+        {
+          "probe_id": "c7-p3",
+          "answer": "모름 (이 요약본에는 task_reminder 어태치먼트 발행 조건(TODO_REMINDER_CONFIG 등)에 대한 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c8-p1",
+          "answer": "부분 정보만 있습니다: 요약본은 'hermes-agent=LangGraph 아닌 raw-SDK 커스텀 하네스'로 정정되었다는 결론만 언급합니다. 즉 원래 CLAUDE.md에는 LangGraph 기반이라고 적혀 있었으나, 소스 확인 후 LangGraph가 아닌 raw-SDK 기반 커스텀 하네스로 정정되었다는 것까지는 확인 가능합니다. 다만 원문/정정문의 정확한 문구나 정확한 줄 번호(18번째 줄)는 이 요약본에 없어 그 부분은 모름."
+        },
+        {
+          "probe_id": "c8-p3",
+          "answer": "모름 (이 요약본에는 addCacheBreakpoints의 markerIndex 계산식이나 skipCacheWrite 관련 세부 내용이 없습니다. 다만 관련 없는 별개 사실로 'KV캐시 갱신 트리거=API요청 1건'이라는 확정 사실만 언급되어 있습니다.)"
+        },
+        {
+          "probe_id": "c9-p1",
+          "answer": "정확한 경로는 /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md 와 /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html 두 벌(md 문서 + html)입니다. 다만 이 3층 규칙은 이후 round10에서 '물리·하드·소프트 3층'에서 '하드·소프트 2층'으로 재편되었다고 요약본에 나와 있습니다."
+        },
+        {
+          "probe_id": "c9-p3",
+          "answer": "모름 (이 요약본에는 FileEditTool의 errorCode나 readFileState 조건식에 대한 내용이 없습니다.)"
+        },
+        {
+          "probe_id": "c10-p1",
+          "answer": "하드·소프트 2층 구조로 재편되었습니다. 요약본에 따르면 사용자가 'L1 물리 층은 아예 존재를 없애라', '당연한소리를 하고있어'라고 지적한 뒤, 기존 '물리·하드·소프트 3층'에서 물리(L1) 층이 통삭제되어 '하드·소프트 2층'으로 문서 전체가 재편되었습니다."
+        },
+        {
+          "probe_id": "c10-p3",
+          "answer": "요약본에 따르면 '비용 경사' 표현을 철회하고 '출력 부피(량) 경사/상한'으로 정정했으며, 그 근거는: Glob은 100개 잘림 상한(GlobTool.ts, 관련 라인 28·50·192 언급), Grep은 head_limit 기본 상한(GrepTool.ts:104-107), Read는 2000줄 상한(FileReadTool.ts, 181번째 줄 부근 언급, 토큰초과 에러 포함)입니다."
+        },
+        {
+          "probe_id": "c11-p1",
+          "answer": "요약본에 따르면 '대체지침'(find 대신 Glob 등)은 순서 규칙이 아니라 수단 선택 규칙이라는 사용자 지적('그럼 저건 소프트 규칙에서 제외해서 별도의 기준으로 잡아야되지않나.. 도구 주의사항?')에 따라 소프트B에서 분리되어, 새로 신설된 §04 '도구 주의사항'(하드/소프트 스펙트럼 밖, 수단선택 규칙 — 권장형 시스템프롬프트 + 금지형 도구설명문은 '같은 정책의 양면')으로 이동했습니다. 최종 문서는 §00~§06 구조를 갖는다고만 나와 있고, 각 섹션 전체의 정확한 명칭 목록(§00~§03, §05, §06 각각의 이름)까지는 이 요약본에 명시되어 있지 않아 그 부분은 모름."
+        },
+        {
+          "probe_id": "c11-p3",
+          "answer": "요약본에 따르면 Glob은 매칭 결과가 많아도 100개까지만 반환합니다('Glob 100개 잘림'). 잘렸을 때 붙는 안내 문구는 'Results are truncated...'로 시작한다고만 언급되어 있고, 문구의 정확한 전체 원문은 이 요약본에 없어 그 부분은 모름."
+        }
+      ],
+      "grades": [
+        {
+          "probe_id": "c1-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "파일명 '배치-단독-개념-소스증명.md'은 정확히 식별했으나 저장 위치(루트 디렉토리 경로)는 모름으로 처리 — 부분 정답."
+        },
+        {
+          "probe_id": "c1-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "기본값 false, Tool.ts:759에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c2-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "paths frontmatter/조건부 rule에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c2-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "FileReadTool.ts:848 nestedMemoryAttachmentTriggers에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c3-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "getHooksSection/<user-prompt-submit-hook>에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c3-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "getSessionSpecificGuidanceSection/BOUNDARY 주석에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c4-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "2026-07-11 파일명/2027→2026 정정에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c4-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "ToolSearch 점수표(12/10/2)에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c5-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "'큐웨이크 6경로' 최종 확정 개수(6)는 맞혔으나 각 경로의 세부 내용은 모름 — 부분 정답."
+        },
+        {
+          "probe_id": "c5-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "POLL_INTERVAL_MS 폴링 주기에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c6-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "EXPERIMENTAL_SKILL_SEARCH 실험적 해법에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c6-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "총 287건과 산출물 .md/.html 두 파일은 맞혔으나 47에이전트/918도구호출/26분/전체287건.json은 모름 — 부분 정답."
+        },
+        {
+          "probe_id": "c7-p1",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "기본 비활성(No) 여부를 판단 못하고 '모름'으로 처리 — 핵심 Yes/No 미답."
+        },
+        {
+          "probe_id": "c7-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "TODO_REMINDER_CONFIG 발행 조건에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c8-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "원래 LangGraph 기반 → 소스 확인 후 raw-SDK 커스텀 하네스로 정정이라는 핵심 전환을 정확히 서술. 정확한 문구/줄번호만 미확인."
+        },
+        {
+          "probe_id": "c8-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "addCacheBreakpoints markerIndex/skipCacheWrite에 대해 '모름' 응답(무관한 KV캐시 사실만 언급)."
+        },
+        {
+          "probe_id": "c9-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "정답 경로 .md/.html 두 벌을 정확히 제시."
+        },
+        {
+          "probe_id": "c9-p3",
+          "score": 0,
+          "is_hallucination": false,
+          "reason": "FileEditTool errorCode 6/조건식에 대해 '모름' 응답."
+        },
+        {
+          "probe_id": "c10-p1",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "하드·소프트 2층 재편을 정확히 답변."
+        },
+        {
+          "probe_id": "c10-p3",
+          "score": 1,
+          "is_hallucination": false,
+          "reason": "Glob 100개 잘림(GlobTool.ts:50 포함), Grep head_limit(GrepTool.ts:104-107), Read 2000줄(FileReadTool.ts:181) 세 근거를 정확히 제시."
+        },
+        {
+          "probe_id": "c11-p1",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "대체지침이 §04 '도구 주의사항'으로 이동한 핵심은 정확하나, 최종 §00~§06 섹션 명칭 전체 구조는 미확인 — 부분 정답."
+        },
+        {
+          "probe_id": "c11-p3",
+          "score": 0.5,
+          "is_hallucination": false,
+          "reason": "Glob 100개 상한은 정확하나 잘림 안내 문구 전체 원문은 시작부만 언급하고 모름 — 부분 정답."
+        }
+      ],
+      "fidelity": {
+        "terms_preserved": 3,
+        "artifact_language": "ko",
+        "notes": "round11.md는 한국어 주도(기술용어만 영문 혼용)의 누적 요약본. terms 배열 10개 중 보존 확인: isConcurrencySafe(다수 등장), ToolSearch(다수 등장), '컨텍스트 주입 4트랙'(세션 대주제 목록에 개념으로 등장, 의미동등). 미보존: skill_listing(대신 skill_discovery만 언급), 배치-단독-개념-소스증명.md, nested_memory 지연주입 rule, UserPromptSubmit 훅, <user-prompt-submit-hook>, getHooksSection(), 세션인풋-시스템프롬프트-도구-전문.md — 이 요약본 chunk 범위(round11: 병렬실행/description교리/PTC)와 무관한 이전 chunk 주제라 미포함. 이로 인해 수험자도 chunk1~4·7~8 관련 probe 다수를 '모름'으로 정직 처리."
+      }
+    }
+  ],
+  "growth": {
+    "codex": [
+      28572,
+      49870,
+      36257,
+      31322,
+      39998,
+      38606,
+      37531,
+      38946,
+      43410,
+      37984,
+      53064
+    ],
+    "claude-code": [
+      17460,
+      22404,
+      31540,
+      29326,
+      43380,
+      36712,
+      33740,
+      32883,
+      36076,
+      21646,
+      26183
+    ],
+    "grok": [
+      12096,
+      16473,
+      21416,
+      21274,
+      23244,
+      19996,
+      20462,
+      15829,
+      18269,
+      15426,
+      18535
+    ],
+    "openclaw": [
+      7021,
+      13264,
+      17860,
+      17688,
+      21143,
+      24356,
+      26517,
+      28923,
+      38140,
+      21583,
+      28465
+    ]
+  }
+}

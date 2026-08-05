@@ -1,0 +1,62 @@
+[
+  {
+    "id": "conv-01",
+    "file": "/Users/seobi/jinsup_space/research/memory/data/conv-01.txt",
+    "source": "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/725702dd-7cc0-4ecd-ba6a-c64b33f9d5e9.jsonl",
+    "project": "-Users-seobi-jinsup-space-CC",
+    "total_chars": 99919,
+    "dialogue_chars": 122145,
+    "hangul_ratio": 0.601,
+    "truncated": true
+  },
+  {
+    "id": "conv-02",
+    "file": "/Users/seobi/jinsup_space/research/memory/data/conv-02.txt",
+    "source": "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/5d6cda93-807c-44fa-bd16-c40f8c1fa391.jsonl",
+    "project": "-Users-seobi-jinsup-space-CC",
+    "total_chars": 94038,
+    "dialogue_chars": 53607,
+    "hangul_ratio": 0.642,
+    "truncated": false
+  },
+  {
+    "id": "conv-03",
+    "file": "/Users/seobi/jinsup_space/research/memory/data/conv-03.txt",
+    "source": "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-research/fb908921-b1b4-488e-93c5-eed88108ed8d.jsonl",
+    "project": "-Users-seobi-jinsup-space-research",
+    "total_chars": 99930,
+    "dialogue_chars": 77949,
+    "hangul_ratio": 0.568,
+    "truncated": true
+  },
+  {
+    "id": "conv-04",
+    "file": "/Users/seobi/jinsup_space/research/memory/data/conv-04.txt",
+    "source": "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-codex/611d0664-ec2d-4c80-862c-10c4a5a6895c.jsonl",
+    "project": "-Users-seobi-jinsup-space-codex",
+    "total_chars": 99650,
+    "dialogue_chars": 78206,
+    "hangul_ratio": 0.49,
+    "truncated": true
+  },
+  {
+    "id": "conv-05",
+    "file": "/Users/seobi/jinsup_space/research/memory/data/conv-05.txt",
+    "source": "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-codex/e70b15f4-c0a8-4c40-845f-08ed2072e83e.jsonl",
+    "project": "-Users-seobi-jinsup-space-codex",
+    "total_chars": 98565,
+    "dialogue_chars": 78617,
+    "hangul_ratio": 0.487,
+    "truncated": true
+  },
+  {
+    "id": "conv-06",
+    "file": "/Users/seobi/jinsup_space/research/memory/data/conv-06.txt",
+    "source": "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-grok-build/e9f273e0-e894-4ec1-8ac7-9f4250d17674.jsonl",
+    "project": "-Users-seobi-jinsup-space-grok-build",
+    "total_chars": 99851,
+    "dialogue_chars": 56089,
+    "hangul_ratio": 0.51,
+    "truncated": true
+  }
+]

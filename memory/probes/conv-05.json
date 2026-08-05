@@ -1,0 +1,102 @@
+{
+  "conversation": "conv-05",
+  "source": "/Users/seobi/jinsup_space/research/memory/data/conv-05.txt",
+  "probes": [
+    {
+      "id": "conv-05-p01",
+      "category": "사실결정",
+      "question": "Codex와 Claude Code의 메인 루프가 '계속할지/종료할지'를 판단하는 기준은 무엇으로 확정되었나? thinking이나 stop_reason이 관여하는가?",
+      "gold_answer": "양쪽 모두 thinking과 stop_reason을 전혀 믿지 않고, 응답에 도구 호출(tool_use/function_call)이 있는지 여부만으로 판단한다. CC는 needsFollowUp(query.ts:823-825, 1053), Codex는 needs_follow_up(turn.rs:328, end_turn 신호 폴백 포함)으로 동일한 결정론적 방식이다. 사용자의 'thinking에서 판단' 이해는 틀린 것으로 교정됐다.",
+      "evidence": "\"루프 계속/종료는 thinking이 전혀 관여하지 않고, 오로지 tool_use 블록 존재 여부(needsFollowUp)로만 결정됩니다\" / \"stop_reason==='tool_use'는 신뢰 불가라 명시(query.ts:549-551)\" / \"순전히 needs_follow_up = model_needs_follow_up || has_pending_input(turn.rs:328)\""
+    },
+    {
+      "id": "conv-05-p02",
+      "category": "사실결정",
+      "question": "8축 계산적 정교함 비교에서 Codex가 Claude Code보다 유일하게 '덜 계산적'이라고 확정된 축은 무엇이고, 그 이유는?",
+      "gold_answer": "축 7(KV/prompt 캐싱). CC는 cache_control: ephemeral breakpoint를 클라이언트가 3전선(시스템 프롬프트 경계, 도구 스키마 끝, 마지막 메시지 1개+tool_result cache_reference)에 직접 심지만, Codex는 prompt_cache_key(세션ID) 하나만 넘기고 OpenAI Responses API의 서버측 자동 prefix 캐싱에 위임한다. 이는 게으름이 아니라 API 설계 차이다. 나머지 축은 동등하거나 Codex가 우위(도구 파이프라인·병렬).",
+      "evidence": "\"유일하게 덜 정교한 축은 7(prompt caching) — Claude는 cache_control breakpoint를 클라이언트가 직접 심지만 Codex는 prompt_cache_key 안정 키만 넘기고 서버 자동 캐싱에 위임\""
+    },
+    {
+      "id": "conv-05-p03",
+      "category": "사실결정",
+      "question": "사용자가 이해했던 '위드홀드 패턴(도구 결과를 보류했다가 배치로 방출)'은 어느 시스템의 동작으로 판명되었나?",
+      "gold_answer": "반전: 그 동작은 CC가 아니라 Codex의 것이다. CC의 StreamingToolExecutor는 완료 즉시 순서만 지켜 방출(eager-emit-in-order)하고, CC 코드의 진짜 'withheld' 변수는 에러 복구용(prompt-too-long 등)이다. 반면 Codex는 스트리밍 중 도구 호출을 in_flight(FuturesOrdered)에 모아뒀다가 스트림 Completed 후 drain_in_flight에서 실행·기록하는 진짜 hold-then-batch다.",
+      "evidence": "\"① 사용자님이 CC에 대해 상상한 '보류 후 배치 방출'은 사실 CC가 아니라 Codex가 합니다\" / \"오히려 Codex가 스트리밍 중엔 도구 호출을 in_flight 큐에 모으기만 하고 ... drain_in_flight에서 한꺼번에 실행\""
+    },
+    {
+      "id": "conv-05-p04",
+      "category": "사실결정",
+      "question": "Codex에 PTC(프로그래매틱 도구 호출)에 해당하는 기능이 있는지, 있다면 무엇이고 기본 모드인지 확정된 결론은?",
+      "gold_answer": "있다 — 'Code Mode'라는 실험적 기능으로, 모델에게 exec 단일 도구를 노출하고 모델이 JavaScript 코드를 작성해 전역 tools.* 객체로 도구를 오케스트레이션한다. 매번 새 V8 isolate에서 실행(Node/fs/net/console 차단)되며 도구는 TypeScript 선언으로 렌더링된다. 단 기본이 아니라 code_mode_only 플래그로 켜는 옵션 레이어이며, Codex의 기본은 function calling 기반 에이전트가 맞다.",
+      "evidence": "\"네, 있습니다. Codex에서는 그걸 'Code Mode'라고 부릅니다 (실험적 기능)\" / \"Codex는 기본적으로 function calling 기반 에이전트가 맞습니다. Code Mode는 그 위에 얹은 선택적·실험적 대체 모드\""
+    },
+    {
+      "id": "conv-05-p05",
+      "category": "기술디테일",
+      "question": "'Read→Edit 강제' 규칙이 두 시스템에서 각각 어떤 메커니즘으로 구현되어 있나 (파일·함수 수준)?",
+      "gold_answer": "CC는 상태 추적 방식: FileEditTool.validateInput(FileEditTool.ts:275-311)이 readFileState를 조회해 안 읽었으면 errorCode 6('File has not been read yet'), 읽은 뒤 mtime이 바뀌면 errorCode 7('File has been modified since read')로 tool.call 실행 전에 거부하는 하드 규칙. Codex는 상태 게이트가 아예 없고(mtime/last_read 추적 무), apply_patch의 seek_sequence 4단계 content 매칭(정확→후행공백무시→trim→유니코드 정규화, apply-patch/src/seek_sequence.rs)이 그 역할을 대체한다. 요약: CC='읽었니?'(상태), Codex='정확히 아니?'(내용).",
+      "evidence": "\"FileEditTool.validateInput(FileEditTool.ts:275-287)이 toolUseContext.readFileState.get(...)를 조회해 ... errorCode:6\" / \"Codex에는 그런 freshness/mtime/last_read 추적이 전혀 없습니다 ... seek_sequence는 4단계 점감 엄격도로 매칭\""
+    },
+    {
+      "id": "conv-05-p06",
+      "category": "기술디테일",
+      "question": "도구 병렬 실행(스마트 배치)의 구현 차이는? 특히 셸 도구의 병렬 판정과 동시성 한도 수치를 포함해 답하라.",
+      "gold_answer": "CC는 partitionToolCalls(toolOrchestration.ts:91)로 정적 사전 분할 — isConcurrencySafe 기준 연속 읽기전용만 같은 배치로 묶고 최대 동시 10(getMaxToolUseConcurrency), Bash는 isReadOnly(input) 명령 파싱으로 동적 판정. Codex는 배치를 안 만들고 각 도구가 tokio::spawn 후 공유 RwLock(parallel.rs:133-137)을 read(병렬)/write(배타 직렬)로 잡는 동적 게이트이며, shell은 명령 내용과 무관하게 supports_parallel_tool_calls=true 고정(shell_command.rs:152), read 락엔 상한 없음. 위험은 배치 분리가 아니라 execpolicy+샌드박스가 잡는다.",
+      "evidence": "\"shell은 supports_parallel_tool_calls → true 고정 (shell_command.rs:152) ... 명령 내용 안 봄\" / \"안전 배치는 runToolsConcurrently에서 all(tasks, getMaxToolUseConcurrency())로 병렬(기본 10)\""
+    },
+    {
+      "id": "conv-05-p07",
+      "category": "기술디테일",
+      "question": "Codex의 컨텍스트 전처리는 CC의 매 사이클 5단계와 어떻게 다른가? for_prompt와 '기록 시점 절단'의 정확한 의미는?",
+      "gold_answer": "Codex는 매 사이클엔 압축 없이 정규화+리마인더만 한다. for_prompt(history.rs:141)는 끊긴 call↔output 페어 정리와 이미지 스트립뿐(압축·슬라이스 안 함). 도구 결과 절단은 '기록 시점' — record_items(history.rs:121)→truncate_function_output_payload가 히스토리에 넣는 순간 1회만 자르고 원본은 보관 안 함. LLM 요약 압축(run_auto_compact)은 토큰 한계 도달 시에만 발동. CC 5단계 중 경계슬라이스·snip·microcompact는 Codex에 대응이 없다. 이 append-only 구조 덕에 KV 캐시 prefix가 잘 유지되고, 절단은 append와 동시라 캐시를 깨지 않는다.",
+      "evidence": "\"'기록 시점'은 도구 결과가 대화 히스토리에 처음 저장되는 순간 ... 넣을 때 딱 한 번 자르고 끝\" / \"for_prompt는 사실 '전처리'가 아니라 '정규화' ... 1. 경계 슬라이스 없음 3. snip 없음 4. microcompact 없음\""
+    },
+    {
+      "id": "conv-05-p08",
+      "category": "기술디테일",
+      "question": "Codex에만 있고 Claude Code엔 대응 개념이 없는 고유 설계 축들은 무엇인가 (3가지 이상)?",
+      "gold_answer": "① Responses API stateful 패러다임(previous_response_id, encrypted_content reasoning, 서버가 상태 이어감 — 가장 근본), ② 커널 샌드박스 3중 격리(execpolicy Starlark DSL + Seatbelt/Landlock 커널 샌드박스 + network-proxy egress) 및 샌드박스 에스컬레이션 재승인, ③ exec-server(도구를 원격·이종 OS에서 실행), ④ rollout JSONL+resume/fork(+SQLite), ⑤ app-server 단일 JSON-RPC 경계(Thread/Turn/Item), ⑥ StepContext(한 번의 모델 호출에 도구·환경·AGENTS.md를 원자 스냅샷 고정), world_state diff, agent-identity, Code Mode(V8).",
+      "evidence": "\"이 중 진짜 'Codex를 Codex답게' 만드는 3가지: 1. Responses API의 stateful 패러다임 2. 실행 안전을 '커널 + 정책 + 네트워크'로 3중 격리 3. exec-server로 실행 위치를 분리\""
+    },
+    {
+      "id": "conv-05-p09",
+      "category": "의도선호",
+      "question": "사용자가 비교 분석의 '관점'에 대해 요구한 제약 두 가지는 무엇인가?",
+      "gold_answer": "① 멀티에이전트(서브에이전트) 기준이 아니라 '하나의 메인 에이전트가 한 턴을 돌리는 파이프라인' 기준으로 비교할 것. ② 단계 수 같은 양적 우위 비교(12 vs 10단계)가 아니라 Read→Edit 하드 규칙, 소프트 툴콜링 순서 규칙 같은 '스마트 특징/기능'의 질적 대조로 비교할 것.",
+      "evidence": "\"제발 멀티에이전트기준으로 얘기하지말고.. 하나의 메인에이전트 파이프라인 기준으로 비교해봐 ㅠㅜ\" / \"뭔가 양으로 우위 비교하지말구... 특징을 비교해야지\""
+    },
+    {
+      "id": "conv-05-p10",
+      "category": "의도선호",
+      "question": "산출물 형식과 저장 위치에 대한 사용자 선호는?",
+      "gold_answer": "텍스트보다 도표·다이어그램·이미지 위주의 비주얼 HTML을 선호한다('택스트보단 비주얼쪽으로'). 결과물은 scratchpad가 아닌 codex 프로젝트 루트(/Users/seobi/jinsup_space/codex/)로 옮기게 했다. 디자인 관례로 Codex=teal, Claude Code=coral 색 체계가 세션 내내 유지됐다.",
+      "evidence": "\"가능하면 html을 비주얼쪽으로 작성잘해줘 택스트보단..\" / \"루트로 옮겨줘\" / \"메타포는 Codex=메시 네트워크(teal) vs Claude Code=위임 트리(coral)로 통일\""
+    },
+    {
+      "id": "conv-05-p11",
+      "category": "미결다음",
+      "question": "세션에서 만든 HTML 산출물 중 유실된 것과 현재 남아 있는 것은 무엇이며, 어떤 후속 조치가 제안된 상태인가?",
+      "gold_answer": "scratchpad에 만든 앞선 4개(agent-arch-compare 멀티에이전트 / agent-turn-pipeline 단일턴 / loop-computation-detail 8축 계산 / codex-vs-cc-master 종합, tool-smart-rules 포함)는 임시 폴더 정리로 사라졌고, 루트(/Users/seobi/jinsup_space/codex/)에는 codex-cc-loop-features.html, codex-multiTurn-flow.html, codex-unique.html 3개가 남았다(커밋 안 됨, git status에 뜸). 유실분 재생성 및 3개를 인덱스 페이지로 묶는 작업이 제안만 되고 미실행 상태다.",
+      "evidence": "\"앞서 만든 4개(멀티에이전트 / 단일턴 파이프라인 / 8축 계산 / 마스터 종합)는 임시 폴더가 정리되며 사라진 것 같습니다 — 필요하시면 다시 만들어 드릴게요\" / \"이제 루트에 Codex 관련 HTML이 3개입니다\""
+    },
+    {
+      "id": "conv-05-p12",
+      "category": "미결다음",
+      "question": "대화가 끝나는 시점에 답변이 완료되지 않은 사용자 질문은 무엇이고, 어떤 답이 준비되던 중이었나?",
+      "gold_answer": "마지막 질문 'StepContext 이건 뭐야? 한번의 모델 호출?'에 대한 답변이 미완이다. 어시스턴트가 codex-rs/core/src/session/step_context.rs를 읽던 중 대화가 절단됐다. 앞선 설명 기준 StepContext는 '한 번의 모델 호출'에 도구·환경·AGENTS.md를 원자 스냅샷으로 고정하는 Codex 고유 개념이며, 이 답변 완성이 다음 세션의 첫 과제다. 그 외 Responses API stateful/exec-server/커널 샌드박스 중 하나를 단독 심화하는 제안도 열려 있다.",
+      "evidence": "\"[USER] StepContext 이건 뭐야? 스텝 컨테스트? 한번의 모델 호출?\" → \"[도구호출 Read] step_context.rs\" 이후 절단 / 이전 정의: \"StepContext: '한 번의 모델 호출'에 도구·환경·AGENTS.md를 원자 스냅샷으로 고정\""
+    }
+  ],
+  "korean_terms": [
+    "코덱스(Codex)",
+    "클로드코드(Claude Code)",
+    "하네스(에이전트 실행 루프)",
+    "위드홀드 패턴",
+    "스마트 배치",
+    "KV 캐싱(cache_control/prompt_cache_key)",
+    "컨텍스트 전처리",
+    "기록 시점 절단",
+    "샌드박스 에스컬레이션",
+    "코드 모드(Code Mode)"
+  ]
+}

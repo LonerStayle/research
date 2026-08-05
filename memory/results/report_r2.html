@@ -1,0 +1,245 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>메모리 요약기법 평가 — 800K 스케일 (라운드 2)</title>
+<style>
+  :root{
+    color-scheme:light;
+    --page:#f9f9f7;--surface:#fcfcfb;--ink:#0b0b0b;--ink2:#52514e;--muted:#898781;
+    --grid:#e1e0d9;--axis:#c3c2b7;--ring:rgba(11,11,11,.10);
+    --codex:#2a78d6;--cc:#008300;--grok:#e87ba4;--openclaw:#eda100;
+    --good:#006300;--crit:#d03b3b;
+  }
+  @media (prefers-color-scheme:dark){:root:not([data-theme="light"]){
+    color-scheme:dark;
+    --page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;
+    --grid:#2c2c2a;--axis:#383835;--ring:rgba(255,255,255,.10);
+    --codex:#3987e5;--cc:#008300;--grok:#d55181;--openclaw:#c98500;
+    --good:#0ca30c;--crit:#e66767;
+  }}
+  :root[data-theme="dark"]{
+    color-scheme:dark;
+    --page:#0d0d0d;--surface:#1a1a19;--ink:#fff;--ink2:#c3c2b7;--muted:#898781;
+    --grid:#2c2c2a;--axis:#383835;--ring:rgba(255,255,255,.10);
+    --codex:#3987e5;--cc:#008300;--grok:#d55181;--openclaw:#c98500;
+    --good:#0ca30c;--crit:#e66767;
+  }
+  *{box-sizing:border-box;margin:0}
+  body{background:var(--page);color:var(--ink);font-family:system-ui,-apple-system,"Segoe UI",sans-serif;line-height:1.55;padding:40px 20px 80px}
+  .wrap{max-width:1060px;margin:0 auto}
+  header h1{font-size:26px;letter-spacing:-.01em}
+  header .sub{color:var(--ink2);margin-top:6px;font-size:14px;max-width:76ch}
+  .meta{color:var(--muted);font-size:12.5px;margin-top:10px}
+  .tiles{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin:26px 0}
+  .tile{background:var(--surface);border:1px solid var(--ring);border-radius:10px;padding:16px 18px}
+  .tile .k{font-size:12.5px;color:var(--ink2)}
+  .tile .v{font-size:29px;font-weight:650;margin-top:2px}
+  .tile .d{font-size:12px;color:var(--muted);margin-top:2px}
+  section{background:var(--surface);border:1px solid var(--ring);border-radius:12px;padding:22px 24px;margin:18px 0}
+  section h2{font-size:16.5px;margin-bottom:2px}
+  section .cap{font-size:13px;color:var(--ink2);margin-bottom:16px}
+  .legend{display:flex;flex-wrap:wrap;gap:14px;margin:4px 0 14px;font-size:12.5px;color:var(--ink2)}
+  .legend .sw{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .hbar-row{display:grid;grid-template-columns:96px 1fr 52px;align-items:center;gap:10px;margin:9px 0}
+  .hbar-row .lab{font-size:13px;color:var(--ink2);text-align:right}
+  .hbar-track{position:relative;height:20px}
+  .hbar-track .gl{position:absolute;top:-4px;bottom:-4px;width:1px;background:var(--grid)}
+  .hbar{position:relative;height:20px;border-radius:0 4px 4px 0}
+  .hbar-row .val{font-size:13px;font-variant-numeric:tabular-nums}
+  .axis-row{display:grid;grid-template-columns:96px 1fr 52px;gap:10px;margin-top:6px}
+  .axis-labels{position:relative;height:16px;font-size:11px;color:var(--muted)}
+  .axis-labels span{position:absolute;transform:translateX(-50%)}
+  svg text{font-family:inherit}
+  .tbl{width:100%;border-collapse:collapse;font-size:13px}
+  .tbl th,.tbl td{padding:7px 9px;text-align:right;font-variant-numeric:tabular-nums;border-bottom:1px solid var(--grid)}
+  .tbl th{color:var(--ink2);font-weight:600}
+  .tbl th:first-child,.tbl td:first-child{text-align:left}
+  .tbl .best{color:var(--good);font-weight:650}
+  .tbl .worst{color:var(--crit)}
+  .dot{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:7px}
+  .gx{display:grid;gap:26px;padding:6px 6px 0;font-size:12.5px;color:var(--ink2);text-align:center}
+  .findings{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:12px}
+  .fcard{border:1px solid var(--ring);border-left:4px solid var(--fc,var(--axis));border-radius:8px;padding:14px 16px}
+  .fcard h3{font-size:14px;margin-bottom:4px}
+  .fcard p{font-size:13px;color:var(--ink2)}
+  .caveat{font-size:12.5px;color:var(--muted)}
+  .caveat li{margin:4px 0 4px 16px}
+  #tip{position:fixed;pointer-events:none;background:var(--ink);color:var(--page);font-size:12px;padding:6px 9px;border-radius:6px;opacity:0;transition:opacity .12s;z-index:10;max-width:260px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>메모리 요약기법 평가 — 800K 실전 스케일 (라운드 2)</h1>
+    <p class="sub">75.4만 자 한국어 실세션을 11청크로 나눠 <b>기법별 11회 반복 컴팩션</b>(요약→요약+새청크→재요약…)을 시뮬레이션. 최종 요약본만으로 22개 프로브에 답하게 하고 블라인드 채점. 라운드 1(10만 자·컴팩션 1회, 전 기법 0.94~0.97)의 천장 효과를 깨기 위한 실험.</p>
+    <p class="meta">데이터: CC 프로젝트 실세션(한글 0.54) · 압축본 44개 · 프로브 핵심11/지엽11 · 압축·답변 Sonnet, 채점 Opus · 환각 0/88</p>
+  </header>
+
+  <div class="tiles">
+    <div class="tile"><div class="k">종합 1위</div><div class="v">openclaw</div><div class="d">회상 0.614 · 압축 3.8% · 효율 16.2</div></div>
+    <div class="tile"><div class="k">claude-code 붕괴</div><div class="v" style="color:var(--crit)">0.97→0.18</div><div class="d">R1 2위 → R2 4위 (반복 컴팩션에 취약)</div></div>
+    <div class="tile"><div class="k">회상 격차 (R1→R2)</div><div class="v">4배 확대</div><div class="d">R1 0.03폭 → R2 0.43폭</div></div>
+    <div class="tile"><div class="k">초반 정보 소실</div><div class="v">최대 100%</div><div class="d">claude-code 초반회상 0.0 · openclaw 0.375</div></div>
+  </div>
+
+  <section>
+    <h2>회상 정확도 — 라운드 1 vs 라운드 2</h2>
+    <p class="cap">같은 4기법, 같은 방법. 입력을 8배(10만→75만 자) 키우고 컴팩션을 1회→11회로 늘리자 순위가 뒤집혔다.</p>
+    <div class="legend">
+      <span><span class="sw" style="background:var(--muted)"></span>라운드 1 (10만 자·1회)</span>
+      <span><span class="sw" style="background:var(--ink)"></span>라운드 2 (75만 자·11회)</span>
+    </div>
+    <div id="r1r2"></div>
+  </section>
+
+  <section>
+    <h2>위치별 회상 — lost-in-the-middle</h2>
+    <p class="cap">대화를 초반/중반/후반으로 나눠 측정. 모든 기법이 최근(후반) > 과거(초반)이지만, 그 낙차가 기법의 질을 가른다. openclaw는 초반도 방어, claude-code는 초반이 완전히 증발.</p>
+    <div class="legend" id="pos-legend"></div>
+    <svg id="pos" viewBox="0 0 680 300" style="width:100%;height:auto" role="img" aria-label="위치별 회상 라인차트"></svg>
+    <div class="gx" style="grid-template-columns:repeat(3,1fr);max-width:560px;margin:0 auto"><span>초반 (청크1–4)</span><span>중반 (5–8)</span><span>후반 (9–11)</span></div>
+  </section>
+
+  <section>
+    <h2>효율 지형 — 적게 쓰고 많이 기억하는가</h2>
+    <p class="cap">가로=압축률(왼쪽일수록 강한 압축), 세로=회상. 좌상단이 이상적. openclaw는 작으면서 정확, codex는 정확하지만 큼, claude-code는 작지도 정확하지도 않음.</p>
+    <svg id="scatter" viewBox="0 0 640 320" style="width:100%;height:auto" role="img" aria-label="압축률 대비 회상 산점도"></svg>
+  </section>
+
+  <section>
+    <h2>요약 크기 성장 곡선 (round 1 → 11)</h2>
+    <p class="cap">반복 컴팩션마다 요약본이 어떻게 커지나. openclaw는 작게 시작해 필요한 만큼 누적(4배 성장하나 절대크기 최소권). codex는 처음부터 크게 유지. claude-code/grok은 거의 안 커짐 = 새 정보를 넣는 만큼 옛 정보를 버린다는 물리적 증거.</p>
+    <div class="legend" id="growth-legend"></div>
+    <svg id="growth" viewBox="0 0 680 300" style="width:100%;height:auto" role="img" aria-label="요약 크기 성장 곡선"></svg>
+  </section>
+
+  <section>
+    <h2>상세 테이블</h2>
+    <table class="tbl" id="tbl"></table>
+  </section>
+
+  <section>
+    <h2>핵심 발견</h2>
+    <div class="findings">
+      <div class="fcard" style="--fc:var(--openclaw)"><h3>openclaw — 스케일을 견딘다</h3><p>11회 재압축 후에도 회상 1위(0.614)이면서 요약 최소권(3.8%). 5섹션 재증류가 안정적이라 핵심 결정은 0.864로 살아남고 초반(0.375)도 최선으로 방어.</p></div>
+      <div class="fcard" style="--fc:var(--codex)"><h3>codex — 정확하지만 비싸다</h3><p>인수인계 프레임이 재압축에 강해 회상 2위(0.568), 후반 0.833으로 최신성 최강. 하지만 요약이 7.0%로 최대 — 효율은 openclaw의 절반.</p></div>
+      <div class="fcard" style="--fc:var(--grok)"><h3>grok — 최신성 편향</h3><p>후반 0.667은 준수하나 초반 0.062 — 오래된 정보가 거의 소실. 22개 중 12개 "모름". 언어 지시 없이 공격적으로 재압축.</p></div>
+      <div class="fcard" style="--fc:var(--cc)"><h3>claude-code — 반복에 붕괴</h3><p>0.965→0.182 폭락. "모든 사용자 메시지 나열"이 재-요약될수록 증발 → 초반 0.0. 단 실전은 transcriptPath 원본복구가 있어 이 수치보다 유리(한계 참조).</p></div>
+    </div>
+  </section>
+
+  <section>
+    <h2>한계</h2>
+    <ul class="caveat">
+      <li><b>표본 1대화</b>(11청크·22프로브) — 통계적 일반화는 약함. 라운드1(6대화)과 상호보완.</li>
+      <li><b>증분 컴팩션 근사</b> — 실제 하네스의 사전 플러시·부분 컴팩션을 "이전요약+새청크 재요약" 단일 패턴으로 근사.</li>
+      <li><b>회상 채널 미평가</b> — claude-code의 transcriptPath 원본복구, grok의 vector+BM25 검색 등 "요약본 밖" 복구는 범위 밖. <b>특히 claude-code는 이 채널이 설계 핵심</b>이라 실전은 0.182보다 크게 높음. 이 평가는 "순수 요약본만의 회상력" 비교.</li>
+      <li><b>압축률=디스크 실측</b>(에이전트 자체보고 아님) · <b>한도 중단 5회</b>를 완성 라운드에서 이어붙여 44라운드 완주(손실 0) · 채점 모델 편향 가능.</li>
+    </ul>
+  </section>
+</div>
+<div id="tip"></div>
+
+<script>
+const T={codex:{c:'var(--codex)'},'claude-code':{c:'var(--cc)'},grok:{c:'var(--grok)'},openclaw:{c:'var(--openclaw)'}};
+const ORDER=['openclaw','codex','grok','claude-code'];
+const D={
+  openclaw:{r1:.972,r2:.614,comp:.038,eff:16.2,pos:[.375,.75,.75],core:.864,tail:.364,unknown:4,terms:9,growth:[7021,13264,17860,17688,21143,24356,26517,28923,38140,21583,28465]},
+  codex:{r1:.944,r2:.568,comp:.070,eff:8.1,pos:[.375,.562,.833],core:.818,tail:.318,unknown:7,terms:8,growth:[28572,49870,36257,31322,39998,38606,37531,38946,43410,37984,53064]},
+  grok:{r1:.958,r2:.295,comp:.025,eff:12.0,pos:[.062,.25,.667],core:.409,tail:.182,unknown:12,terms:3,growth:[12096,16473,21416,21274,23244,19996,20462,15829,17200,17800,18535]},
+  'claude-code':{r1:.965,r2:.182,comp:.035,eff:5.2,pos:[0,.062,.583],core:.182,tail:.182,unknown:16,terms:4,growth:[17460,22404,31540,29326,43380,36712,33740,32883,36076,21646,26183]},
+};
+const tip=document.getElementById('tip');
+function bindTips(root){root.querySelectorAll('[data-tip]').forEach(el=>{
+  el.addEventListener('mousemove',e=>{tip.textContent=el.dataset.tip;tip.style.opacity=1;tip.style.left=Math.min(e.clientX+14,innerWidth-280)+'px';tip.style.top=(e.clientY+14)+'px';});
+  el.addEventListener('mouseleave',()=>tip.style.opacity=0);});}
+
+/* R1 vs R2 그룹 가로바 */
+(function(){
+  const el=document.getElementById('r1r2');let h='';
+  for(const t of ORDER){
+    const d=D[t];
+    h+=`<div class="hbar-row"><span class="lab">${t}</span><div class="hbar-track">
+      <span class="gl" style="left:25%"></span><span class="gl" style="left:50%"></span><span class="gl" style="left:75%"></span><span class="gl" style="left:100%"></span>
+      <div class="hbar" style="height:9px;margin-bottom:2px;width:${d.r1*100}%;background:var(--muted)" data-tip="${t} 라운드1: ${d.r1}"></div>
+      <div class="hbar" style="height:9px;width:${d.r2*100}%;background:${d.c=d.c||T[t].c,T[t].c}" data-tip="${t} 라운드2: ${d.r2}"></div>
+      </div><span class="val">${d.r2.toFixed(2).replace(/^0/,'')}</span></div>`;
+  }
+  h+=`<div class="axis-row"><span></span><div class="axis-labels"><span style="left:0">0</span><span style="left:25%">.25</span><span style="left:50%">.50</span><span style="left:75%">.75</span><span style="left:100%">1.0</span></div><span></span></div>`;
+  el.innerHTML=h;bindTips(el);
+})();
+
+/* 위치별 라인 */
+(function(){
+  const svg=document.getElementById('pos'),W=680,H=300,L=44,R=90,Tp=20,B=44;
+  const xs=[L+40,(L+W-R)/2,W-R-10];
+  const y=v=>Tp+(1-v)*(H-Tp-B);
+  let g='';
+  for(const yv of[0,.25,.5,.75,1]){g+=`<line x1="${L}" y1="${y(yv)}" x2="${W-R}" y2="${y(yv)}" stroke="var(--grid)"/><text x="${L-8}" y="${y(yv)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yv.toFixed(2).replace(/^0/,'')}</text>`;}
+  for(const t of ORDER){
+    const d=D[t],pts=d.pos.map((v,i)=>[xs[i],y(v)]);
+    g+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${T[t].c}" stroke-width="2.5"/>`;
+    pts.forEach((p,i)=>g+=`<circle cx="${p[0]}" cy="${p[1]}" r="5" fill="${T[t].c}" stroke="var(--surface)" stroke-width="2" data-tip="${t} ${['초반','중반','후반'][i]}: ${d.pos[i]}"/>`);
+    g+=`<text x="${pts[2][0]+10}" y="${pts[2][1]+4}" font-size="12" font-weight="600" fill="${T[t].c}">${t}</text>`;
+  }
+  svg.innerHTML=g;bindTips(svg);
+  document.getElementById('pos-legend').innerHTML=ORDER.map(t=>`<span><span class="sw" style="background:${T[t].c}"></span>${t}</span>`).join('');
+})();
+
+/* 산점도 */
+(function(){
+  const svg=document.getElementById('scatter'),W=640,H=320,L=52,R=20,Tp=24,B=44;
+  const x=v=>L+(v/0.09)*(W-L-R),y=v=>Tp+(1-v)*(H-Tp-B);
+  let g='';
+  for(const yv of[0,.2,.4,.6,.8,1]){g+=`<line x1="${L}" y1="${y(yv)}" x2="${W-R}" y2="${y(yv)}" stroke="var(--grid)"/><text x="${L-8}" y="${y(yv)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yv.toFixed(1).replace(/^0/,'')}</text>`;}
+  for(const xv of[0,.02,.04,.06,.08]){g+=`<text x="${x(xv)}" y="${H-B+18}" text-anchor="middle" font-size="11" fill="var(--muted)">${(xv*100).toFixed(0)}%</text>`;}
+  g+=`<line x1="${L}" y1="${H-B}" x2="${W-R}" y2="${H-B}" stroke="var(--axis)" stroke-width="1.5"/>`;
+  g+=`<text x="${(L+W-R)/2}" y="${H-6}" text-anchor="middle" font-size="11.5" fill="var(--ink2)">압축률 (← 왼쪽일수록 강한 압축)</text>`;
+  g+=`<text x="14" y="${(Tp+H-B)/2}" text-anchor="middle" font-size="11.5" fill="var(--ink2)" transform="rotate(-90 14 ${(Tp+H-B)/2})">회상 정확도</text>`;
+  g+=`<text x="${x(.004)}" y="${y(.97)}" font-size="11" fill="var(--muted)">◤ 이상적</text>`;
+  const off={openclaw:[12,-8],codex:[12,4],grok:[10,-8],'claude-code':[12,14]};
+  for(const t of ORDER){const d=D[t],px=x(d.comp),py=y(d.r2),[dx,dy]=off[t];
+    g+=`<circle cx="${px}" cy="${py}" r="8" fill="${T[t].c}" stroke="var(--surface)" stroke-width="2" data-tip="${t} — 압축 ${(d.comp*100).toFixed(1)}% · 회상 ${d.r2} · 효율 ${d.eff}"/>`;
+    g+=`<text x="${px+dx}" y="${py+dy}" font-size="12" font-weight="600" fill="var(--ink)" text-anchor="${dx<0?'end':'start'}">${t}</text>`;}
+  svg.innerHTML=g;bindTips(svg);
+})();
+
+/* 성장곡선 */
+(function(){
+  const svg=document.getElementById('growth'),W=680,H=300,L=52,R=90,Tp=18,B=40;
+  const maxV=55000;
+  const x=i=>L+(i/10)*(W-L-R),y=v=>Tp+(1-v/maxV)*(H-Tp-B);
+  let g='';
+  for(const yv of[0,10000,20000,30000,40000,50000]){g+=`<line x1="${L}" y1="${y(yv)}" x2="${W-R}" y2="${y(yv)}" stroke="var(--grid)"/><text x="${L-8}" y="${y(yv)+4}" text-anchor="end" font-size="11" fill="var(--muted)">${yv/1000}k</text>`;}
+  for(let i=0;i<11;i+=2){g+=`<text x="${x(i)}" y="${H-B+18}" text-anchor="middle" font-size="11" fill="var(--muted)">r${i+1}</text>`;}
+  g+=`<text x="${(L+W-R)/2}" y="${H-4}" text-anchor="middle" font-size="11.5" fill="var(--ink2)">컴팩션 사이클 (요약 문자수)</text>`;
+  for(const t of ORDER){const d=D[t],pts=d.growth.map((v,i)=>[x(i),y(v)]);
+    g+=`<polyline points="${pts.map(p=>p.join(',')).join(' ')}" fill="none" stroke="${T[t].c}" stroke-width="2.2"/>`;
+    const last=pts[pts.length-1];
+    g+=`<circle cx="${last[0]}" cy="${last[1]}" r="4" fill="${T[t].c}"/><text x="${last[0]+8}" y="${last[1]+4}" font-size="11.5" font-weight="600" fill="${T[t].c}">${t}</text>`;}
+  svg.innerHTML=g;bindTips(svg);
+  document.getElementById('growth-legend').innerHTML=ORDER.map(t=>`<span><span class="sw" style="background:${T[t].c}"></span>${t}</span>`).join('');
+})();
+
+/* 테이블 */
+(function(){
+  const tbl=document.getElementById('tbl');
+  const rows=[['회상','r2',v=>v.toFixed(3),'max'],['압축률','comp',v=>(v*100).toFixed(1)+'%','min'],['효율','eff',v=>v.toFixed(1),'max'],
+    ['핵심','core',v=>v.toFixed(3),'max'],['지엽','tail',v=>v.toFixed(3),'max'],
+    ['초반','pos0',v=>v.toFixed(3),'max'],['중반','pos1',v=>v.toFixed(3),'max'],['후반','pos2',v=>v.toFixed(3),'max'],
+    ['"모름"','unknown',v=>v+'/22','min'],['용어보존','terms',v=>v+'/10','max']];
+  const get=(t,k)=>k.startsWith('pos')?D[t].pos[+k[3]]:D[t][k];
+  let h=`<tr><th>지표</th>${ORDER.map(t=>`<th><span class="dot" style="background:${T[t].c}"></span>${t}</th>`).join('')}</tr>`;
+  for(const[name,key,fmt,dir]of rows){
+    const vals=ORDER.map(t=>get(t,key));
+    const best=dir==='max'?Math.max(...vals):Math.min(...vals);
+    const worst=dir==='max'?Math.min(...vals):Math.max(...vals);
+    h+=`<tr><td>${name}</td>${ORDER.map(t=>{const v=get(t,key);const cls=v===best?'best':(v===worst?'worst':'');return `<td class="${cls}">${fmt(v)}</td>`;}).join('')}</tr>`;
+  }
+  tbl.innerHTML=h;
+})();
+</script>
+</body>
+</html>

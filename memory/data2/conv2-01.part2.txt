@@ -1,0 +1,1220 @@
+
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/memoryFileDetection.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts
+/Users/seobi/jinsup_space/CC/src/utils/claudemd.ts
+/Users/seobi/jinsup_space/CC/src/utils/settings/types.ts
+/Users/seobi/jinsup_space/CC/src/commands/init.ts
+/Users/seobi/jinsup_space/CC/src/services/compact/compact.ts
+---nested_memory 생성부---
+/Users/seobi/jinsup_space/CC/src/Tool.ts:217:   * CLAUDE.md paths already injected as nested_memory attachments this
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:3700:    case 'nested_memory': {
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:493:      type: 'nested_memory'
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:818:  // This ensures files are added to nestedMemoryAttachmentTriggers before nested_memory processes them
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:872:    maybe('nested_memory', () => getNestedMemoryAttachments(context)),
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:1727:        type: 'nested_memory',
+/Users/seobi/jinsup_space/CC/src/utils/collapseReadSearch.ts:923:      // Exception: nested_memory attachments are pushed through even during a group so
+/Users/seobi/jinsup_space/CC/src/utils/collapseReadSearch.ts:927:        !(msg.type === 'attachment' && msg.attachment.type === 'nested_memory')
+/Users/seobi/jinsup_space/CC/src/screens/REPL.tsx:1964:  // Session-level dedup for nested_memory CLAUDE.md attachments.
+/Users/seobi/jinsup_space/CC/src/screens/REPL.tsx:3809:      // getChangedFiles + nested_memory dedup still work.
+
+[도구호출 Bash] {"command": "grep -n \"rules\" /Users/seobi/jinsup_space/CC/src/utils/claudemd.ts | head -30", "description": "claudemd.ts에서 rules 관련 로직 확인"}
+
+[도구결과] 6: * 3. Project memory (CLAUDE.md, .claude/CLAUDE.md, and .claude/rules/*.md in project roots) - Instructions checked into the codebase
+16: * - CLAUDE.md, .claude/CLAUDE.md, and all .md files in .claude/rules/ are checked in each directory for Project memory
+688: * Processes all .md files in the .claude/rules/ directory and its subdirectories
+689: * @param rulesDir The path to the rules directory
+698:  rulesDir,
+705:  rulesDir: string
+712:  if (visitedDirs.has(rulesDir)) {
+721:      rulesDir,
+724:    visitedDirs.add(rulesDir)
+742:      const entryPath = join(rulesDir, entry.name)
+757:            rulesDir: resolvedEntryPath,
+781:      logEvent('tengu_claude_rules_md_permission_error', {
+783:        has_home_dir: rulesDir.includes(getClaudeConfigHomeDir()) ? 1 : 0,
+813:    // Process Managed .claude/rules/*.md files
+817:        rulesDir: managedClaudeRulesDir,
+836:      // Process User ~/.claude/rules/*.md files
+840:          rulesDir: userClaudeRulesDir,
+862:    // checked-in files like CLAUDE.md and .claude/rules/*.md, so the same
+909:        // Try reading .claude/rules/*.md files (Project)
+910:        const rulesDir = join(dir, '.claude', 'rules')
+913:            rulesDir,
+965:        // Try reading .claude/rules/*.md files from the additional directory
+966:        const rulesDir = join(dir, '.claude', 'rules')
+969:            rulesDir,
+1045:    // memory system, not "instructions" in the CLAUDE.md/rules sense.
+1198: * Gets managed and user conditional rules that match the target path.
+1203: * @returns Array of MemoryFileInfo objects for matching conditional rules
+1211:  // Process Managed conditional .claude/rules/*.md files
+1224:    // Process User conditional .claude/rules/*.md files
+1242: * Loads CLAUDE.md, unconditional rules, and conditional rules for that directory.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/claudemd.ts", "offset": 688, "limit": 100}
+
+[도구결과] 688	 * Processes all .md files in the .claude/rules/ directory and its subdirectories
+689	 * @param rulesDir The path to the rules directory
+690	 * @param type Type of memory file (User, Project, Local)
+691	 * @param processedPaths Set of already processed file paths
+692	 * @param includeExternal Whether to include external files
+693	 * @param conditionalRule If true, only include files with frontmatter paths; if false, only include files without frontmatter paths
+694	 * @param visitedDirs Set of already visited directory real paths (for cycle detection)
+695	 * @returns Array of MemoryFileInfo objects
+696	 */
+697	export async function processMdRules({
+698	  rulesDir,
+699	  type,
+700	  processedPaths,
+701	  includeExternal,
+702	  conditionalRule,
+703	  visitedDirs = new Set(),
+704	}: {
+705	  rulesDir: string
+706	  type: MemoryType
+707	  processedPaths: Set<string>
+708	  includeExternal: boolean
+709	  conditionalRule: boolean
+710	  visitedDirs?: Set<string>
+711	}): Promise<MemoryFileInfo[]> {
+712	  if (visitedDirs.has(rulesDir)) {
+713	    return []
+714	  }
+715	
+716	  try {
+717	    const fs = getFsImplementation()
+718	
+719	    const { resolvedPath: resolvedRulesDir, isSymlink } = safeResolvePath(
+720	      fs,
+721	      rulesDir,
+722	    )
+723	
+724	    visitedDirs.add(rulesDir)
+725	    if (isSymlink) {
+726	      visitedDirs.add(resolvedRulesDir)
+727	    }
+728	
+729	    const result: MemoryFileInfo[] = []
+730	    let entries: import('fs').Dirent[]
+731	    try {
+732	      entries = await fs.readdir(resolvedRulesDir)
+733	    } catch (e: unknown) {
+734	      const code = getErrnoCode(e)
+735	      if (code === 'ENOENT' || code === 'EACCES' || code === 'ENOTDIR') {
+736	        return []
+737	      }
+738	      throw e
+739	    }
+740	
+741	    for (const entry of entries) {
+742	      const entryPath = join(rulesDir, entry.name)
+743	      const { resolvedPath: resolvedEntryPath, isSymlink } = safeResolvePath(
+744	        fs,
+745	        entryPath,
+746	      )
+747	
+748	      // Use 
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/claudemd.ts", "offset": 1198, "limit": 85}
+
+[도구결과] 1198	 * Gets managed and user conditional rules that match the target path.
+1199	 * This is the first phase of nested memory loading.
+1200	 *
+1201	 * @param targetPath The target file path to match against glob patterns
+1202	 * @param processedPaths Set of already processed file paths (will be mutated)
+1203	 * @returns Array of MemoryFileInfo objects for matching conditional rules
+1204	 */
+1205	export async function getManagedAndUserConditionalRules(
+1206	  targetPath: string,
+1207	  processedPaths: Set<string>,
+1208	): Promise<MemoryFileInfo[]> {
+1209	  const result: MemoryFileInfo[] = []
+1210	
+1211	  // Process Managed conditional .claude/rules/*.md files
+1212	  const managedClaudeRulesDir = getManagedClaudeRulesDir()
+1213	  result.push(
+1214	    ...(await processConditionedMdRules(
+1215	      targetPath,
+1216	      managedClaudeRulesDir,
+1217	      'Managed',
+1218	      processedPaths,
+1219	      false,
+1220	    )),
+1221	  )
+1222	
+1223	  if (isSettingSourceEnabled('userSettings')) {
+1224	    // Process User conditional .claude/rules/*.md files
+1225	    const userClaudeRulesDir = getUserClaudeRulesDir()
+1226	    result.push(
+1227	      ...(await processConditionedMdRules(
+1228	        targetPath,
+1229	        userClaudeRulesDir,
+1230	        'User',
+1231	        processedPaths,
+1232	        true,
+1233	      )),
+1234	    )
+1235	  }
+1236	
+1237	  return result
+1238	}
+1239	
+1240	/**
+1241	 * Gets memory files for a single nested directory (between CWD and target).
+1242	 * Loads CLAUDE.md, unconditional rules, and conditional rules for that directory.
+1243	 *
+1244	 * @param dir The directory to process
+1245	 * @param targetPath The target file path (for conditional rule matching)
+1246	 * @param processedPaths Set of already processed file paths (will be mutated)
+1247	 * @returns Array of MemoryFileInfo objects
+1248	 */
+1249	export async function getMemoryFilesForNestedDirectory(
+1250	  dir: string,
+1251	  targetPath: string,
+1252	  processedPaths: Set<string>,
+1253	): P
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/attachments.ts", "offset": 1660, "limit": 80}
+
+[도구결과] 1660	  // Build list of directories from original CWD to targetPath's directory
+1661	  const targetDir = dirname(resolve(targetPath))
+1662	  const nestedDirs: string[] = []
+1663	  let currentDir = targetDir
+1664	
+1665	  // Walk up from target directory to original CWD
+1666	  while (currentDir !== originalCwd && currentDir !== parse(currentDir).root) {
+1667	    if (currentDir.startsWith(originalCwd)) {
+1668	      nestedDirs.push(currentDir)
+1669	    }
+1670	    currentDir = dirname(currentDir)
+1671	  }
+1672	
+1673	  // Reverse to get order from CWD down to target
+1674	  nestedDirs.reverse()
+1675	
+1676	  // Build list of directories from root to CWD (for conditional rules only)
+1677	  const cwdLevelDirs: string[] = []
+1678	  currentDir = originalCwd
+1679	
+1680	  while (currentDir !== parse(currentDir).root) {
+1681	    cwdLevelDirs.push(currentDir)
+1682	    currentDir = dirname(currentDir)
+1683	  }
+1684	
+1685	  // Reverse to get order from root to CWD
+1686	  cwdLevelDirs.reverse()
+1687	
+1688	  return { nestedDirs, cwdLevelDirs }
+1689	}
+1690	
+1691	/**
+1692	 * Converts memory files to attachments, filtering out already-loaded files.
+1693	 *
+1694	 * @param memoryFiles The memory files to convert
+1695	 * @param toolUseContext The tool use context (for tracking loaded files)
+1696	 * @returns Array of nested memory attachments
+1697	 */
+1698	function isInstructionsMemoryType(
+1699	  type: MemoryFileInfo['type'],
+1700	): type is InstructionsMemoryType {
+1701	  return (
+1702	    type === 'User' ||
+1703	    type === 'Project' ||
+1704	    type === 'Local' ||
+1705	    type === 'Managed'
+1706	  )
+1707	}
+1708	
+1709	/** Exported for testing — regression guard for LRU-eviction re-injection. */
+1710	export function memoryFilesToAttachments(
+1711	  memoryFiles: MemoryFileInfo[],
+1712	  toolUseContext: ToolUseContext,
+1713	  triggerFilePath?: string,
+1714	): Attachment[] {
+1715	  const attachments: Attachment[] = []
+1716	  const shouldFireHook = hasInstructionsLoadedHook()
+1717	
+1718	  for
+
+[도구호출 Bash] {"command": "grep -rn \"nestedMemoryAttachmentTriggers\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" --include=\"*.tsx\" | head -15; echo \"---globs frontmatter 파싱---\"; grep -n \"globs\" /Users/seobi/jinsup_space/CC/src/utils/claudemd.ts | head -15", "description": "nested memory 트리거 등록 지점과 globs 파싱 위치 검색"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/Tool.ts:215:  nestedMemoryAttachmentTriggers?: Set<string>
+/Users/seobi/jinsup_space/CC/src/QueryEngine.ts:370:      nestedMemoryAttachmentTriggers: new Set<string>(),
+/Users/seobi/jinsup_space/CC/src/QueryEngine.ts:518:      nestedMemoryAttachmentTriggers: new Set<string>(),
+/Users/seobi/jinsup_space/CC/src/tools/FileReadTool/FileReadTool.ts:848:    context.nestedMemoryAttachmentTriggers?.add(fullFilePath)
+/Users/seobi/jinsup_space/CC/src/tools/FileReadTool/FileReadTool.ts:870:    context.nestedMemoryAttachmentTriggers?.add(fullFilePath)
+/Users/seobi/jinsup_space/CC/src/tools/FileReadTool/FileReadTool.ts:1038:  context.nestedMemoryAttachmentTriggers?.add(fullFilePath)
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:818:  // This ensures files are added to nestedMemoryAttachmentTriggers before nested_memory processes them
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:823:  // nestedMemoryAttachmentTriggers is populated before getNestedMemoryAttachments runs
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2165: * Uses nestedMemoryAttachmentTriggers field from ToolUseContext
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2173:    !toolUseContext.nestedMemoryAttachmentTriggers ||
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2174:    toolUseContext.nestedMemoryAttachmentTriggers.size === 0
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2182:  for (const filePath of toolUseContext.nestedMemoryAttachmentTriggers) {
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2191:  toolUseContext.nestedMemoryAttachmentTriggers.clear()
+/Users/seobi/jinsup_space/CC/src/utils/forkedAgent.ts:314: * - Fresh collections: nestedMemoryAttachmentTriggers, toolDecisions
+/Users/seobi/jinsup_space/CC/src/utils/forkedAgent.ts:382:    nestedMemoryAttachmentTriggers: new Set<string>(),
+---globs frontmatter 파싱---
+234:  globs?: string[] // Glob patterns for file paths this rule applies to
+252: * @returns Object with cont
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/claudemd.ts", "offset": 250, "limit": 55}
+
+[도구결과] 250	 * Parses raw content to extract both content and glob patterns from frontmatter
+251	 * @param rawContent Raw file content with frontmatter
+252	 * @returns Object with content and globs (undefined if no paths or match-all pattern)
+253	 */
+254	function parseFrontmatterPaths(rawContent: string): {
+255	  content: string
+256	  paths?: string[]
+257	} {
+258	  const { frontmatter, content } = parseFrontmatter(rawContent)
+259	
+260	  if (!frontmatter.paths) {
+261	    return { content }
+262	  }
+263	
+264	  const patterns = splitPathInFrontmatter(frontmatter.paths)
+265	    .map(pattern => {
+266	      // Remove /** suffix - ignore library treats 'path' as matching both
+267	      // the path itself and everything inside it
+268	      return pattern.endsWith('/**') ? pattern.slice(0, -3) : pattern
+269	    })
+270	    .filter((p: string) => p.length > 0)
+271	
+272	  // If all patterns are ** (match-all), treat as no globs (undefined)
+273	  // This means the file applies to all paths
+274	  if (patterns.length === 0 || patterns.every((p: string) => p === '**')) {
+275	    return { content }
+276	  }
+277	
+278	  return { content, paths: patterns }
+279	}
+280	
+281	/**
+282	 * Strip block-level HTML comments (<!-- ... -->) from markdown content.
+283	 *
+284	 * Uses the marked lexer to identify comments at the block level only, so
+285	 * comments inside inline code spans and fenced code blocks are preserved.
+286	 * Inline HTML comments inside a paragraph are also left intact; the intended
+287	 * use case is authorial notes that occupy their own lines.
+288	 *
+289	 * Unclosed comments (`<!--` with no matching `-->`) are left in place so a
+290	 * typo doesn't silently swallow the rest of the file.
+291	 */
+292	export function stripHtmlComments(content: string): {
+293	  content: string
+294	  stripped: boolean
+295	} {
+296	  if (!content.includes('<!--')) {
+297	    return { content, stripped: false }
+298	  }
+299	  // gfm:false is fine here — html-block detection is a CommonMark rule.
+300	  return st
+
+[ASSISTANT] 확인했습니다. 핵심은 **rule 파일의 frontmatter `paths:` 글롭 하나로 세팅**되고, 런타임에는 **"도구가 파일을 건드린 경로"가 트리거**가 되어 매칭되는 rule만 어태치먼트로 끌려 들어오는 구조입니다.
+
+## 세팅 방법 (사용자 쪽)
+
+`.claude/rules/*.md` 파일에 YAML frontmatter로 적용 경로를 선언합니다:
+
+```markdown
+---
+paths: src/api/**
+---
+API 코드 작업 시 지켜야 할 규칙...
+```
+
+이 `paths` 유무가 rule의 운명을 가릅니다 (`src/utils/claudemd.ts:254-279`, `:773`):
+
+| frontmatter | 분류 | 로딩 시점 |
+|---|---|---|
+| `paths` 없음 (또는 `**` 전체 매칭) | **무조건부 rule** | 세션 시작 시 CLAUDE.md와 함께 병합 → 0번 메시지에 포함 |
+| `paths: <글롭>` 있음 | **조건부 rule** | 시작 시엔 안 실림 — **매칭되는 파일을 건드릴 때** 지연 주입 |
+
+스코프는 3곳에서 스캔합니다: Managed, User(`~/.claude/rules/`), Project(각 디렉토리의 `.claude/rules/`) — 하위 디렉토리 재귀 포함 (`claudemd.ts:697-778`).
+
+## 런타임 동작 (지연 주입 파이프라인)
+
+1. **트리거 등록**: Read 도구가 파일을 읽으면 그 경로를 `context.nestedMemoryAttachmentTriggers` Set에 넣습니다 (`FileReadTool.ts:848,870,1038` — Set 자체는 `QueryEngine.ts:370,518`에서 생성).
+
+2. **수집**: 다음 ReAct 사이클의 어태치먼트 수집 때 `getNestedMemoryAttachments`가 트리거 Set을 순회하고 비웁니다 (`attachments.ts:872, 2182, 2191`). 도구 실행 → 트리거 적재 → 다음 전처리에서 수거, 순서가 보장되도록 배치돼 있습니다 (`attachments.ts:818` 주석).
+
+3. **매칭**: 트리거된 경로마다 두 갈래로 rule을 찾습니다 —
+   - Managed/User 조건부 rule: `getManagedAndUserConditionalRules(targetPath, ...)` (`claudemd.ts:1205`)
+   - CWD→대상 파일 사이의 중첩 디렉토리들: 각 디렉토리의 `CLAUDE.md` + `.claude/rules/` (`getMemoryFilesForNestedDirectory`, `claudemd.ts:1249`)
+   
+   글롭 매칭은 `ignore` 라이브러리, 즉 **gitignore 문법**으로 상대경로를 판정합니다 (`claudemd.ts:1369-1395`).
+
+4. **주입**: 매칭된 rule은 `nested_memory` 어태치먼트가 되어 `"Contents of <경로>:\n\n<내용>"` 형태의 system-reminder 유저 메시지로 삽입됩니다 (`messages.ts:3700-3707`) — skill_listing과 같은 어태치먼트 트랙이에요.
+
+5. **중복 방지**: 한 번 주입된 rule은 `loadedNestedMemoryPaths`(축출 없는 Set)로 세션 내 재주입을 막습니다. `readFileState`만 쓰면 100개 LRU라 바쁜 세션에서 밀려나 같은 rule이 반복 주입되는 버그가 있어서 별도 Set을 둔 것까지 주석에 남아 있습니다 (`attachments.ts:1718-1732`).
+
+정리하면: **선언은 정적(frontmatter 글롭), 발동은 동적(파일 접근 이벤트)**입니다. "필요한 상황"의 정의가 곧 "그 글롭에 매칭되는 파일을 도구가 실제로 건드린 순간"이고, 그래서 안 쓰는 영역의 rule은 컨텍스트를 한 바이트도 안 먹다가 해당 코드를 만지는 순간에만 끌려 들어옵니다.
+
+[USER] 음..???? 이해가 안되네
+
+[ASSISTANT] 제가 한 번에 너무 많이 쏟아냈네요. 구체적인 시나리오 하나로 다시 설명해볼게요.
+
+## 상황 설정
+
+이런 rule 파일을 하나 만들어뒀다고 합시다:
+
+```markdown
+# .claude/rules/api-rule.md
+---
+paths: src/api/**
+---
+API 코드는 반드시 zod로 입력 검증할 것
+```
+
+## 세션에서 실제로 벌어지는 일
+
+```
+[세션 시작]
+  CLAUDE.md      → 바로 로드됨 (0번 메시지)
+  api-rule.md    → 로드 안 됨. 그냥 대기.   ← paths가 있어서
+
+[유저] "README 오타 좀 고쳐줘"
+  클로드가 README.md 를 Read
+  → README.md 는 src/api/** 에 안 맞음 → 아무 일 없음
+  → api-rule.md 는 여전히 컨텍스트에 없음 (토큰 0)
+
+[유저] "유저 조회 API 수정해줘"
+  클로드가 src/api/user.ts 를 Read
+  → 하네스가 "src/api/user.ts 만졌네?" 하고 기록해둠
+  → 다음 모델 호출 직전에 검사: "이 경로에 맞는 rule 있나?"
+  → src/api/** 매칭! → 이 메시지가 대화에 끼어듬:
+
+     
+
+  → 이제부터 모델이 이 규칙을 알고 작업함
+
+[이후]
+  src/api/ 파일을 또 읽어도 재주입 안 함 (이미 대화에 있으니까)
+```
+
+## 요점 세 개
+
+1. **세팅은 frontmatter의 `paths:` 한 줄이 전부**입니다. 그게 있으면 "조건부", 없으면 CLAUDE.md처럼 처음부터 로드.
+2. **"필요한 상황"의 판정 기준 = 클로드가 도구로 그 패턴에 맞는 파일을 실제로 읽었는가**입니다. 유저 말의 의미를 AI가 분석해서 가져오는 게 아니라, 파일 접근이라는 기계적인 이벤트로 발동합니다.
+3. 발동하면 rule 내용이 **대화 중간에 유저 메시지(system-reminder)로 끼어드는** 것뿐이에요. 특별한 채널이 있는 게 아닙니다.
+
+이러면 rule을 100개 만들어놔도 평소엔 토큰을 하나도 안 먹고, 해당 영역을 건드리는 세션에서만 그 rule이 올라옵니다. 어떤 부분이 걸리셨던 건지 말씀해주시면 거기만 더 파볼게요.
+
+[USER] Read툴이 읽으면 마치 훅마냥 잡아서 실행해서 어태치먼트로 넣는거야?
+
+[ASSISTANT] 거의 맞는데, "훅처럼 잡아서 바로 실행"은 아니고 **2단계로 나뉜 우편함 방식**입니다. 이미 확인한 소스 기준으로 정확히 말하면:
+
+## 1단계 — Read는 그냥 "쪽지만 남김"
+
+Read 도구 코드 안에 직접 이 한 줄이 박혀 있습니다 (`FileReadTool.ts:848`):
+
+```ts
+context.nestedMemoryAttachmentTriggers?.add(fullFilePath)
+```
+
+이벤트 리스너나 훅 등록 같은 게 아니라, Read가 자기 일(파일 읽기) 하는 김에 **컨텍스트에 있는 Set에 경로를 하나 추가**하는 게 전부입니다. 이 시점엔 rule 매칭도, 주입도 일어나지 않아요. 그리고 Read는 이 Set 처리를 기다리지 않고 그냥 끝납니다.
+
+## 2단계 — 다음 사이클 전처리가 우편함을 비움
+
+앞에서 봤던 ReAct 사이클 전처리(매 모델 호출 직전에 어차피 도는 어태치먼트 수집 단계) 안에 `nested_memory` 수집기가 원래 들어 있습니다 (`attachments.ts:872`). 얘가 자기 차례가 오면:
+
+```
+Set을 순회 (:2182) → 각 경로마다 글롭 매칭 → 매칭된 rule을 어태치먼트로 생성 → Set 비움 (:2191)
+```
+
+## 그림으로
+
+```
+[사이클 N]   모델: "Read src/api/user.ts 호출"
+             Read 실행 → 파일 내용 반환 + Set에 경로 add  ← 여기까지가 Read의 역할
+                                          │
+[사이클 N+1] 전처리(어태치먼트 수집) ──────┘
+             Set 열어봄 → "src/api/user.ts 있네" → rule 글롭 매칭
+             → nested_memory 어태치먼트 생성 → system-reminder 메시지로 삽입
+             모델 호출 (이때부터 rule이 보임)
+```
+
+훅과의 차이를 짚으면:
+
+- **즉시성 없음** — Read 시점에 발동하는 인터셉터가 아니라, 다음 전처리 때 **배치로** 처리됩니다. 그래서 한 배치에서 파일 10개를 병렬 Read해도 rule 매칭은 다음 전처리에서 한 번에 이뤄집니다.
+- **등록 메커니즘 없음** — 콜백/이벤트 시스템이 아니라 그냥 공유 Set 하나(`QueryEngine.ts:370`에서 생성)를 쓰는 생산자-소비자 구조입니다. Read가 생산자, 전처리가 소비자.
+- 참고로 CC의 진짜 훅 시스템(PreToolUse/PostToolUse)은 별도로 존재하는데, 이 rule 주입은 그 훅 시스템을 안 탑니다.
+
+그래서 정확한 한 줄 요약은: **"Read가 잡아서 넣는" 게 아니라 "Read는 표시만 하고, 매 사이클 도는 전처리가 표시된 걸 보고 넣는"** 구조입니다.
+
+[USER] ReAct 사이클 전처리가 도구결과 보낼떄 인건가
+
+[ASSISTANT] 맞는지 소스에서 그 지점을 직접 확인해보겠습니다.
+
+[도구호출 Bash] {"command": "grep -n \"getAttachment\\|collectAttachment\\|Attachment\" /Users/seobi/jinsup_space/CC/src/query.ts | head -20", "description": "query.ts에서 어태치먼트 수집 호출 지점 검색"}
+
+[도구결과] 32:  AttachmentMessage,
+60:  createAttachmentMessage,
+61:  filterDuplicateMemoryAttachments,
+62:  getAttachmentMessages,
+324:    // getAttachmentMessages 내부에서 실행되던 블로킹 assistant_turn 경로를 대체합니다
+326:    // 여전히 userInputAttachments에서 블로킹됩니다 — 이것은 숨길 수 있는
+547:    const toolResults: (UserMessage | AttachmentMessage)[] = []
+1498:        yield createAttachmentMessage({
+1547:    // getQueuedCommandAttachments의 INLINE_NOTIFICATION_MODES에서 제외.
+1569:    for await (const attachment of getAttachmentMessages(
+1592:      const memoryAttachments = filterDuplicateMemoryAttachments(
+1596:      for (const memAttachment of memoryAttachments) {
+1597:        const msg = createAttachmentMessage(memAttachment)
+1609:      const skillAttachments =
+1611:      for (const att of skillAttachments) {
+1612:        const msg = createAttachmentMessage(att)
+1634:    const fileChangeAttachmentCount = count(
+1642:      fileChangeAttachmentCount,
+1694:      yield createAttachmentMessage({
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/query.ts", "offset": 1540, "limit": 75}
+
+[도구결과] 1540	    // (MONITOR_TOOL이 켜져 있을 때)이며 Sleep 없이 드레인. 다른 작업 유형
+1541	    // (agent/workflow/framework)은 여전히 'later' 기본값 — Sleep 플러시가
+1542	    // 이를 처리. 모든 작업 유형이 'next'로 이동하면 이 브랜치 제거 가능.
+1543	    //
+1544	    // 슬래시 커맨드는 턴 중간 드레인에서 제외 — 턴 종료 후
+1545	    // processSlashCommand (useQueueProcessor를 통해)를 거쳐야 하며 모델에
+1546	    // 텍스트로 전송되면 안됨. Bash 모드 커맨드는 이미
+1547	    // getQueuedCommandAttachments의 INLINE_NOTIFICATION_MODES에서 제외.
+1548	    //
+1549	    // 에이전트 스코핑: 큐는 코디네이터와 모든 인프로세스 서브에이전트가
+1550	    // 공유하는 프로세스 전역 싱글톤. 각 루프는 자신에게 지정된 것만 드레인 —
+1551	    // 메인 스레드는 agentId===undefined를 드레인, 서브에이전트는
+1552	    // 자신의 agentId를 드레인. 사용자 프롬프트 (mode:'prompt')는 여전히 메인만;
+1553	    // 서브에이전트는 프롬프트 스트림을 보지 않음.
+1554	    // eslint-disable-next-line custom-rules/require-tool-match-name -- ToolUseBlock.name has no aliases
+1555	    const sleepRan = toolUseBlocks.some(b => b.name === SLEEP_TOOL_NAME)
+1556	    const isMainThread =
+1557	      querySource.startsWith('repl_main_thread') || querySource === 'sdk'
+1558	    const currentAgentId = toolUseContext.agentId
+1559	    const queuedCommandsSnapshot = getCommandsByMaxPriority(
+1560	      sleepRan ? 'later' : 'next',
+1561	    ).filter(cmd => {
+1562	      if (isSlashCommand(cmd)) return false
+1563	      if (isMainThread) return cmd.agentId === undefined
+1564	      // 서브에이전트는 자신에게 주소가 지정된 task-notification만 드레인 —
+1565	      // 누군가 agentId를 찍더라도 사용자 프롬프트는 절대 안됨.
+1566	      return cmd.mode === 'task-notification' && cmd.agentId === currentAgentId
+1567	    })
+1568	
+1569	    for await (const attachment of getAttachmentMessages(
+1570	      null,
+1571	      updatedToolUseContext,
+1572	      null,
+1573	      queuedCommandsSnapshot,
+1574	      [...messagesForQuery, ...assistantMessages, ...toolResults],
+1575	      querySource,
+1576	    )) {
+1577	      yield attachment
+1578	      toolResults.push(attachment)
+1579	    }
+1580	
+1581	    // 메모리 프리페치 소비: 완료되었고 이전 반복에서 아직 소비되지 않은
+1582	    // 경우에만. 아직 완료되지 않았으면 건너뜀 (대기 없음) 다음 반복에서
+1583	    // 재시도 — 프리페치는 턴이 끝나기 전에 루
+
+[도구호출 Bash] {"command": "grep -n \"전처리\\|1569\\|getAttachmentMessages\" /Users/seobi/jinsup_space/CC/md_group/cc-context-preprocessing-timing.md | head -25; echo ---; wc -l /Users/seobi/jinsup_space/CC/md_group/cc-context-preprocessing-timing.md", "description": "전처리 타이밍 문서에서 정의와 어태치먼트 수집 위치 확인"}
+
+[도구결과] 1:# 컨텍스트 전처리 타이밍 & 3계층 패턴 — Claude Code
+5:**전처리는 사이클마다, 모델 부르기 직전 1번**
+7:Claude Code의 흐름은 **3계층** — 대화 턴(상위) ⊃ ReAct 사이클(중위) ⊃ 10단계 파이프라인(하위). 컨텍스트 전처리는 **중위 사이클마다 맨 위에서 1번** 돌며, **직전 사이클이 뱉은 도구 결과 묶음**을 모델에 보여주기 직전 정리한다.
+14:  - **중위 · ReAct 사이클 ×N** (= queryLoop 1바퀴): `전처리 → 모델(Reason) → 도구실행(Act) → (반복 ↺)`
+19:## 중위 = [전처리 → 모델 → 도구실행] 반복
+21:한 대화 턴 안에서 이 사이클이 여러 번 돈다. 전처리는 매 사이클 맨 위, 모델 호출 직전.
+25:| 사이클 1 | 전처리 → 모델 → Bash·Bash·Read (병렬) | 전처리는 거의 no-op (아직 도구 결과 없음) |
+26:| 사이클 2 | 전처리 ★ → 모델 → Edit | 전처리가 사이클 1의 결과 묶음을 정리 |
+27:| 사이클 3 | 전처리 → 모델 → 도구 없음 = 최종답 | |
+29:→ 전처리는 **사이클 개수만큼** 돈다 (사이클 N개 = 전처리 N번). "전체에 1번"이 아니라 **"사이클마다 1번"**.
+31:- source: `query.ts:364-463` (전처리 5단, 루프 top) · `query.ts:654` (callModel)
+33:## 전처리 타이밍 규칙
+42:## 전처리는 "직전 사이클 결과 묶음"을 정리
+44:사이클 1이 병렬 도구를 돌리면 결과들이 한 묶음(tool_result 메시지)이 되고 — 사이클 2 맨 위 전처리가 그걸 모델에 보여주기 직전 다듬는다.
+47:- **사이클 N+1 (맨 위)**: 전처리 ← 그 묶음(fresh)을 정리 → 모델이 (다듬어진) 결과를 봄
+51:## 전처리 5단계 — 보는 범위가 다르다
+71:- 전처리 = 사이클마다 1번, 맨 위(모델 호출 직전), 직전 사이클 결과 묶음 정리 · 1턴 전용은 applyToolResultBudget 1개
+---
+      71 /Users/seobi/jinsup_space/CC/md_group/cc-context-preprocessing-timing.md
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/md_group/cc-context-preprocessing-timing.md", "offset": 33, "limit": 39}
+
+[도구결과] 33	## 전처리 타이밍 규칙
+34	
+35	| 질문 | 답 |
+36	|---|---|
+37	| 사이클당 몇 번? | ✓ 딱 1번 (맨 위, 모델 호출 직전) |
+38	| 한 사이클 도구가 여러 개면 그 사이에 또? | ✗ 안 함 — 도구 다 끝날 때까지 재호출 X |
+39	| 언제 또 도나? | ✓ 다음 사이클 맨 위 (모델 또 부르기 직전) |
+40	| 전체 작업에 1번? | ✗ 아니오 — 사이클마다 1번씩 (N개면 N번) |
+41	
+42	## 전처리는 "직전 사이클 결과 묶음"을 정리
+43	
+44	사이클 1이 병렬 도구를 돌리면 결과들이 한 묶음(tool_result 메시지)이 되고 — 사이클 2 맨 위 전처리가 그걸 모델에 보여주기 직전 다듬는다.
+45	
+46	- **사이클 N**: 모델 → [Bash, Bash, Read] 병렬 → 결과 3개 = 한 묶음 (tool_result)
+47	- **사이클 N+1 (맨 위)**: 전처리 ← 그 묶음(fresh)을 정리 → 모델이 (다듬어진) 결과를 봄
+48	
+49	- source: `toolResultStorage.ts:739-814` (fresh 메시지 = 직전 사이클 묶음만 검사, 과거는 frozen)
+50	
+51	## 전처리 5단계 — 보는 범위가 다르다
+52	
+53	"직전 1턴 묶음"만 보는 건 **1개뿐**(applyToolResultBudget). 나머지는 누적/전체 대화를 본다.
+54	
+55	| 단계 | 이름 | 하는 일 | 범위 | 소스 확인 |
+56	|---|---|---|---|---|
+57	| ① | applyToolResultBudget | 직전 사이클 묶음(메시지 1개)이 200K자 초과면 큰 것 디스크로 | 직전 1턴 | ✓ src |
+58	| ② | snipCompact | 토큰 확보용 trimming (autocompact 임계에 반영) | 누적-ish | ⚠ 스냅샷에 파일 없음 |
+59	| ③ | microcompact | 오래된 도구결과(최근 N개 제외) 내용 비움 — 나이 기준 | 전체 대화 | ✓ |
+60	| ④ | contextCollapse | read/search 그룹 접기 | 누적-ish | ⚠ 스냅샷에 파일 없음 |
+61	| ⑤ | autocompact | 토큰 임계 초과 시 대화 전체를 인수인계 문서로 교체 | 전체 대화 | ✓ |
+62	
+63	> **정직 표기:** ② snipCompact · ④ contextCollapse는 이 src 스냅샷에 파일이 없어 내부를 **소스로 확인 못 했다.** "누적-ish"는 query.ts 호출 맥락(snipTokensFreed가 autocompact 임계에 반영 등)에서 추정한 것. ①③⑤만 코드로 확인됨.
+64	
+65	- source: `query.ts:364-463` (5단 호출 순서) · `toolResultStorage.ts` (①) · `microCompact.ts` (③) · `autoCompact.ts` (⑤)
+66	
+67	## 요약
+68	
+69	- claude-code · context preprocessing timing & pattern hierarchy
+70	- 3계층: 대화턴(상위) ⊃ ReAct 사이클(중위) ⊃ 10단계 파이프라인(하위)
+71	- 전처리 = 사이클마다 1번, 맨 위(모델 호출 직전), 직전 사이클 결과 묶음 정리 · 1턴 전용은 applyToolResultBudget 1개
+
+[ASSISTANT] 네, 두 질문 다 답이 나왔습니다. 소스를 보니 **제가 앞에서 "다음 사이클 전처리가 우편함을 비운다"고 한 표현은 부정확했어요** — 정확히 교정해서 답합니다.
+
+## Q1. "도구결과 보낼 때인가?" → 네, 정확히 그 타이밍
+
+`query.ts:1569-1579`가 결정적입니다. 위치가 **도구 실행이 끝난 직후, 같은 사이클의 꼬리**예요:
+
+```ts
+// 도구 실행 완료 → toolResults 배열에 tool_result 쌓인 상태에서
+for await (const attachment of getAttachmentMessages(...)) {
+  yield attachment
+  toolResults.push(attachment)   // ← 도구 결과와 같은 묶음에 합류
+}
+```
+
+어태치먼트(rule 주입 포함)가 **`toolResults` 배열에 같이 push**됩니다. 즉 도구 결과 묶음과 한 덩어리가 되어 다음 모델 호출에 함께 실려 갑니다. "도구결과 보낼 때 어태치먼트도 같이 보낸다"가 맞습니다.
+
+## Q2. "컨텍스트 전처리 구간과는 다른 거지?" → 네, 다른 구간입니다
+
+리서치 문서(`cc-context-preprocessing-timing.md`)가 말하는 "전처리"는 **압축 5단**(applyToolResultBudget → snipCompact → microcompact → contextCollapse → autocompact)이고, 위치는 `query.ts:364-463` — **다음 사이클 맨 위, 모델 호출 직전**입니다. 어태치먼트 수집(`:1569`)과는 코드 위치도 역할도 다릅니다:
+
+```
+사이클 N:   모델 → 도구 실행 → [어태치먼트 수집 :1569]   ← 사이클 꼬리, "내용 추가"
+                                    ↓ toolResults에 합류
+사이클 N+1: [전처리 5단 :364-463] → prependUserContext(:655) → 모델 호출
+             ↑ 사이클 머리, "내용 압축/정리"
+```
+
+| | 어태치먼트 수집 | 컨텍스트 전처리 (5단) |
+|---|---|---|
+| 위치 | 사이클 **꼬리** (도구 직후, `:1569`) | 다음 사이클 **머리** (모델 직전, `:364-463`) |
+| 방향 | 메시지를 **더한다** (rule, 파일변경 알림, 스킬 공지...) | 메시지를 **줄인다/다듬는다** (예산 초과 디스크 스필, 오래된 결과 비우기, 컴팩트) |
+| 대상 | 이번 사이클에서 생긴 이벤트 | 대화 전체 + 직전 묶음 |
+
+순서상 **수집이 먼저, 압축이 나중**이라서 전처리 5단은 방금 추가된 어태치먼트까지 포함한 상태를 보고 정리합니다.
+
+그래서 앞 설명을 교정하면: Read가 Set에 쪽지를 남기면 → **같은 사이클 꼬리의 어태치먼트 수집**이 그걸 비워서 도구 결과 묶음에 합류시키고 → 다음 사이클 머리의 전처리(압축)를 통과한 뒤 → 모델이 봅니다. 모델 입장에선 "다음 호출부터 rule이 보인다"는 결론은 동일하지만, 수집과 전처리는 별개 구간입니다.
+
+[USER] 프론트메타로 쓰는건 다그렇다고봐야돼? 스킬도 포함해서?
+
+[ASSISTANT] 좋은 질문입니다 — "frontmatter 선언 = 지연 로딩"이 공통 패턴인지, 스킬 쪽 소스를 확인해서 답하겠습니다.
+
+[도구호출 Bash] {"command": "grep -n \"frontmatter\\|description\" /Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts | head -20; echo \"---스킬 호출 시 본문 로드---\"; grep -n \"readFile\\|SKILL.md\\|getSkillContent\\|loadSkill\" /Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts | head -15", "description": "SkillTool의 frontmatter 파싱과 본문 로드 시점 확인"}
+
+[도구결과] 55:import { parseFrontmatter } from '../../utils/frontmatterParser.js'
+342:  description: async ({ skill }) => `Execute skill: ${skill}`,
+890:  'frontmatterKeys',
+893:  'description',
+1065:  // Strip YAML frontmatter (---\nname: x\n---) before prepending the header
+1067:  // content unchanged if no frontmatter is present.
+---스킬 호출 시 본문 로드---
+601:    // `_canonical_<slug>` before local command lookup — loads SKILL.md from
+958: * Load a remote canonical skill and inject its SKILL.md content into the
+1066:  // (matches loadSkillsDir.ts:333). parseFrontmatter returns the original
+1071:  // substitution (matches loadSkillsDir.ts) so the model can resolve relative
+1095:  // Direct injection — wrap SKILL.md content in a meta user message. Matches
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts", "offset": 1055, "limit": 65}
+
+[도구결과] 1055	        slug as AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+1056	    }),
+1057	  })
+1058	
+1059	  recordSkillUsage(commandName)
+1060	
+1061	  logForDebugging(
+1062	    `SkillTool loaded remote skill ${slug} (cacheHit=${cacheHit}, ${latencyMs}ms, ${content.length} chars)`,
+1063	  )
+1064	
+1065	  // Strip YAML frontmatter (---\nname: x\n---) before prepending the header
+1066	  // (matches loadSkillsDir.ts:333). parseFrontmatter returns the original
+1067	  // content unchanged if no frontmatter is present.
+1068	  const { content: bodyContent } = parseFrontmatter(content, skillPath)
+1069	
+1070	  // Inject base directory header + ${CLAUDE_SKILL_DIR}/${CLAUDE_SESSION_ID}
+1071	  // substitution (matches loadSkillsDir.ts) so the model can resolve relative
+1072	  // refs like ./schemas/foo.json against the cache dir.
+1073	  const skillDir = dirname(skillPath)
+1074	  const normalizedDir =
+1075	    process.platform === 'win32' ? skillDir.replace(/\\/g, '/') : skillDir
+1076	  let finalContent = `Base directory for this skill: ${normalizedDir}\n\n${bodyContent}`
+1077	  finalContent = finalContent.replace(/\$\{CLAUDE_SKILL_DIR\}/g, normalizedDir)
+1078	  finalContent = finalContent.replace(
+1079	    /\$\{CLAUDE_SESSION_ID\}/g,
+1080	    getSessionId(),
+1081	  )
+1082	
+1083	  // Register with compaction-preservation state. Use the cached file path so
+1084	  // post-compact restoration knows where the content came from. Must use
+1085	  // finalContent (not raw content) so the base directory header and
+1086	  // ${CLAUDE_SKILL_DIR} substitutions survive compaction — matches how local
+1087	  // skills store their already-transformed content via processSlashCommand.
+1088	  addInvokedSkill(
+1089	    commandName,
+1090	    skillPath,
+1091	    finalContent,
+1092	    getAgentContext()?.agentId ?? null,
+1093	  )
+1094	
+1095	  // Direct injection — wrap SKILL.md content in a meta user message. Matches
+1096	  // the shape of what processPromptSlashCommand produces for simple skil
+
+[도구호출 Bash] {"command": "grep -n \"frontmatter\\|systemPrompt\\|description\" /Users/seobi/jinsup_space/CC/src/tools/AgentTool/loadAgentsDir.ts | head -12; echo \"---커맨드 로더---\"; grep -rn \"frontmatter\" /Users/seobi/jinsup_space/CC/src/services/customCommands.ts /Users/seobi/jinsup_space/CC/src/utils/loadSkillsDir.ts 2>/dev/null | head -8", "description": "에이전트/커맨드 정의의 frontmatter 파싱 확인"}
+
+[도구결과] 23:import { parsePositiveIntFromFrontmatter } from '../../utils/frontmatterParser.js'
+75:    description: z.string().min(1, 'Description cannot be empty'),
+111:  skills?: string[] // Skill names to preload (parsed from comma-separated frontmatter)
+135:// Built-in agents - dynamic prompts only, no static systemPrompt field
+312:        .map(({ filePath, baseDir, frontmatter, content, source }) => {
+316:            frontmatter,
+323:            // that look like agent attempts (have a 'name' field in frontmatter).
+324:            if (!frontmatter['name']) {
+327:            const errorMsg = getParseError(frontmatter)
+403:function getParseError(frontmatter: Record<string, unknown>): string {
+404:  const agentType = frontmatter['name']
+405:  const description = frontmatter['description']
+---커맨드 로더---
+
+[ASSISTANT] 네, **"메타는 미리, 본문은 필요할 때"라는 2단 분리 구조 자체는 전부 공통**입니다. 스킬도 포함해서요. 방금 소스로 확인한 것까지 합치면 frontmatter를 쓰는 4종이 모두 같은 설계입니다. 다만 **"필요할 때"를 판정하는 주체가 3갈래로 다릅니다** — 이게 핵심 차이예요.
+
+| | frontmatter의 역할 | 처음부터 실리는 것 | 본문 로드 시점 | 발동 주체 |
+|---|---|---|---|---|
+| **rules** | `paths:` 글롭 = 발동 **조건** | 없음 (0토큰) | 매칭 파일을 도구가 건드린 사이클 꼬리 | **하네스** — 기계적 글롭 매칭 |
+| **skills** | `name`/`description` = 모델용 **카탈로그** | skill_listing에 이름+설명만 | 모델이 Skill 도구를 호출한 순간 | **모델** — 설명 읽고 의미 판단 |
+| **agents** | name/description/tools/model | Agent 도구의 타입 목록에 설명만 | 스폰 시 body가 그 서브에이전트의 시스템 프롬프트가 됨 | **모델** |
+| **slash commands** | description, allowed-tools 등 | 커맨드 목록 | 유저가 `/명령` 입력 시 | **유저** |
+
+## 스킬 쪽 소스 근거
+
+`SkillTool.ts:1065-1107`에서 확인됩니다. 스킬 호출 시:
+
+```ts
+const { content: bodyContent } = parseFrontmatter(content, skillPath)  // frontmatter 떼고
+...
+return {
+  data: { success: true, ... },
+  newMessages: [createUserMessage({ content: finalContent, isMeta: true })]  // 본문을 유저 메시지로 주입
+}
+```
+
+재미있는 건 주입 채널입니다 — 스킬 본문이 tool_result로 오는 게 아니라, **`newMessages`로 별도의 meta 유저 메시지를 대화에 끼워 넣습니다**. rule의 nested_memory 어태치먼트와 결국 같은 모양(isMeta user 메시지)으로 도착해요. 채널은 달라도 종착지는 같은 겁니다.
+
+에이전트도 동일 구조입니다 (`loadAgentsDir.ts:312-324`): frontmatter(`name`, `description`...)만 파싱해서 Agent 도구 목록에 올리고, body는 스폰될 때 시스템 프롬프트로 씁니다.
+
+## 정리하면
+
+설계 철학은 하나입니다: **"값싼 색인은 항상 보이게, 비싼 본문은 방아쇠가 당겨질 때만."** 차이는 방아쇠 종류뿐이에요:
+
+- rules → **문법적 방아쇠** (글롭 매칭, 모델 판단 개입 없음)
+- skills/agents → **의미적 방아쇠** (모델이 description을 보고 "지금 필요하다" 판단)
+- commands → **명시적 방아쇠** (유저 타이핑)
+
+한 가지 주의: "frontmatter 쓰면 무조건 지연"은 아닙니다. rules에서 `paths` 없는 파일은 frontmatter가 있어도 세션 시작 때 CLAUDE.md와 함께 즉시 로드되고(무조건부 rule), 스킬의 frontmatter는 조건이 아니라 카탈로그 메타데이터입니다. 정확한 일반화는 "frontmatter = 로딩 정책 선언부, 본문 = 지연 페이로드"까지입니다.
+
+[USER] 위 내용들도 /visual-explainer 로 작성해줘
+
+[도구호출 Skill] {"skill": "visual-explainer", "args": "0번 유저 메시지(claudeMd)·skill_listing·rules 지연주입·frontmatter 4종 비교 — 이번 대화에서 소스로 검증한 컨텍스트 주입 메커니즘 시각화"}
+
+[도구결과] Launching skill: visual-explainer
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>컨텍스트 주입 4트랙 — Claude Code 소스 검증</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Black+Han+Sans&family=Gothic+A1:
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html", "old_string": "  /* ---------- S5 frontmatter 4종 ---------- */\n  .fm-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}\n  .fm-card{\n    background:var(--panel);border:1px solid var(--line);border-radius:13px;\n    padding:18px 16px;border-top:4px solid var(--line);\n  }\n  .fm-card.c-g{border-top-color:var(--green)}\n  .fm-card.c-v{border-top-color:var(--violet)}\n  .fm-card.c-c{border-top-c
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html", "old_string": "    .flow{grid-template-columns:1fr 1fr}\n    .step:not(:last-child)::after{display:none}\n    .fm-grid{grid-template-columns:1fr 1fr}\n  }\n  @media (max-width:640px){\n    .vs-grid{grid-template-columns:1fr}\n    .vs-badge{margin:14px auto}\n    .band{flex-direction:column}\n    .flow{grid-template-columns:1fr}\n    .fm-grid{grid-template-columns:1fr}", "new_string": "    .flow{grid-templat
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] Now replacing the section 05 body:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html", "old_string": "  <div class=\"sec-head\"><span class=\"sec-num\">05</span><h2>frontmatter 4종 = 방아쇠 3종</h2></div>\n  <p class=\"caption\">\"메타는 미리, 본문은 필요할 때\" 구조는 4종 모두 동일.\n  다른 건 <b>누가 방아쇠를 당기느냐</b> — 하네스(문법적) / 모델(의미적) / 유저(명시적).</p>\n\n  <div class=\"fm-grid\">\n    <div class=\"fm-card c-g\">\n      <div class=\"fm-name\">rules</div>\n      <div class=\"fm-path\">.claude/rules/*.md</div>\n      <div cl
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open /Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html", "description": "완성된 시각설명 HTML을 브라우저로 열기"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 완성했습니다 → `컨텍스트-주입-4트랙-시각설명.html` (레포 루트, 브라우저로 열어뒀습니다)
+
+## 구성 요약
+
+| 섹션 | 내용 | 시각 형태 |
+|---|---|---|
+| Hero | "컨텍스트 주입 4트랙" + 트랙별 색상 범례 | 앰버/시안/그린/바이올렛 4색 칩 |
+| 01 종착지는 하나 | messages 배열에 4트랙이 어디로·언제 꽂히는지 | 색상 코딩된 배열 스택 (system 파라미터는 배열 밖으로 분리 표기) |
+| 02 유령 vs 정주민 | claudeMd(매 호출 재생성) vs skill_listing(1회 삽입 잔류) | 좌우 VS 패널 + 호출별 미니 스택 + 특성 표 |
+| 03 rules 우편함 파이프라인 | 선언→대기→쪽지→수집·매칭→주입 5단계 | rule 파일 목업 + 5스텝 플로우 |
+| 04 수집 꼬리 vs 전처리 머리 | ➕더하기(사이클 꼬리) / ➖줄이기(다음 머리) 구간 구분 | 사이클 밴드 + 압축 5단 칩 |
+| **05 frontmatter 4종** ★ | 요청하신 표를 3단으로 확장 | 아래 상세 |
+
+## 05번 — 특별히 공들인 부분
+
+말씀하신 표를 그대로 옮기지 않고 **3개 레이어로 분해**했습니다:
+
+1. **2단 로딩 흐름도** — 4종 각각을 `[1단: 항상 실리는 색인] ──방아쇠──▸ [2단: 본문의 도착지]` 한 줄 흐름으로. rules의 1단은 점선 빈 박스("0토큰")로 그려서 "아무것도 안 실림"이 시각적으로 보이게 했습니다.
+2. **정밀 비교 표** — 주신 표 그대로의 5칼럼을 타입별 색상 좌측 보더 + 모노 폰트 코드 표기로 스타일링 (모바일에선 가로 스크롤).
+3. **방아쇠 스펙트럼** — "자동 ◀────▶ 수동" 축 위에 문법적(rules) / 의미적(skills·agents) / 명시적(commands) 3존 배치. 표에선 안 보이던 "방아쇠 3종이 하나의 축 위에 있다"는 구조를 드러냅니다.
+
+각 섹션 하단에 이번 대화에서 검증한 출처(`src/utils/api.ts:449-474` 등)를 박았고, 미검증인 실서비스 `userEmail` 키는 footer에 "확인 못함"으로 정직 표기했습니다.
+
+수정 원하시면 말씀해주세요 — 예: 05를 맨 앞으로 올리기, 배치-단독 내용까지 한 페이지에 합치기, 라이트 테마 버전 등.
+
+[USER] This session is being continued from a previous conversation that ran out of context. The summary below covers the earlier portion of the conversation.
+
+Summary:
+1. Primary Request and Intent:
+   - **Session goal ("클코 전체파악")**: User asked to fully understand the CC workspace (`/Users/seobi/jinsup_space/CC`) — a research project reverse-engineering Claude Code internals. Delivered via Explore agent + summary report.
+   - **Deep-dive Q&A chain on batch scheduling**: User asked what "배치 병렬의 3조 요건" meant → asked to confirm partition behavior for [Read,Read,Grep,Edit,Write] → demanded source-code proof ("이건 소스코드 보고 증명해봐") → asked if mid-sequence Edit split was file-based → then requested an MD documenting the proof including my tests ("저거 너가 테스트해본거까지 md로 마들어주라") → 배치-단독-개념-소스증명.md created.
+   - **Context injection Q&A chain**: User asked whether the 0th user prompt contains CLAUDE.md + skill list → whether both enter the messages array → how conditional rules loading is set up → whether Read acts like a hook → whether the collection timing = when tool results are sent → whether it differs from context preprocessing → whether ALL frontmatter usage (including skills) follows the lazy pattern.
+   - **Final deliverable**: "위 내용들도 /visual-explainer 로 작성해줘" — create a visual HTML explainer of the context-injection findings. Mid-work, user pasted the frontmatter 4종 comparison table and said "특히 이거 잘작성해줘" — section 05 (frontmatter 4종 = 방아쇠 3종) must be especially well crafted.
+   - **Standing constraints**: Always respond in Korean. All claims MUST be source-verified via grep/Read (project CLAUDE.md: "주장은 반드시 소스 코드 기반으로 검증", "추측·과장 금지 — 확인 안 된 부분은 '소스에서 확인 못함'으로 표기"). Docs must use ~ neutral paths (memory: repo shared between seobi/goldenplanet machines; absolute paths cause pull conflicts). Don't hardcode user PC paths in HTML.
+
+2. Key Technical Concepts:
+   - **Batch partitioning**: `partitionToolCalls` reduce — safe tools merge only if consecutive AND previous batch safe; unsafe tools ALWAYS form solo batches ("단독" not "분리"); unsafe never merge with each other; no reordering; no file-overlap analysis. 3-color classification: 항상병렬 21+, 항상단독 4, 조건부 2 (Bash-family, input-based).
+   - **3조 요건 for parallelism**: model multi-tool_use emission × per-tool isConcurrencySafe declaration × harness partition/concurrent dispatch (limit `CLAUDE_CODE_MAX_TOOL_USE_CONCURRENCY` default 10). Batches execute serially; within safe batch concurrently.
+   - **0번 유저 메시지 (ghost message)**: `prependUserContext` regenerates `<system-reminder>` user message (isMeta:true) with claudeMd + currentDate at EVERY API call, index 0, not in history — cache-key prefix (with systemPrompt/systemContext).
+   - **skill_listing (resident message)**: separate attachment-pipeline message; delta announcements via `sentSkillNames`; suppressed on --resume; not re-injected post-compact (~4K tokens); only for agents with Skill tool; FILTERED_LISTING_MAX=30 fallback.
+   - **Conditional rules (.claude/rules/*.md)**: frontmatter `paths:` glob = trigger condition; no paths (or `**`) = unconditional (loads with CLAUDE.md at start). Lazy pipeline: Read tool adds path to `nestedMemoryAttachmentTriggers` Set (mailbox/producer-consumer, NOT hook system) → same-cycle-tail attachment collection drains Set → gitignore-style matching via `ignore` library → `nested_memory` attachment ("Contents of <path>: ...") → dedup via `loadedNestedMemoryPaths` non-evicting Set (vs 100-entry LRU readFileState).
+   - **Collection vs preprocessing (different 구간)**: attachment collection = cycle TAIL after tools (query.ts:1569, ➕ adds messages, joins toolResults); context preprocessing 5단 = next cycle HEAD before model (query.ts:364-463, ➖ compresses: applyToolResultBudget→snipCompact→microcompact→contextCollapse→autocompact). Collection first, so compression sees new attachments.
+   - **Frontmatter 2-stage pattern (4종 공통)**: "값싼 색인은 항상, 비싼 본문은 방아쇠 당길 때만" — rules (⚙️ 하네스/문법적 glob trigger), skills (🧠 모델/의미적, body injected via newMessages as meta user message, frontmatter stripped), agents (🧠 모델, body = subagent system prompt), slash commands (⌨️ 유저/명시적). Caveat: frontmatter ≠ always lazy (paths-less rules load immediately; skill frontmatter is catalog metadata not condition).
+
+3. Files and Code Sections:
+   - **`src/services/tools/toolOrchestration.ts`** (read fully, 189 lines) — partition proof core:
+     ```ts
+     // :95-115
+     return toolUseMessages.reduce((acc: Batch[], toolUse) => {
+       ...
+       if (isConcurrencySafe && acc[acc.length - 1]?.isConcurrencySafe) {
+         acc[acc.length - 1]!.blocks.push(toolUse)
+       } else {
+         acc.push({ isConcurrencySafe, blocks: [toolUse] })  // unsafe → always new solo batch
+       }
+       return acc
+     }, [])
+     ```
+     Also runTools (:26-81, batch-serial/within-batch-concurrent), getMaxToolUseConcurrency (:8-12).
+   - **`src/Tool.ts:750-760`** — `TOOL_DEFAULTS = { isConcurrencySafe: (_input?: unknown) => false }` ("assume not safe"); Edit/Write don't override (FileEditTool.ts:86, FileWriteTool.ts:94 use buildTool) → always solo regardless of input.
+   - **`src/tools/FileReadTool/FileReadTool.ts:373`, `src/tools/GrepTool/GrepTool.ts:183`** — `isConcurrencySafe() { return true }`.
+   - **`src/query.ts:820-824`** — `message.message.content.filter(content => content.type === 'tool_use')` → order = model emission order, no reordering; :1371 runTools call; :655 `prependUserContext(messagesForQuery, userContext)` per call; :1569-1579 in-loop `getAttachmentMessages` at cycle tail with `toolResults.push(attachment)`.
+   - **`src/utils/api.ts:449-474`** — `prependUserContext`: creates `<system-reminder>\nAs you answer the user's questions, you can use the following context:\n# key\nvalue...` user message (isMeta:true) prepended at index 0.
+   - **`src/context.ts:155-189`** — `getUserContext` returns `{...(claudeMd && { claudeMd }), currentDate}` only; userEmail NOT in this src snapshot ("소스에서 확인 못함").
+   - **`src/utils/attachments.ts`** — :875 `maybe('skill_listing', ...)`, :2661-2751 getSkillListingAttachments (sentSkillNames delta, suppressNextSkillListing, FILTERED_LISTING_MAX=30), :2182/:2191 trigger Set iterate/clear, :1718-1732 loadedNestedMemoryPaths dedup, :818 ordering comment.
+   - **`src/utils/messages.ts:3700-3707, 3728-3738`** — nested_memory rendering ("Contents of <path>:") and skill_listing rendering ("The following skills are available for use with the Skill tool:").
+   - **`src/utils/claudemd.ts`** — :254-279 parseFrontmatterPaths (`paths:` frontmatter, `**`→unconditional), :773 `files.filter(f => (conditionalRule ? f.globs : !f.globs))`, :1205 getManagedAndUserConditionalRules, :1249 getMemoryFilesForNestedDirectory, :1369-1395 `ignore().add(file.globs).ignores(relativePath)`.
+   - **`src/tools/SkillTool/SkillTool.ts:1065-1107`** — skill body load on invoke: `parseFrontmatter` strips frontmatter, returns `newMessages: [createUserMessage({ content: finalContent, isMeta: true })]` (not tool_result).
+   - **`src/tools/AgentTool/loadAgentsDir.ts:312-324`** — agent frontmatter parsing (name/description required).
+   - **`md_group/cc-context-preprocessing-timing.md`** (71 lines, read) — preprocessing 5단 definition, query.ts:364-463, "사이클마다 1번, 맨 위, 모델 호출 직전".
+   - **`배치-세계-전수도감.md`** (root, 244 lines) — existing doc; grep/read for 3색 분류, partition algorithm, sibling abort.
+   - **CREATED: `/Users/seobi/jinsup_space/CC/배치-단독-개념-소스증명.md`** — sister doc to 도감: §00 오해(분리) vs 실제(단독) 표, §01 파티션 원문, §02 도구별 선언표 + TOOL_DEFAULTS, §03 배치 간 직렬/내 병렬, §04 모델 emit 순서, §05 node 재현 시연 (스크립트+결과 두 케이스), §06 파일 겹침 무관 양방향 표, §07 한 줄 요약, 검증 이력 (2026-07-10). ~ neutral/repo-relative paths used.
+   - **CREATED: `/Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html`** — single-file dark-theme visual explainer. Fonts: Black Han Sans (display) + Gothic A1 (body) + IBM Plex Mono. Palette: bg #0d1015, amber(claudeMd) #ffb020, cyan(skill_listing) #3fd0c9, green(rules) #7ee081, violet(skill body) #b78cff, red #ff5d5d. Sections: 01 종착지는 하나(messages 배열 시각화), 02 유령 vs 정주민(VS 패널+spec 표), 03 rules 우편함 파이프라인(rule 파일 카드+5-step flow), 04 수집 꼬리 vs 전처리 머리(사이클 밴드+5단 칩), 05 frontmatter 4종 = 방아쇠 3종. IntersectionObserver staggered reveal. Footer notes userEmail 미검증. Section 05 redesigned (3 Edits) per user request into: ① 2단 로딩 흐름도 (.ld rows: 4 types × [1단 색인 stage | 방아쇠 badge with .tline arrows | 2단 본문 도착지 stage]), ② 정밀 비교 표 (.fmt-wrap/.fmt with color-coded first column, columns: frontmatter의 역할/처음부터 실리는 것/본문 로드 시점/발동 주체), ③ 방아쇠 스펙트럼 (.spectrum 3 zones: 문법적/의미적/명시적, 자동↔수동 axis), + principle banner kept. File opened via `open`.
+
+4. Errors and fixes:
+   - **Imprecise explanation corrected (self-caught)**: I initially said "다음 사이클 전처리가 우편함을 비운다" for rules injection. Source check (query.ts:1569 position) showed collection happens at the SAME cycle's tail right after tool execution, distinct from preprocessing at next cycle head. Explicitly corrected: "제가 앞에서 '다음 사이클 전처리가 우편함을 비운다'고 한 표현은 부정확했어요".
+   - **User confusion ("음..???? 이해가 안되네")**: My dense pipeline explanation of rules didn't land. Fixed by re-explaining with one concrete scenario (api-rule.md + session timeline) and 3 요점. Lesson: user prefers simple scenario-first explanations over dense technical dumps.
+   - **User misconception corrected**: User thought unsafe tools just "split" batches (분리) — actual concept is "단독" (solo; unsafe never merge together). Also user guessed same-file analysis caused splits — disproved (input-agnostic default `(_input?) => false`).
+   - **User half-correct belief corrected**: skill list is NOT in the 0th user prompt with claudeMd — separate skill_listing attachment with different lifecycle.
+
+5. Problem Solving:
+   - Proved batch "단독" semantics end-to-end from source + faithful node simulation: `[Read,Read,Grep,Edit,Write] => 병렬[Read,Read,Grep] → 단독[Edit] → 단독[Write]`; `[Read,Edit,Read,Grep] => 병렬[Read] → 단독[Edit] → 병렬[Read,Grep]` (proves no reordering).
+   - Mapped the full context-injection architecture: 4 tracks (claudeMd ghost / skill_listing resident / rules nested_memory / skill body newMessages) all landing as isMeta user messages in the messages array; distinguished collection(+) vs preprocessing(−) timing.
+   - Generalized frontmatter design: 2-stage (index always / body lazy) across rules/skills/agents/commands with 3 trigger types.
+
+6. All user messages:
+   - "클로드코드 전체파악해봐라"
+   - "4번은 무슨말이지"
+   - "근데 단독이면 Read,Read, Grep,Edit, Write 가 한배치에 나오면 1배치에 Read, Read, Grep 이고 2배치에 Edit 3배치에 Write 야?"
+   - "이건 소스코드 보고 증명해봐"
+   - "증거4 후자의 경우 Read -> Edit 하고 다시 병렬이됬잖아? 중간에 Edit이 낀 이유는 같은파일 기준이라 그래?"
+   - "아 이해했다 오케이"
+   - "아 저건 몰랐네.. 단독 .. 이라는 개념이구나 나 분리만하는줄 저거 너가 테스트해본거까지 md로 마들어주라"
+   - "내가 알기로는 0번 유저프롬프트에 CLAUDE.md 관련내용과 함께 현재 스킬목록도 들어가는걸로 알고있어 맞아?"
+   - "어쨋든 타이밍은 배열로 들어간다는거지"
+   - "그리고 그 rules로 하면 필요한 상황일떄 그걸로가져와쓰잖아 그건 어떻게 세팅한거지"
+   - "음..???? 이해가 안되네"
+   - "Read툴이 읽으면 마치 훅마냥 잡아서 실행해서 어태치먼트로 넣는거야?"
+   - "ReAct 사이클 전처리가 도구결과 보낼떄 인건가"
+   - "컨텍스트 전처리 하는 구간과는 다른거지?" (mid-work)
+   - "프론트메타로 쓰는건 다그렇다고봐야돼? 스킬도 포함해서?"
+   - "위 내용들도 /visual-explainer 로 작성해줘"
+   - (mid-work, pasted the frontmatter 4종 ASCII table with columns frontmatter의 역할/처음부터 실리는 것/본문 로드 시점/발동 주체 for rules/skills/agents/slash commands) "특히 이거 잘작성해줘"
+
+7. Pending Tasks:
+   - Deliver the final user-facing completion message for the visual-explainer HTML (skill Step 5 requires: "무엇을 어떤 컨셉/구성으로 만들었는지 표로 1회 요약 + 추가 수정 제안"). The file is built, section 05 reworked, and opened in browser — only the summary message remains.
+   - (Earlier offered, not requested-confirmed): HTML companion for 배치-단독-개념-소스증명.md — only if user asks.
+
+8. Current Work:
+   Executing the /visual-explainer skill for "위 내용들" (context-injection findings). Created `/Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html` (dark ink theme, "4개 트랙이 하나의 messages 배열로 합류" metaphor, 5 sections with per-section `› source file:line` citations). Then honored the user's mid-work request "특히 이거 잘작성해줘" (the pasted frontmatter 4종 table) by upgrading section 05 via three Edits: (1) replaced .fm-grid card CSS with .ld/.ld-row/.stage/.tline (2-stage loading flow rows), .fmt-wrap/.fmt (styled detailed comparison table, min-width 780px with overflow-x scroll), .spectrum/.zone/.zchip (trigger spectrum); (2) updated responsive rules (880px: .ld-row stacks to 1 column; 640px: .spec-axis 1 column); (3) replaced section 05 HTML body with ① 2단 로딩 흐름도 (4 color-coded rows rules/skills/agents/commands, each: 1단 색인 stage → trigger badge ⚙️파일접근/🧠Skill호출/🧠Agent스폰/⌨️/명령입력 → 2단 본문 도착지), ② 정밀 비교 표 (exactly the user's pasted columns, enriched), ③ 방아쇠 스펙트럼 (문법적/의미적/명시적 zones on 자동↔수동 axis), keeping the principle banner ("값싼 색인은 항상 보이게, 비싼 본문은 방아쇠가 당겨질 때만") and source line (SkillTool.ts:1065-1107 · loadAgentsDir.ts:312-324 · claudemd.ts:773). Last action: `open /Users/seobi/jinsup_space/CC/컨텍스트-주입-4트랙-시각설명.html` — completed successfully.
+
+9. Optional Next Step:
+   Write the final completion message (Korean) summarizing the artifact per the visual-explainer skill's Step 5: a one-time table of what was created (file path, concept/aesthetic: 다크 잉크 + 4트랙 합류 메타포, Black Han Sans/Gothic A1/IBM Plex Mono, section list 01-05), explicitly noting how section 05 was specially reinforced per the user's "특히 이거 잘작성해줘" request (2단 로딩 흐름도 + 정밀 비교 표 + 방아쇠 스펙트럼 3-부분 구성), plus brief 추가 수정 제안 (e.g., 배치-단독 md의 짝꿍 HTML 여부, 색/폰트 조정 가능). No further tool work is needed unless the user requests adjustments after viewing the opened page.
+
+If you need specific details from before compaction (like exact code snippets, error messages, or content you generated), read the full transcript at: /Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d.jsonl
+Continue the conversation from where it left off without asking the user any further questions. Resume directly — do not acknowledge the summary, do not recap what was happening, do not preface with "I'll continue" or similar. Pick up the last task as if the break never happened.
+
+[USER] [슬래시커맨드 /compact]
+
+[USER] <local-command-stdout>[2mCompacted PostCompact [INPUT=$(cat); NAME=$(printf '%s' "$INPUT" | /Users/seobi/.claude/scripts/cc-name.sh); /opt/homebrew/bin/hs -c "bigAlert('$NAME: 컨텍스트 압축됨')" &] completed successfully[22m</local-command-stdout>
+
+[USER] 지금 유저프롬프트로 내용 뭐들어가?
+
+[ASSISTANT] 지금 이 순간(= compact 직후 첫 API 호출)의 유저 프롬프트를, 제 컨텍스트에 실제로 보이는 그대로 말씀드릴게요.
+
+## 0번 유령 메시지 (매 호출 재생성되는 그것)
+
+`<system-reminder> As you answer the user's questions...` 형식으로 3개 키가 들어있습니다:
+
+| 키 | 지금 실제 내용 |
+|---|---|
+| `# claudeMd` | 전역 `~/.claude/CLAUDE.md` (AskUserQuestion 원칙 + Subagent Workflow) + 프로젝트 `CLAUDE.md` (리서치 프로젝트 안내, 4개 교차 레포, 작업 원칙) + auto-memory의 `MEMORY.md` 인덱스 1줄 |
+| `# userEmail` | `axtech@goldenplanet.co.kr` — src 스냅샷의 `getUserContext`엔 없어서 "소스에서 확인 못함"이라 표기했던 그 키인데, 실서비스에선 이렇게 실제로 들어옵니다 |
+| `# currentDate` | 오늘 날짜 |
+
+## compact 직후라서 추가로 들어온 것들
+
+이번 호출은 평소와 달리 뒤에 특수 화물이 여럿 붙었습니다:
+
+1. **compact 요약문** — 대화 이력 전체가 날아가고, 그 자리를 8개 섹션짜리 인수인계 문서(요청 의도 / 기술 개념 / 파일·코드 / 에러와 수정 / 유저 메시지 전문 / 진행 상태...)가 user 메시지로 대체. 원본 transcript의 `.jsonl` 경로 + "요약 언급하지 말고 이어서 하라"는 지시 포함.
+2. **파일 리플레이** — compact 직전에 Read했던 파일 2개(`md_group/CLAUDE.md`, `md_group/cc-context-preprocessing-timing.md`)가 "Called the Read tool... Result:" 형태로 통째로 재주입. 요약으로는 파일 내용이 소실되니 최근 읽은 파일을 복원해주는 메커니즘이에요.
+3. **호출됐던 스킬 재고지** — 이전에 실행한 `visual-explainer` 스킬 본문 전체가 "EARLIER in this session에 호출됐던 것, 재실행하지 말 것" 리마인더로 다시 들어옴. 앞서 본 skill_listing(목록 정주민)과는 별개로, **이미 발동된 스킬의 본문**을 compact 후 되살리는 트랙입니다.
+4. 그 외 상주 리마인더들 — ToolSearch 지연 도구 목록, Agent 타입 목록, MCP 서버 instructions, SessionStart 훅 출력(superpowers), 날짜 변경 알림.
+5. **방금 치신 메시지** — `/compact` 커맨드의 stdout 로그(caveat 래핑) + 실제 질문 텍스트.
+
+요약하면: **유령 메시지(claudeMd·userEmail·currentDate)는 평소처럼 0번에 재생성**됐고, 대화 이력 자리엔 **요약문 + 최근 파일 리플레이 + 스킬 재고지**가 들어와서 지금 프롬프트가 평소보다 화물이 많은 상태입니다.
+
+[USER] user-prompt-submit-hook 이건 언제씡늑너지
+
+[ASSISTANT] `UserPromptSubmit` 훅이 어느 시점에 발동하고 출력이 어디로 들어가는지 소스에서 직접 확인해볼게요.
+
+[도구호출 Bash] {"command": "grep -rn \"UserPromptSubmit\\|user-prompt-submit\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l | head -20", "description": "src에서 UserPromptSubmit 훅 관련 파일 검색"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/tools/AgentTool/runAgent.ts
+/Users/seobi/jinsup_space/CC/src/types/hooks.ts
+/Users/seobi/jinsup_space/CC/src/constants/prompts.ts
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts
+/Users/seobi/jinsup_space/CC/src/utils/settings/settings.ts
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts
+/Users/seobi/jinsup_space/CC/src/utils/plugins/loadPluginHooks.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks/hooksConfigManager.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks/execAgentHook.ts
+/Users/seobi/jinsup_space/CC/src/utils/hooks/execPromptHook.ts
+/Users/seobi/jinsup_space/CC/src/entrypoints/sdk/coreTypes.ts
+/Users/seobi/jinsup_space/CC/src/entrypoints/sdk/coreSchemas.ts
+/Users/seobi/jinsup_space/CC/src/skills/bundled/updateConfig.ts
+
+[도구호출 Bash] {"command": "grep -n \"UserPromptSubmit\\|user-prompt-submit\" /Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts /Users/seobi/jinsup_space/CC/src/utils/hooks/execPromptHook.ts /Users/seobi/jinsup_space/CC/src/utils/messages.ts /Users/seobi/jinsup_space/CC/src/utils/hooks.ts | head -40", "description": "UserPromptSubmit 훅 호출/렌더링 지점 라인 확인"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:42:  executeUserPromptSubmitHooks,
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:43:  getUserPromptSubmitHookBlockingMessage,
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:178:  // Execute UserPromptSubmit hooks and handle blocking
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:182:  for await (const hookResult of executeUserPromptSubmitHooks(
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:195:      const blockingMessage = getUserPromptSubmitHookBlockingMessage(
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:235:          hookName: 'UserPromptSubmit',
+/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts:237:          hookEvent: 'UserPromptSubmit',
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:4102:        attachment.hookEvent !== 'UserPromptSubmit'
+/Users/seobi/jinsup_space/CC/src/utils/hooks/execPromptHook.ts:41:    // trigger UserPromptSubmit hooks and cause infinite recursion
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:101:  UserPromptSubmitHookInput,
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:432:          'for UserPromptSubmit': {
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:433:            hookEventName: '"UserPromptSubmit"',
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:624:      case 'UserPromptSubmit':
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:828:    // bricks UserPromptSubmit/Stop until restart. The pre-check is necessary
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:1932: * Format a list of blocking errors from a UserPromptSubmit hook's configured commands.
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:1936:export function getUserPromptSubmitHookBlockingMessage(
+/Users/seobi/jinsup_space/CC/src/utils/hooks.ts:1939:  return `UserPromptSubmit operation blocked by hook:\n${blockingError.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/processUserInput/processUserInput.ts", "offset": 140, "limit": 130}
+
+[도구결과] 140	}): Promise<ProcessUserInputBaseResult> {
+141	  const inputString = typeof input === 'string' ? input : null
+142	  // Immediately show the user input prompt while we are still processing the input.
+143	  // Skip for isMeta (system-generated prompts like scheduled tasks) — those
+144	  // should run invisibly.
+145	  if (mode === 'prompt' && inputString !== null && !isMeta) {
+146	    setUserInputOnProcessing?.(inputString)
+147	  }
+148	
+149	  queryCheckpoint('query_process_user_input_base_start')
+150	
+151	  const appState = context.getAppState()
+152	
+153	  const result = await processUserInputBase(
+154	    input,
+155	    mode,
+156	    setToolJSX,
+157	    context,
+158	    pastedContents,
+159	    ideSelection,
+160	    messages,
+161	    uuid,
+162	    isAlreadyProcessing,
+163	    querySource,
+164	    canUseTool,
+165	    appState.toolPermissionContext.mode,
+166	    skipSlashCommands,
+167	    bridgeOrigin,
+168	    isMeta,
+169	    skipAttachments,
+170	    preExpansionInput,
+171	  )
+172	  queryCheckpoint('query_process_user_input_base_end')
+173	
+174	  if (!result.shouldQuery) {
+175	    return result
+176	  }
+177	
+178	  // Execute UserPromptSubmit hooks and handle blocking
+179	  queryCheckpoint('query_hooks_start')
+180	  const inputMessage = getContentText(input) || ''
+181	
+182	  for await (const hookResult of executeUserPromptSubmitHooks(
+183	    inputMessage,
+184	    appState.toolPermissionContext.mode,
+185	    context,
+186	    context.requestPrompt,
+187	  )) {
+188	    // We only care about the result
+189	    if (hookResult.message?.type === 'progress') {
+190	      continue
+191	    }
+192	
+193	    // Return only a system-level error message, erasing the original user input
+194	    if (hookResult.blockingError) {
+195	      const blockingMessage = getUserPromptSubmitHookBlockingMessage(
+196	        hookResult.blockingError,
+197	      )
+198	      return {
+199	        messages: [
+200	          // TODO: Make this an attachment message
+201	          createSystemMessage(
+202	      
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/hooks.ts", "offset": 3820, "limit": 70}
+
+[도구결과] 3820	 * Execute start hooks if configured
+3821	 * @param prompt The user prompt that will be passed to the tool
+3822	 * @param permissionMode Permission mode from toolPermissionContext
+3823	 * @param toolUseContext ToolUseContext for prompt-based hooks
+3824	 * @returns Async generator that yields progress messages and hook results
+3825	 */
+3826	export async function* executeUserPromptSubmitHooks(
+3827	  prompt: string,
+3828	  permissionMode: string,
+3829	  toolUseContext: ToolUseContext,
+3830	  requestPrompt?: (
+3831	    sourceName: string,
+3832	    toolInputSummary?: string | null,
+3833	  ) => (request: PromptRequest) => Promise<PromptResponse>,
+3834	): AsyncGenerator<AggregatedHookResult> {
+3835	  const appState = toolUseContext.getAppState()
+3836	  const sessionId = toolUseContext.agentId ?? getSessionId()
+3837	  if (!hasHookForEvent('UserPromptSubmit', appState, sessionId)) {
+3838	    return
+3839	  }
+3840	
+3841	  const hookInput: UserPromptSubmitHookInput = {
+3842	    ...createBaseHookInput(permissionMode),
+3843	    hook_event_name: 'UserPromptSubmit',
+3844	    prompt,
+3845	  }
+3846	
+3847	  yield* executeHooks({
+3848	    hookInput,
+3849	    toolUseID: randomUUID(),
+3850	    signal: toolUseContext.abortController.signal,
+3851	    timeoutMs: TOOL_HOOK_EXECUTION_TIMEOUT_MS,
+3852	    toolUseContext,
+3853	    requestPrompt,
+3854	  })
+3855	}
+3856	
+3857	/**
+3858	 * Execute session start hooks if configured
+3859	 * @param source The source of the session start (startup, resume, clear)
+3860	 * @param sessionId Optional The session id to use as hook input
+3861	 * @param agentType Optional The agent type (from --agent flag) running this session
+3862	 * @param model Optional The model being used for this session
+3863	 * @param signal Optional AbortSignal to cancel hook execution
+3864	 * @param timeoutMs Optional timeout in milliseconds for hook execution
+3865	 * @returns Async generator that yields progress messages and hook results
+3866	 */
+3867	export async function* exec
+
+[도구호출 Bash] {"command": "grep -n \"user-prompt-submit\\|hook_additional_context\\|hook_success\" /Users/seobi/jinsup_space/CC/src/utils/messages.ts /Users/seobi/jinsup_space/CC/src/constants/prompts.ts | head -20", "description": "훅 출력 렌더링 태그 위치 검색"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/messages.ts:1037:      message.attachment.type === 'hook_success' ||
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:1039:      message.attachment.type === 'hook_additional_context' ||
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:1065:  // attachment messages (e.g., hook_success + hook_additional_context)
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:1206:  // A single hook can produce multiple attachment messages (e.g., hook_success + hook_additional_context),
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:4099:    case 'hook_success':
+/Users/seobi/jinsup_space/CC/src/utils/messages.ts:4117:    case 'hook_additional_context': {
+/Users/seobi/jinsup_space/CC/src/constants/prompts.ts:128:  return `Users may configure 'hooks', shell commands that execute in response to events like tool calls, in settings. Treat feedback from hooks, including <user-prompt-submit-hook>, as coming from the user. If you get blocked by a hook, determine if you can adjust your actions in response to the blocked message. If not, ask the user to check their hooks configuration.`
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/utils/messages.ts", "offset": 4090, "limit": 55}
+
+[도구결과] 4090	    case 'hook_blocking_error':
+4091	      return [
+4092	        createUserMessage({
+4093	          content: wrapInSystemReminder(
+4094	            `${attachment.hookName} hook blocking error from command: "${attachment.blockingError.command}": ${attachment.blockingError.blockingError}`,
+4095	          ),
+4096	          isMeta: true,
+4097	        }),
+4098	      ]
+4099	    case 'hook_success':
+4100	      if (
+4101	        attachment.hookEvent !== 'SessionStart' &&
+4102	        attachment.hookEvent !== 'UserPromptSubmit'
+4103	      ) {
+4104	        return []
+4105	      }
+4106	      if (attachment.content === '') {
+4107	        return []
+4108	      }
+4109	      return [
+4110	        createUserMessage({
+4111	          content: wrapInSystemReminder(
+4112	            `${attachment.hookName} hook success: ${attachment.content}`,
+4113	          ),
+4114	          isMeta: true,
+4115	        }),
+4116	      ]
+4117	    case 'hook_additional_context': {
+4118	      if (attachment.content.length === 0) {
+4119	        return []
+4120	      }
+4121	      return [
+4122	        createUserMessage({
+4123	          content: wrapInSystemReminder(
+4124	            `${attachment.hookName} hook additional context: ${attachment.content.join('\n')}`,
+4125	          ),
+4126	          isMeta: true,
+4127	        }),
+4128	      ]
+4129	    }
+4130	    case 'hook_stopped_continuation':
+4131	      return [
+4132	        createUserMessage({
+4133	          content: wrapInSystemReminder(
+4134	            `${attachment.hookName} hook stopped continuation: ${attachment.message}`,
+4135	          ),
+4136	          isMeta: true,
+4137	        }),
+4138	      ]
+4139	    case 'compaction_reminder': {
+4140	      return wrapMessagesInSystemReminder([
+4141	        createUserMessage({
+4142	          content:
+4143	            'Auto-compact is enabled. When the context window is nearly full, older messages will be automatically summarized so you can continue working seamlessly. There is no need to stop or rush \u2014 
+
+[ASSISTANT] 소스로 확인했습니다. 결론부터: **UserPromptSubmit 훅은 사용자가 Enter로 프롬프트를 제출할 때마다, 모델 호출 전에 딱 1번** 발동합니다. 사이클마다 도는 게 아니라 **대화 턴의 맨 입구**에서 도는 문지기예요.
+
+## 발동 시점 — 턴 입구, 쿼리 루프 진입 직전
+
+`processUserInput.ts:149-264`에 순서가 그대로 있습니다:
+
+```
+Enter 제출
+  → processUserInputBase        (슬래시 커맨드 확장, 붙여넣기 처리 등)
+  → shouldQuery 판정            (여기서 false면 훅도 안 돎 — 예: 로컬 커맨드로 끝난 경우)
+  → executeUserPromptSubmitHooks ★  (query_hooks_start 체크포인트)
+  → queryLoop (사이클 1 시작)
+```
+
+훅 스크립트는 stdin으로 `{ hook_event_name: 'UserPromptSubmit', prompt: "제출된 텍스트" }`를 받습니다 (`hooks.ts:3841-3845`). 훅이 설정에 없으면 즉시 스킵이고(`hooks.ts:3837`), 무한 재귀 방지를 위해 프롬프트 기반 훅이 다시 UserPromptSubmit을 발동시키진 않습니다 (`execPromptHook.ts:41`).
+
+## 결과별 4갈래 — 문지기가 할 수 있는 일
+
+| 훅의 응답 | 하네스 동작 | 소스 |
+|---|---|---|
+| **blockingError** (exit 2) | 프롬프트 **차단** — 모델 호출 자체가 취소되고, 원래 입력 대신 경고 메시지만 남음 | processUserInput.ts:194-209 |
+| **preventContinuation** | 프롬프트는 컨텍스트에 남기되 처리 중단 ("Operation stopped by hook") | :213-224 |
+| **additionalContext** (JSON) | `hook_additional_context` 어태치먼트로 **프롬프트 옆에 컨텍스트 주입** | :227-240 |
+| **stdout** (exit 0) | `hook_success`로 주입 — 단 **UserPromptSubmit·SessionStart 2종만** stdout이 컨텍스트에 들어가고 다른 훅 이벤트의 stdout은 버려짐 | messages.ts:4099-4116 |
+
+주입 형태는 우리가 계속 봐온 그 패턴입니다 — `` 를 감싼 **isMeta user 메시지** (`messages.ts:4117-4128`). 즉 앞서 정리한 4트랙(claudeMd/skill_listing/rules/skill 본문)에 이어 **다섯 번째 주입 트랙**이고, 종착지는 역시 같은 messages 배열이에요.
+
+## `<user-prompt-submit-hook>` 태그의 정체
+
+이 이름이 시스템 프롬프트에 박혀 있습니다 (`constants/prompts.ts:128`): "훅 피드백은, `<user-prompt-submit-hook>`을 포함해서, **유저가 말한 것으로 취급하라**"는 모델용 지시문이에요. 다만 이 src 스냅샷의 실제 렌더링 코드는 위처럼 `<system-reminder>` + "hook success:" 접두사 방식이라, `<user-prompt-submit-hook>` 태그로 직접 감싸는 코드는 **이 스냅샷에서 확인 못 했습니다** (시스템 프롬프트 문구에만 남아있는 구버전 태그명으로 추정).
+
+## 타이밍 지도에 얹으면
+
+- **UserPromptSubmit** = 턴 입구 (제출 직후, 사이클 0 이전) — 턴당 1번
+- **어태치먼트 수집** = 사이클 꼬리 (도구 실행 직후) — 사이클당 1번
+- **전처리 5단** = 사이클 머리 (모델 호출 직전) — 사이클당 1번
+
+참고로 대표님이 방금 보신 `/compact` 출력의 `PostCompact [...]` 훅은 별개 이벤트(압축 후 발동)고, UserPromptSubmit은 매번 타이핑하시는 그 순간마다 돌고 있는 겁니다 — 프롬프트 검열(차단), 동적 컨텍스트 주입(현재 시각, 브랜치 상태 등), 로깅 같은 용도로 쓰는 자리예요.
+
+[USER] 무슨말이야? 나프롬프트 중에 
+
+ - 사용자는 설정에서 도구 호출 등의 이벤트에 반응하여 실행되는 셸 명령인
+   'hooks'를 구성할 수 있습니다. <user-prompt-submit-hook>을 포함한 hooks의
+   피드백은 사용자로부터 온 것으로 취급하세요. hook에 의해 차단되면, 차단된
+   메시지에 대응하여 행동을 조정할 수 있는지 판단하세요. 불가능하면 사용자에게
+   hooks 설정을 확인하도록 요청하세요.
+
+이걸봐서 뭔가해서 물어본거야 역할이 뭐냐구.....
+
+[ASSISTANT] 아 질문 의도를 제가 빗나갔네요. 그 문단이 **어디서 와서 무슨 역할인지**를 물으신 거군요. 그 문단이 시스템 프롬프트에 언제 포함되는지 소스에서 확인해볼게요.
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/constants/prompts.ts", "offset": 115, "limit": 25}
+
+[도구결과] 115	  '__SYSTEM_PROMPT_DYNAMIC_BOUNDARY__'
+116	
+117	// @[MODEL LAUNCH]: Update the latest frontier model.
+118	const FRONTIER_MODEL_NAME = 'Claude Opus 4.6'
+119	
+120	// @[MODEL LAUNCH]: Update the model family IDs below to the latest in each tier.
+121	const CLAUDE_4_5_OR_4_6_MODEL_IDS = {
+122	  opus: 'claude-opus-4-6',
+123	  sonnet: 'claude-sonnet-4-6',
+124	  haiku: 'claude-haiku-4-5-20251001',
+125	}
+126	
+127	function getHooksSection(): string {
+128	  return `Users may configure 'hooks', shell commands that execute in response to events like tool calls, in settings. Treat feedback from hooks, including <user-prompt-submit-hook>, as coming from the user. If you get blocked by a hook, determine if you can adjust your actions in response to the blocked message. If not, ask the user to check their hooks configuration.`
+129	}
+130	
+131	function getSystemRemindersSection(): string {
+132	  return `- Tool results and user messages may include <system-reminder> tags. <system-reminder> tags contain useful information and reminders. They are automatically added by the system, and bear no direct relation to the specific tool results or user messages in which they appear.
+133	- The conversation has unlimited context through automatic summarization.`
+134	}
+135	
+136	function getAntModelOverrideSection(): string | null {
+137	  if (process.env.USER_TYPE !== 'ant') return null
+138	  if (isUndercover()) return null
+139	  return getAntModelOverrideConfig()?.defaultSystemPromptSuffix || null
+
+[도구호출 Bash] {"command": "grep -n \"getHooksSection\" /Users/seobi/jinsup_space/CC/src -r", "description": "getHooksSection이 시스템 프롬프트에 포함되는 조건 확인"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/constants/prompts.ts:127:function getHooksSection(): string {
+/Users/seobi/jinsup_space/CC/src/constants/prompts.ts:192:    getHooksSection(),
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/src/constants/prompts.ts", "offset": 160, "limit": 50}

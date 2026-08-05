@@ -1,0 +1,56 @@
+[
+  {
+    "id": "conv2-01",
+    "source": "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d.jsonl",
+    "project": "-Users-seobi-jinsup-space-CC",
+    "hangul_ratio": 0.542,
+    "total_chars": 753972,
+    "n_chunks": 11,
+    "parts": [
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part1.txt",
+        "chars": 69330
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part2.txt",
+        "chars": 69389
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part3.txt",
+        "chars": 69041
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part4.txt",
+        "chars": 69984
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part5.txt",
+        "chars": 69577
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part6.txt",
+        "chars": 69690
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part7.txt",
+        "chars": 64238
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part8.txt",
+        "chars": 69698
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part9.txt",
+        "chars": 69752
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part10.txt",
+        "chars": 69874
+      },
+      {
+        "file": "/Users/seobi/jinsup_space/research/memory/data2/conv2-01.part11.txt",
+        "chars": 63399
+      }
+    ]
+  }
+]

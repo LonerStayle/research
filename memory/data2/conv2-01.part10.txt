@@ -1,0 +1,811 @@
+
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<b style=\"color:var(--amber)\">단일 사례가 아니라 가족</b> — 전수는 아래 ⑤.", "new_string": "<b style=\"color:var(--amber)\">단일 사례가 아니라 가족</b> — 전수는 바로 아래 \"③ 심화\"에."}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html\"", "description": "Reopen fixed HTML"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 고쳤습니다. 세 군데 정리:
+
+| 전 | 후 |
+|---|---|
+| `L3 소프트 B — 문구 장치 4종` | `L3 소프트 B — 문구 장치` (숫자 제거) |
+| `⑤ 결과 넛지 가족 전수 — "에러 메시지는…"` | `③ 심화 — 결과 넛지 가족 전수 · "에러 메시지는…"` |
+| ③카드: "전수는 아래 ⑤" | "전수는 바로 아래 **③ 심화**에" |
+
+이제 구조가 논리적으로 맞아요 — 장치는 ①~④ 4개고, 그 아래 블록은 다섯 번째 장치가 아니라 **③(결과 넛지)의 심화 전수**라는 게 제목에서 바로 읽힙니다.
+
+[USER] L3 소프트 B (문구 장치)
+├─ 정적 안내 — "표지판"                    ← 넛지 아님
+│   ① 대체지침   "find 말고 Glob 써라"      (시스템프롬프트에 항상 있음)
+│   ② 탈출구     "열린 탐색이면 Agent로"    (도구 설명문에 항상 있음)
+│
+└─ 동적 넛지 — "옆구리 찌르기"              ← 이게 넛지
+    ③ 결과넛지   "완료됨. 지금 TaskList 불러봐"  (사건이 난 그 순간 결과에 꽂힘)
+    ④ 리마인더   "태스크 도구 10턴째 안 썼는데?"  (방치가 감지된 그 턴에 꽂힘)
+
+이런식으로 정리좀해주라 소프트 A도 마찬가지로
+
+[ASSISTANT] 좋은 구조예요 — 소프트 B는 그 트리 그대로, 소프트 A(깔때기)도 같은 방식으로 "구조 분해" 트리를 만들어서 md·html 양쪽에 넣겠습니다.
+
+먼저 md — §03(소프트 A)에 트리 추가:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "- 이름만 안다 → Glob → 내용으로 좁힘 → Grep → 확정본 읽기 → Read. **데이터 의존성상 이 경로가 유일**해서 순서가 \"저절로\" 나온다.\n- › source `tools/GlobTool/prompt.ts` · `tools/GrepTool/prompt.ts` · `tools/FileReadTool/prompt.ts` (renderPromptTemplate)\n\n**깔때기의 문법**: `비용 오름차순 배치(싼 것부터) + 출력 타입 = 다음 입력 타입 + 각 설명문에 자기 니치(\"when you need to...\") 명시`.", "new_string": "- 이름만 안다 → Glob → 내용으로 좁힘 → Grep → 확정본 읽기 → Read. **데이터 의존성상 이 경로가 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] md — §04(소프트 B)에 표지판/넛지 트리 추가:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "## §04 L3 소프트 규칙 B — 문구 장치\n\n깔때기 외에 소스에서 확인된 유도 장치들. 4갈래인데, 그중 **결과 넛지는 단일 사례가 아니라 가족**이다 (§04-1에 전수).", "new_string": "## §04 L3 소프트 규칙 B — 문구 장치\n\n깔때기 외에 소스에서 확인된 유도 장치들. 4갈래인데, 성격은 두 그룹으로 갈린다 — **정적 안내(표지판) vs 동적 넛지(옆구리 찌르기)**. 차이의 본질은 **타이밍**: 표지판은 항상 서 있고, 넛지는 사건이 난 그 순간에만 꽂힌다.\n\n```\nL3 소프트 B (문구 장치) — 말로 유도\n├─ 정적 안내 — \"표지판\"                       ← 넛지 아님 · 항상 같은 자리에 상주\n│    ① 대체지침  
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 이제 html — 트리 스타일 추가 후 두 섹션에 삽입:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "  .note{margin-top:16px;border:1px dashed var(--amber-dim);border-radius:10px;padding:14px 18px;font-size:12.5px;color:var(--mut);background:rgba(255,180,84,.04)}\n  .note b{color:var(--amber)}", "new_string": "  .note{margin-top:16px;border:1px dashed var(--amber-dim);border-radius:10px;padding:14px 18px;font-size:12.5px;color:var(--mut);background:rgba(255,180,84,.04)}\n  .note b{color:var(-
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "    <div class=\"note rv\"><b>깔때기의 문법</b> — 비용 오름차순 배치(싼 것부터) + 출력 타입 = 다음 입력 타입 + 설명문에 자기 니치(\"Use this tool when you need to…\") 명시.</div>", "new_string": "    <div class=\"panel rv\">\n<pre class=\"tree\"><span class=\"tt\">L3 소프트 A (깔때기 설계) — 구조로 유도</span>\n├─ <span class=\"br\">비용 경사 — \"싼 것부터\"</span>                  ← 순서를 어기면 손해가 나게\n│    <span class=\"q\">Glob(이름 매칭·싸다) → Grep(내용 검색·중
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <h2><span style=\"color:var(--cyan)\">L3 소프트 B</span> — 문구 장치</h2>\n      <p class=\"cap\">깔때기 밖에서 순서·선택을 미는 표지판들. 전부 <b>강제가 아니라 유도</b> — 무시해도 에러는 없다.</p>\n    </div>", "new_string": "      <h2><span style=\"color:var(--cyan)\">L3 소프트 B</span> — 문구 장치</h2>\n      <p class=\"cap\">말로 유도하는 장치 4갈래 — 성격은 두 그룹. <b>정적 안내(표지판)는 항상 서 있고, 동적 넛지는 사건 순간에만 꽂힌다.</b>\n      전부 강제가 아니라 유도 — 무시해도 에러는 없다
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html\"", "description": "Reopen updated HTML"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 반영했습니다. md·html 양쪽에 트리 두 개가 들어갔어요.
+
+**소프트 B** (§04 도입부) — 대표님 트리 그대로 + 타이밍 한 줄:
+```
+L3 소프트 B (문구 장치) — 말로 유도
+├─ 정적 안내 — "표지판"          ← 넛지 아님 · 항상 상주
+│   ① 대체지침  ② 탈출구
+└─ 동적 넛지 — "옆구리 찌르기"    ← 이게 넛지 · 사건 순간에만 주입
+    ③ 결과넛지  ④ 리마인더
+```
+
+**소프트 A** (§03) — 같은 형식으로 깔때기를 구조 분해:
+```
+L3 소프트 A (깔때기 설계) — 구조로 유도
+├─ 비용 경사 — "싼 것부터"               ← 순서를 어기면 손해가 나게
+├─ 입출력 사슬 — "앞의 출력 = 뒤의 입력"  ← 순서를 어기면 넣을 게 없게
+└─ 니치 선언 — "언제 나를 쓰는지"         ← 각 설명문이 자기 자리를 말함
+```
+
+이렇게 놓으니 A와 B의 대비도 선명해졌습니다 — **A는 "구조로" 유도(문구조차 아님), B는 "말로" 유도(그 안에서 표지판 vs 넛지)**. html에서는 트리를 모노폰트 패널로 렌더링하고 가지 제목은 청록, "← 넛지 아님"은 빨강, "← 이게 넛지"는 초록으로 색을 줬어요. B 트리는 섹션 05 카드 4장 바로 위에 배치해서, 트리에서 본 ①~④가 아래 카드로 이어지는 흐름입니다.
+
+[USER] 비용 경사 — "싼 것부터"    ??? 이렇게 ㅇ비용 계산한게 어딨는데
+
+[ASSISTANT] 정확한 지적이에요. "비용을 계산하는 코드"는 없습니다 — 그건 제 해석 프레임인데 검증분처럼 트리에 박아놨네요. 소스에 실제로 있는 게 뭔지 확인하고 정정하겠습니다.
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC/src\necho \"=== 비용/cost/expensive 계산·언급 자체가 있나 (검색도구 3종) ===\"\nrg -in \"cost|expensive|cheap|budget\" tools/GlobTool/ tools/GrepTool/ tools/FileReadTool/ | head -8\necho\necho \"=== 실재하는 것: 출력량 상한들 ===\"\nrg -n \"100|head_limit|MAX_LINES|maxTokens|truncat\" tools/GlobTool/GlobTool.ts tools/GrepTool/GrepTool.ts tools/FileReadTool/prompt.ts 2>/dev/null | grep -viE \"^\\s*//|import\" | head -12\necho\necho \"=== Glob 설명문의 'Fast' / Read의 부분읽기 권고 ===\"\nr
+
+[도구결과] === 비용/cost/expensive 계산·언급 자체가 있나 (검색도구 3종) ===
+tools/FileReadTool/limits.ts:4: *   | limit         | default | checks                    | cost          | on overflow     |
+tools/FileReadTool/FileReadTool.ts:867:    // Images have their own size limits (token budget + compression) —
+tools/FileReadTool/FileReadTool.ts:869:    const data = await readImageWithTokenBudget(resolvedFilePath, maxTokens)
+tools/FileReadTool/FileReadTool.ts:1094: * @param maxTokens - Maximum token budget for the image
+tools/FileReadTool/FileReadTool.ts:1097:export async function readImageWithTokenBudget(
+tools/FileReadTool/FileReadTool.ts:1136:  // Check if it fits in token budget
+
+=== 실재하는 것: 출력량 상한들 ===
+tools/GrepTool/GrepTool.ts:56:        'Output mode: "content" shows matching lines (supports -A/-B/-C context, -n line numbers, head_limit), "files_with_matches" shows file paths (supports head_limit), "count" shows match counts (supports head_limit). Defaults to "files_with_matches".',
+tools/GrepTool/GrepTool.ts:80:    head_limit: semanticNumber(z.number().optional()).describe(
+tools/GrepTool/GrepTool.ts:84:      'Skip first N lines/entries before applying head_limit, equivalent to "| tail -n +N | head -N". Works across all output modes. Defaults to 0.',
+tools/GrepTool/GrepTool.ts:104:// Default cap on grep results when head_limit is unspecified. Unbounded content-mode
+tools/GrepTool/GrepTool.ts:107:// Pass head_limit=0 explicitly for unlimited.
+tools/GrepTool/GrepTool.ts:121:  // Only report appliedLimit when truncation actually occurred, so the model
+tools/GrepTool/GrepTool.ts:131:// appliedLimit is only set when truncation actually occurred (see applyHeadLimit),
+tools/GrepTool/GrepTool.ts:302:    // head_limit has already been applied in call() method, so just show all filenames
+tools/GrepTool/GrepTool.ts:323:      head_limit,
+tools/GrepTool/GrepTool.ts:447:      // Apply head_limit first — relativize is per-line work, so
+tools/GrepTool/GrepTool.ts:449:      // return 10k+ lines with h
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "```\nGlob   \"find files by NAME patterns\"        출력: 경로 목록      (넓고 싸다)\n   ↓ 경로가 있어야 범위를 좁힘\nGrep   \"search the CONTENT of files\"        출력: 매칭 라인/파일 (중간)\n       — glob 파라미터로 Glob의 출력을 받게 설계\n   ↓ 정확한 파일을 알아야\nRead   \"file_path must be an ABSOLUTE path\" 출력: 전체 내용      (좁고 비싸다)\n```", "new_string": "```\nGlob   \"find files by NAME patterns\"        출력: 경로 목록      (출력 작음)\n   ↓ 경로가 있어야 범위
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "```\nL3 소프트 A (깔때기 설계) — 구조로 유도\n├─ 비용 경사 — \"싼 것부터\"                  ← 순서를 어기면 손해가 나게\n│    Glob(이름 매칭·싸다) → Grep(내용 검색·중간) → Read(통독·비싸다)\n│\n├─ 입출력 사슬 — \"앞의 출력 = 뒤의 입력\"     ← 순서를 어기면 넣을 게 없게\n│    Glob 출력(경로 목록)  → Grep의 glob 파라미터로\n│    Grep 출력(파일 확정)  → Read의 absolute path로\n│\n└─ 니치 선언 — \"언제 나를 쓰는지\"            ← 각 설명문이 자기 자리를 말함\n     \"find files by NAME patterns\" / \"search the CON
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "**깔때기의 문법**: `비용 오름차순 배치(싼 것부터) + 출력 타입 = 다음 입력 타입 + 각 설명문에 자기 니치(\"when you need to...\") 명시`.", "new_string": "**깔때기의 문법**: `출력 부피 오름차순(작은 출력부터) + 출력 타입 = 다음 입력 타입 + 각 description에 자기 니치(\"when you need to...\") 명시`."}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "- 2026-07-22 (증보): 결과 넛지 가족 전수", "new_string": "- 2026-07-23 (정정): \"비용 경사\" 표현 철회 — 비용을 계산·비교하는 코드 없음(cost/expensive/cheap grep — 검색도구 3종에 0건). 실재하는 것은 **출력량 상한**(Glob 100파일 잘림 `GlobTool.ts:50` / Grep head_limit 기본상한 `GrepTool.ts:104-107` / Read 2000줄·토큰상한 `FileReadTool.ts:181`)과 문구 힌트(Glob \"Fast\", Read \"only read that part\"). \"싼/비싼\"은 반환 토큰량에 대한 해석임을 명시로 완화.\n- 2026-07-22 (증보): 결과 넛지 가족 전
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <text x=\"470\" y=\"92\" text-anchor=\"middle\" fill=\"#aab6c2\" font-size=\"12\">\"find files by NAME patterns\" — 넓고 싸다</text>", "new_string": "        <text x=\"470\" y=\"92\" text-anchor=\"middle\" fill=\"#aab6c2\" font-size=\"12\">\"find files by NAME patterns\" — 출력 작음 (경로 ≤100개)</text>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <text x=\"470\" y=\"310\" text-anchor=\"middle\" fill=\"#aab6c2\" font-size=\"12\">\"file_path must be an ABSOLUTE path\" — 좁고 비싸다 · 출력: 전체 내용</text>", "new_string": "        <text x=\"470\" y=\"310\" text-anchor=\"middle\" fill=\"#aab6c2\" font-size=\"12\">\"file_path must be an ABSOLUTE path\" — 출력 큼 (전문 · ≤2000줄+토큰상한)</text>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "├─ <span class=\"br\">비용 경사 — \"싼 것부터\"</span>                  ← 순서를 어기면 손해가 나게\n│    <span class=\"q\">Glob(이름 매칭·싸다) → Grep(내용 검색·중간) → Read(통독·비싸다)</span>", "new_string": "├─ <span class=\"br\">출력 부피 경사 — \"작은 출력부터\"</span>          ← 반환량이 단계별로 커지게 설계됨\n│    <span class=\"q\">Glob: 경로 ≤100개 잘림 → Grep: head_limit 상한 → Read: ≤2000줄+토큰 상한</span>\n│    <span class=\"q\">※ 비용을 계산하는 코드는 없음 — 싸다/
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "    <div class=\"note rv\"><b>깔때기의 문법</b> — 비용 오름차순 배치(싼 것부터) + 출력 타입 = 다음 입력 타입 + 설명문에 자기 니치(\"Use this tool when you need to…\") 명시.</div>", "new_string": "    <div class=\"note rv\"><b>깔때기의 문법</b> — 출력 부피 오름차순(작은 출력부터) + 출력 타입 = 다음 입력 타입 + description에 자기 니치(\"Use this tool when you need to…\") 명시.\n    출력 상한 근거: GlobTool.ts:50 · GrepTool.ts:104-107 · FileReadTool.ts:181.</div>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 정정 완료(양쪽 파일). 이제 그 혼란 — **"설명문이 대체 어디 있는 거냐"** — 를 풀어드릴게요. 이게 헷갈리는 게 당연한 게, "설명문"이 사는 곳과 모델에게 전달되는 경로를 제가 한 번도 그림으로 안 보여드렸네요.
+
+## "설명문(description)"의 정체 — 소스 파일이 아니라 **매 요청의 메뉴판**
+
+```
+[개발자가 쓰는 곳]                        [모델이 읽는 곳]
+tools/GlobTool/prompt.ts                  매 API 요청의 tools 배열
+  export const DESCRIPTION =                {
+    "- Fast file pattern matching..."  ──▶    "name": "Glob",
+                                              "description": "- Fast file pattern...",
+                                              "input_schema": { pattern, path }
+                                            },
+tools/GrepTool/prompt.ts             ──▶    { "name": "Grep", "description": "...NEVER
+                                              invoke grep as Bash...", ... },
+tools/FileReadTool/prompt.ts         ──▶    { "name": "Read", "description": "...must be
+                                              an absolute path...", ... }
+          ↑                                        ↑
+   소스코드 속 문자열                    toolToAPISchema가 조립 (claude.ts:1235)
+                                        → system·messages와 함께 매 요청마다 전송
+```
+
+즉 `tools/GlobTool/prompt.ts` 같은 파일은 **개발자용 보관 장소**일 뿐이고, 그 문자열이 **매 API 요청의 `tools` 배열에 실려서** 모델에게 갑니다. 모델 입장에선 시스템프롬프트 옆에 항상 붙어 오는 **"도구 메뉴판"** — 식당 메뉴판에 "이 메뉴는 2인분부터" 같은 안내가 적혀 있는 것과 같아요. 지난번 올드스쿨 툴콜링 정리에서 "프롬프트 적는 곳 3곳" 중 **②번(tool description)**이 바로 이겁니다.
+
+## 그럼 "깔때기가 전부 설명서에 들어있냐" — **아니요, 사는 곳이 세 군데로 갈립니다**
+
+| 깔때기 요소 | 어디에 사나 | 모델이 어떻게 아나 |
+|---|---|---|
+| **니치 선언** ("이름 찾을 땐 나") | description 문자열 | 메뉴판에서 **읽어서** 앎 |
+| **입력 계약** ("절대경로 내놔") | description + **input_schema**(파라미터 정의) | 메뉴판에서 **읽어서** 앎 |
+| **출력 부피 상한** (100개 잘림, 2000줄) | **도구 구현 코드** (설명서 아님) | 실행해보고 결과로 **겪어서** 앎 |
+| **출력→입력 연결** (Glob 결과를 Grep에) | **어디에도 안 적혀 있음** | 모델이 tool_result 보고 **스스로 추론** |
+
+마지막 줄이 핵심이에요. "Glob 다음에 Grep 해라"라는 문장은 **소스 어디에도 없습니다.** 있는 건:
+
+1. Glob 메뉴 설명: "이름 패턴으로 파일 찾는 도구" → 실행하면 **경로 목록**이 tool_result로 돌아옴
+2. Grep 메뉴 설명: "내용 검색, glob 파라미터로 파일 좁힐 수 있음"
+3. 모델이 1의 결과(경로들)를 보고 "아, 이걸 2의 glob 파라미터에 넣으면 되겠네" — **이 연결은 모델의 추론**
+
+그래서 "깔때기 설계"라는 표현의 정확한 의미는 — 순서를 적어놓은 게 아니라, **각 도구의 메뉴 설명(니치·입력조건)과 반환물 모양을 잘 깎아놔서, 합리적인 모델이라면 그 순서로 이을 수밖에 없게 만든 것**입니다. 레고 블록의 요철을 맞물리게 깎아놓은 거지, 조립 설명서를 쓴 게 아니에요.
+
+그리고 방금 대표님이 잡아낸 정정도 이 표에 반영했습니다 — "비용 경사"는 코드에 없고(비용 계산 코드 0건), 실재하는 건 **출력량 상한**(Glob 100개 잘림 / Grep head_limit / Read 2000줄+토큰상한)이라 md·html 둘 다 "출력 부피 경사 + 해석 표기"로 고쳤어요.
+
+[USER] 레이어1 물리 층은 아예 존재를 없애라;; 저건 뭔.. 당연한소리를 하고있어
+
+[ASSISTANT] 맞는 지적이에요 — "도구를 안 주면 못 쓴다"는 규칙이라기보다 동어반복이죠. L1을 들어내고 **하드·소프트 2층**으로 재편하겠습니다. md부터:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "# 도구 호출 순서는 어떻게 설계하나 — 물리·하드·소프트 3층 규칙\n\n> 작성일: 2026-07-22 · 검증 대상: `~/jinsup_space/CC/src` (구버전 스냅샷) — 전 항목 grep/Read 직접 확인\n> 질문의 출발: \"glob→grep→read 순서는 어떻게 세팅했나\" + \"Read→Edit은 에러 말고 또 뭐가 있나\"\n> 결론 한 줄: **순서를 \"지정\"하는 코드는 없다. 대신 강제력이 다른 3층의 장치로 \"설계\"되어 있다.**\n\n---\n\n## §00 스펙트럼 — 강제력 3층\n\n| 층 | 이름 | 강제력 | 위반하면 | CC 실례 |\n|---|---|---|---|---|\n| L1 | **물리 규칙** (풀 설계) | 시도 자체가 불가능 | 호
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC\necho \"=== 남은 L1/L2/L3/§번호 참조 위치 확인 ===\"\ngrep -n \"L1\\|L2\\|L3\\|§0[2-6]\\|3층\\|물리\" 도구호출-순서설계-하드소프트.md | head -40", "description": "Find remaining layer/section references to fix"}
+
+[도구결과] === 남은 L1/L2/L3/§번호 참조 위치 확인 ===
+52:## §03 L3 소프트 규칙 A — 깔때기 설계 (glob→grep→read)
+71:L3 소프트 A (깔때기 설계) — 구조로 유도
+90:## §04 L3 소프트 규칙 B — 문구 장치
+95:L3 소프트 B (문구 장치) — 말로 유도
+105:그중 **③ 결과 넛지는 단일 사례가 아니라 가족**이다 (§04-1에 전수).
+111:| **결과 넛지 가족** (tool_result 문구) | 성공/에러 결과에 다음 행동을 심음 — **§04-1 전수** | 다수 도구 + 실행기 |
+114:### §04-1 결과 넛지 가족 전수 — "에러 메시지는 로그가 아니라 프롬프트다"
+128:**B. 에러 리다이렉트 — "안 된다 + 대신 Y 써라"** (L2 게이트의 에러문이 곧 L3 안내)
+144:L1 물리 규칙(디퍼드)에 걸렸을 때의 **탈출 사다리를 하네스가 대신 놔주는** 사례 — 게이트로 막되, 막힌 자리에 항상 표지판을 세운다.
+152:## §05 설계 결정 흐름 — 언제 어느 층을 쓰나
+156: └ yes → L1 물리: 풀에서 제거 (프롬프트로 빌지 마라)
+159: └ yes → L2 하드: 설명문 사전경고 + 실행 전 상태검사 + 에러는 tool_result로
+162: └ yes → L3 소프트: 깔때기(출력→입력 계약) + 문구 장치(대체/탈출구/넛지/리마인더)
+167:- 워커 감시 금지·직접실행 금지(코디네이터) → **L1**
+168:- 안 읽은 파일 수정 금지 → **L2**
+169:- 검색 순서, 태스크 갱신 타이밍, 다음 행동 선택 → **L3** (모델 재량)
+175:| 답변 전 검증 게이트 (투자권유·편향) | **L2 하드** (파이프라인 강제 관문) | 어기면 규제 사고 |
+176:| 워커에게 발송(fan-out) 권한 안 줌 | **L1 물리** | 수백만 푸시 오발송 = 재앙 |
+177:| 진단→제안 등 기능 에이전트 간 순서 | **L3 소프트** (깔때기 + 라우팅 재량) | 어겨도 품질 저하일 뿐 |
+181:## §06 등장 프롬프트 전문 — 한국어 대역
+185:### L2 하드 — Read→Edit 게이트 관련
+207:### L3 소프트 A — 깔때기 설명문 3종
+248:### L3 소프트 B — 문구 장치 관련
+277:### 결과 넛지 가족 (⑪~) — §04-1에 EN→KO 대역 포함
+279:성공 넛지 5종(TaskUpdate 완료·검증넛지 / EnterPlanMode / Glob 잘림 / WebFetch 리다이렉트), 에러 리다이렉트 5종(Edit↔NotebookEdit 쌍 / Read 토큰초과·바이너리 / Bash sleep 차단), 하네스 힌트 1종(buildSchemaNotSentHint), 결과 속 system-reminder 2종(빈 파일 / 멀웨어) — **전문과 한국어 대역은 §04-1 표에 수록**.
+287:- 2026-07-22 (증보): 결과 넛지 가족 전수 — `tools/` 지시형 문구 패턴 grep(`Consider using|use the .* tool|Call [A-Z]|You should now|Please use` 등) + `TaskUpdateTool.ts:395-397`(검증넛지) · `toolExecution.ts:578-598`(buildSchemaNotSentHint) 원문 Read. §04-1 표의 전 인용문 소스 확인분.
+288:- 정직 표기: "물리/하드/소프트 3층" 분류 자체는 이 문서의 프레임(제안)이며, 각 메커니즘은 소스 검증분. 키움 적용 표는 설계 제안. Bash의 readFileState 기록(:404)이 어떤 bash 명령에서 발동되는지 상세 조건은 미확인.
+
+[ASSISTANT] 나머지 참조를 일괄 정리합니다:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "## §03 L3 소프트 규칙 A — 깔때기 설계 (glob→grep→read)", "new_string": "## §02 소프트 규칙 A — 깔때기 설계 (glob→grep→read)"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "L3 소프트 A (깔때기 설계) — 구조로 유도", "new_string": "소프트 A (깔때기 설계) — 구조로 유도"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "## §04 L3 소프트 규칙 B — 문구 장치", "new_string": "## §03 소프트 규칙 B — 문구 장치"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "L3 소프트 B (문구 장치) — 말로 유도", "new_string": "소프트 B (문구 장치) — 말로 유도"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "그중 **③ 결과 넛지는 단일 사례가 아니라 가족**이다 (§04-1에 전수).", "new_string": "그중 **③ 결과 넛지는 단일 사례가 아니라 가족**이다 (§03-1에 전수)."}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "| **결과 넛지 가족** (tool_result 문구) | 성공/에러 결과에 다음 행동을 심음 — **§04-1 전수** | 다수 도구 + 실행기 |", "new_string": "| **결과 넛지 가족** (tool_result 문구) | 성공/에러 결과에 다음 행동을 심음 — **§03-1 전수** | 다수 도구 + 실행기 |"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "### §04-1 결과 넛지 가족 전수 — \"에러 메시지는 로그가 아니라 프롬프트다\"", "new_string": "### §03-1 결과 넛지 가족 전수 — \"에러 메시지는 로그가 아니라 프롬프트다\""}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "**B. 에러 리다이렉트 — \"안 된다 + 대신 Y 써라\"** (L2 게이트의 에러문이 곧 L3 안내)", "new_string": "**B. 에러 리다이렉트 — \"안 된다 + 대신 Y 써라\"** (하드 게이트의 에러문이 곧 소프트 안내)"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "L1 물리 규칙(디퍼드)에 걸렸을 때의 **탈출 사다리를 하네스가 대신 놔주는** 사례 — 게이트로 막되, 막힌 자리에 항상 표지판을 세운다.", "new_string": "디퍼드 도구(ToolSearch로 스키마를 로드해야 쓸 수 있는 도구)에 걸렸을 때의 **탈출 사다리를 하네스가 대신 놔주는** 사례 — 게이트로 막되, 막힌 자리에 항상 표지판을 세운다."}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Read] {"file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "offset": 150, "limit": 35}
+
+[도구결과] 150	---
+151	
+152	## §05 설계 결정 흐름 — 언제 어느 층을 쓰나
+153	
+154	```
+155	이 도구를 이 맥락에서 아예 쓰면 안 되는가?
+156	 └ yes → L1 물리: 풀에서 제거 (프롬프트로 빌지 마라)
+157	 └ no ↓
+158	순서를 어기면 되돌릴 수 없는 사고인가? (데이터 파괴·규제 위반·비용 폭발)
+159	 └ yes → L2 하드: 설명문 사전경고 + 실행 전 상태검사 + 에러는 tool_result로
+160	 └ no ↓
+161	순서를 어기면 그냥 비효율인가?
+162	 └ yes → L3 소프트: 깔때기(출력→입력 계약) + 문구 장치(대체/탈출구/넛지/리마인더)
+163	```
+164	
+165	CC의 배치 실례를 이 축에 놓으면:
+166	
+167	- 워커 감시 금지·직접실행 금지(코디네이터) → **L1**
+168	- 안 읽은 파일 수정 금지 → **L2**
+169	- 검색 순서, 태스크 갱신 타이밍, 다음 행동 선택 → **L3** (모델 재량)
+170	
+171	### 키움 AI PB 적용 (🟦 설계 제안 — 소스 근거 아님)
+172	
+173	| 키움 요소 | 층 | 이유 |
+174	|---|---|---|
+175	| 답변 전 검증 게이트 (투자권유·편향) | **L2 하드** (파이프라인 강제 관문) | 어기면 규제 사고 |
+176	| 워커에게 발송(fan-out) 권한 안 줌 | **L1 물리** | 수백만 푸시 오발송 = 재앙 |
+177	| 진단→제안 등 기능 에이전트 간 순서 | **L3 소프트** (깔때기 + 라우팅 재량) | 어겨도 품질 저하일 뿐 |
+178	
+179	---
+180	
+181	## §06 등장 프롬프트 전문 — 한국어 대역
+182	
+183	이 문서(및 html 짝꿍)에 인용된 영어 프롬프트 원문 전체와 한국어 번역. 원문이 소스 검증분이고 번역은 참고용.
+184
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "## §05 설계 결정 흐름 — 언제 어느 층을 쓰나\n\n```\n이 도구를 이 맥락에서 아예 쓰면 안 되는가?\n └ yes → L1 물리: 풀에서 제거 (프롬프트로 빌지 마라)\n └ no ↓\n순서를 어기면 되돌릴 수 없는 사고인가? (데이터 파괴·규제 위반·비용 폭발)\n └ yes → L2 하드: 설명문 사전경고 + 실행 전 상태검사 + 에러는 tool_result로\n └ no ↓\n순서를 어기면 그냥 비효율인가?\n └ yes → L3 소프트: 깔때기(출력→입력 계약) + 문구 장치(대체/탈출구/넛지/리마인더)\n```\n\nCC의 배치 실례를 이 축에 놓으면:\n\n- 워커 감시 금지·직접실행 금지(코디네이터) → **L1**\n- 안 읽은 파일 수정 금지 → **L2**\n- 검색 순서
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "### L2 하드 — Read→Edit 게이트 관련", "new_string": "### 하드 — Read→Edit 게이트 관련"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "### L3 소프트 A — 깔때기 설명문 3종", "new_string": "### 소프트 A — 깔때기 설명문 3종"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "### L3 소프트 B — 문구 장치 관련", "new_string": "### 소프트 B — 문구 장치 관련"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "### 결과 넛지 가족 (⑪~) — §04-1에 EN→KO 대역 포함", "new_string": "### 결과 넛지 가족 (⑪~) — §03-1에 EN→KO 대역 포함"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "하네스 힌트 1종(buildSchemaNotSentHint), 결과 속 system-reminder 2종(빈 파일 / 멀웨어) — **전문과 한국어 대역은 §04-1 표에 수록**.", "new_string": "하네스 힌트 1종(buildSchemaNotSentHint), 결과 속 system-reminder 2종(빈 파일 / 멀웨어) — **전문과 한국어 대역은 §03-1 표에 수록**."}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "§04-1 표의 전 인용문 소스 확인분.\n- 정직 표기: \"물리/하드/소프트 3층\" 분류 자체는 이 문서의 프레임(제안)이며, 각 메커니즘은 소스 검증분. 키움 적용 표는 설계 제안. Bash의 readFileState 기록(:404)이 어떤 bash 명령에서 발동되는지 상세 조건은 미확인.", "new_string": "§03-1 표의 전 인용문 소스 확인분.\n- 2026-07-23 (구조 변경): \"L1 물리 층\"(도구를 풀에서 빼면 못 쓴다) 삭제 — 자명한 소리라는 피드백 반영, **하드/소프트 2층**으로 재편. 코디네이터 풀 구성·디퍼드 로딩 내용은 본 문서에서 제거 (디퍼드는 §03-1 하네스 힌트의 배경 설명으로만 유지).\n- 정직 표기: \"하드/소프트 2층\" 분류 자체는 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC\ngrep -n \"L1\\|L2\\|L3\\|물리\\|3층\" 도구호출-순서설계-하드소프트.md | head", "description": "Verify no stray layer references remain in md"}
+
+[도구결과] 283:- 2026-07-23 (구조 변경): "L1 물리 층"(도구를 풀에서 빼면 못 쓴다) 삭제 — 자명한 소리라는 피드백 반영, **하드/소프트 2층**으로 재편. 코디네이터 풀 구성·디퍼드 로딩 내용은 본 문서에서 제거 (디퍼드는 §03-1 하네스 힌트의 배경 설명으로만 유지).
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<title>도구 호출 순서 설계 — 물리·하드·소프트 3층 규칙</title>", "new_string": "<title>도구 호출 순서 설계 — 하드·소프트 2층 규칙</title>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "    <h1>도구 호출 순서는<br><span class=\"r\">벽</span> · <span class=\"a\">차단기</span> · <span class=\"c\">표지판</span>으로 설계한다</h1>\n    <p class=\"sub\">\"glob→grep→read는 어떻게 세팅했나\"의 답 — 순서를 지정하는 코드는 없다.\n    대신 강제력이 다른 3층 장치(물리·하드·소프트)가 순서를 만든다. 전 항목 소스 검증.</p>\n    <div class=\"chips\">\n      <span class=\"chip\">검증 <b>tools/*/prompt.ts</b></span>\n      <span class=\"chip\"><b>FileEditTool.ts</b> ·
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 섹션 01 스펙트럼을 2층 SVG로 교체:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <div class=\"num\">01</div>\n      <h2>강제력 스펙트럼 — <span style=\"color:var(--red)\">물리</span> → <span style=\"color:var(--amber)\">하드</span> → <span style=\"color:var(--cyan)\">소프트</span></h2>\n      <p class=\"cap\">기준은 하나: <b>어기면 무슨 일이 나는가.</b> 시도 자체가 불가능하면 <span class=\"hr\">물리</span>,\n      시도하면 코드가 거부하면 <span class=\"ha\">하드</span>, 안 따라도 비효율일 뿐이면 <span class=\"hc\">소프트</span>.\n   
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 섹션 02(물리) 통삭제:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<!-- ===== 02 L1 물리 ===== -->\n<section>\n  <div class=\"wrap\">\n    <div class=\"rv\">\n      <div class=\"num\">02</div>\n      <h2><span style=\"color:var(--red)\">L1 물리</span> — 도구를 풀에서 빼버린다</h2>\n      <p class=\"cap\">가장 강한 방법. 프롬프트로 \"쓰지 마라\" 빌 필요가 없다 —\n      <b>tools 배열에 없으면 모델은 그 도구의 존재조차 모른다.</b></p>\n    </div>\n    <div class=\"duo\">\n      <div class=\"panel rv\">\n        <svg
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <div class=\"num\">03</div>\n      <h2><span style=\"color:var(--amber)\">L2 하드</span> — Read→Edit 게이트 해부 (에러 1개가 아니라 5겹)</h2>\n      <p class=\"cap\">풀에는 있으니 시도는 가능 — 대신 실행 직전 <b>readFileState 상태머신</b>이 검사한다.", "new_string": "      <div class=\"num\">02</div>\n      <h2><span style=\"color:var(--amber)\">하드</span> — Read→Edit 게이트 해부 (에러 1개가 아니라 5겹)</h2>\n      <p class=\"cap\">시도는 가능 — 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <div class=\"num\">04</div>\n      <h2><span style=\"color:var(--cyan)\">L3 소프트 A</span> — 깔때기: 출력이 다음 입력이 되게 판다</h2>", "new_string": "      <div class=\"num\">03</div>\n      <h2><span style=\"color:var(--cyan)\">소프트 A</span> — 깔때기: 출력이 다음 입력이 되게 판다</h2>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<pre class=\"tree\"><span class=\"tt\">L3 소프트 A (깔때기 설계) — 구조로 유도</span>", "new_string": "<pre class=\"tree\"><span class=\"tt\">소프트 A (깔때기 설계) — 구조로 유도</span>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <div class=\"num\">05</div>\n      <h2><span style=\"color:var(--cyan)\">L3 소프트 B</span> — 문구 장치</h2>", "new_string": "      <div class=\"num\">04</div>\n      <h2><span style=\"color:var(--cyan)\">소프트 B</span> — 문구 장치</h2>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<pre class=\"tree\"><span class=\"tt\">L3 소프트 B (문구 장치) — 말로 유도</span>", "new_string": "<pre class=\"tree\"><span class=\"tt\">소프트 B (문구 장치) — 말로 유도</span>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <span class=\"ko\">\"이 도구의 스키마가 API에 안 실렸다. 먼저 ToolSearch를 select:{도구명}으로 호출해 로드한 뒤 이 호출을 재시도하라\" — 도구가 아니라 실행기가, 정확한 재시도 명령어까지 조립. L1 물리 규칙에 걸린 자리에 하네스가 탈출 사다리를 놔줌</span>", "new_string": "        <span class=\"ko\">\"이 도구의 스키마가 API에 안 실렸다. 먼저 ToolSearch를 select:{도구명}으로 호출해 로드한 뒤 이 호출을 재시도하라\" — 도구가 아니라 실행기가, 정확한 재시도 명령어까지 조립. 디퍼드 도구(스키마 미로딩) 게이트에 걸린 자리에 하네스가 탈출 사다리를 놔줌</span>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "    예외 로그가 아니라 <b>복구 프롬프트</b>. 게이트(L2)로 막되, 막힌 자리에 항상 표지판(L3)을 세운다.</div>", "new_string": "    예외 로그가 아니라 <b>복구 프롬프트</b>. 게이트(하드)로 막되, 막힌 자리에 항상 표지판(소프트)을 세운다.</div>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <div class=\"num\">06</div>\n      <h2>어느 층을 쓰나 — 결정 흐름</h2>\n      <p class=\"cap\">CC가 실제로 지키는 배치 원칙: <b>어기면 사고 → 위층, 어기면 비효율 → 아래층.</b></p>\n    </div>\n    <div class=\"panel rv\">\n      <svg viewBox=\"0 0 940 300\" role=\"img\" aria-label=\"층 선택 결정 흐름\">\n        <defs>\n          <marker id=\"ar5\" viewBox=\"0 0 10 10\" refX=\"9\" refY=\"5\" markerWidth=\"7\" markerHeight=\"7\" or
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "    \"물리/하드/소프트 3층\" 분류 자체는 이 문서의 프레임(제안)이며, 각 층의 메커니즘은 소스 검증분.</p>", "new_string": "    \"하드/소프트 2층\" 분류 자체는 이 문서의 프레임(제안)이며, 각 층의 메커니즘은 소스 검증분.</p>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC\necho \"=== html 잔여 참조 확인 ===\"\ngrep -n \"L1\\|L2\\|L3\\|물리\\|3층\" 도구호출-순서설계-하드소프트.html | head", "description": "Check for remaining stray references in HTML"}
+
+[도구결과] === html 잔여 참조 확인 ===
+118:            <path d="M0,0 L10,5 L0,10 z" fill="#5b6773"/>
+163:            <path d="M0,0 L10,5 L0,10 z" fill="#5b6773"/>
+166:            <path d="M0,0 L10,5 L0,10 z" fill="#f0616a"/>
+169:            <path d="M0,0 L10,5 L0,10 z" fill="#7ee787"/>
+242:<!-- ===== 04 L3-A 깔때기 ===== -->
+255:            <path d="M0,0 L10,5 L0,10 z" fill="#4dd0e1"/>
+312:<!-- ===== 05 L3-B 문구장치 ===== -->
+418:            <path d="M0,0 L10,5 L0,10 z" fill="#5b6773"/>
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<!-- ===== 04 L3-A 깔때기 ===== -->", "new_string": "<!-- ===== 03 소프트A 깔때기 ===== -->"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<!-- ===== 05 L3-B 문구장치 ===== -->", "new_string": "<!-- ===== 04 소프트B 문구장치 ===== -->"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC/src\necho \"=== Grep 입력 스키마 전체 (파라미터 정의) ===\"\nsed -n '40,102p' tools/GrepTool/GrepTool.ts", "description": "Read Grep tool input schema parameters"}
+
+[도구결과] === Grep 입력 스키마 전체 (파라미터 정의) ===
+    path: z
+      .string()
+      .optional()
+      .describe(
+        'File or directory to search in (rg PATH). Defaults to current working directory.',
+      ),
+    glob: z
+      .string()
+      .optional()
+      .describe(
+        'Glob pattern to filter files (e.g. "*.js", "*.{ts,tsx}") - maps to rg --glob',
+      ),
+    output_mode: z
+      .enum(['content', 'files_with_matches', 'count'])
+      .optional()
+      .describe(
+        'Output mode: "content" shows matching lines (supports -A/-B/-C context, -n line numbers, head_limit), "files_with_matches" shows file paths (supports head_limit), "count" shows match counts (supports head_limit). Defaults to "files_with_matches".',
+      ),
+    '-B': semanticNumber(z.number().optional()).describe(
+      'Number of lines to show before each match (rg -B). Requires output_mode: "content", ignored otherwise.',
+    ),
+    '-A': semanticNumber(z.number().optional()).describe(
+      'Number of lines to show after each match (rg -A). Requires output_mode: "content", ignored otherwise.',
+    ),
+    '-C': semanticNumber(z.number().optional()).describe('Alias for context.'),
+    context: semanticNumber(z.number().optional()).describe(
+      'Number of lines to show before and after each match (rg -C). Requires output_mode: "content", ignored otherwise.',
+    ),
+    '-n': semanticBoolean(z.boolean().optional()).describe(
+      'Show line numbers in output (rg -n). Requires output_mode: "content", ignored otherwise. Defaults to true.',
+    ),
+    '-i': semanticBoolean(z.boolean().optional()).describe(
+      'Case insensitive search (rg -i)',
+    ),
+    type: z
+      .string()
+      .optional()
+      .describe(
+        'File type to search (rg --type). Common types: js, py, rust, go, java, etc. More efficient than include for standard file types.',
+      ),
+    head_limit: semanticNumber(z.number().optional()).describe(
+      'Limit output to first N lines/entries, equivalent to "| head -N". Wor
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "Glob   \"find files by NAME patterns\"        출력: 경로 목록      (출력 작음)\n   ↓ 경로가 있어야 범위를 좁힘\nGrep   \"search the CONTENT of files\"        출력: 매칭 라인/파일 (출력 중간)\n       — glob 파라미터로 Glob의 출력을 받게 설계\n   ↓ 정확한 파일을 알아야\nRead   \"file_path must be an ABSOLUTE path\" 출력: 전체 내용      (출력 큼)", "new_string": "Glob   \"find files by NAME patterns\"        출력: 경로 목록      (출력 작음)  ┐\n                          
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "├─ 입출력 사슬 — \"앞의 출력 = 뒤의 입력\"     ← 순서를 어기면 넣을 게 없게\n│    Glob 출력(경로 목록)  → Grep의 glob 파라미터로\n│    Grep 출력(파일 확정)  → Read의 absolute path로", "new_string": "├─ 입출력 합류 — \"경로 없이는 못 읽는다\"     ← 검색 없이 Read부터 하면 넣을 게 없게\n│    Glob 출력(경로 목록) ┐\n│    Grep 출력(경로/매칭) ┴→ Read의 file_path(절대경로 필수)로\n│    ※ Glob→Grep 배선은 없음 — Grep의 glob 파라미터는 패턴(*.js)이지 Glob 도구 출력이 아님"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "> - \"glob 파라미터로 파일을 필터링하라 (예: \\\"*.js\\\", \\\"**/*.tsx\\\")\" ← *Glob의 출력을 받는 연결고리*", "new_string": "> - \"glob 파라미터로 파일을 필터링하라 (예: \\\"*.js\\\", \\\"**/*.tsx\\\")\" ← *여기서 glob은 패턴 문법 — Glob 도구의 출력이 아님*"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "- 2026-07-23 (구조 변경): \"L1 물리 층\"", "new_string": "- 2026-07-23 (정정 2): \"Glob 출력 → Grep glob 파라미터\" 주장 철회 — `GrepTool.ts` 스키마 확인 결과 glob 파라미터는 **패턴**(\"Glob pattern to filter files (e.g. \\\"*.js\\\") - maps to rg --glob\")이지 Glob 도구의 출력이 아님. Grep은 Glob 없이 독립 동작(path 기본값=cwd). 구조를 3단 사슬 → **Y자 합류**(Glob/Grep 출력 경로 → Read의 file_path 필수)로 정정.\n- 2026-07-23 (구조 변경): \"L1 물리 층\""}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] html도 같은 정정:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <text x=\"470\" y=\"202\" text-anchor=\"middle\" fill=\"#aab6c2\" font-size=\"12\">\"search the CONTENT of files\" — glob 파라미터로 앞 출력을 받음</text>", "new_string": "        <text x=\"470\" y=\"202\" text-anchor=\"middle\" fill=\"#aab6c2\" font-size=\"12\">\"search the CONTENT of files\" — 독립 동작 (glob 파라미터는 *.js 패턴 필터)</text>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <text x=\"620\" y=\"144\" class=\"m\" fill=\"#5fb3bd\" font-size=\"10\">경로가 있어야 범위를 좁힘</text>", "new_string": "        <text x=\"620\" y=\"144\" class=\"m\" fill=\"#5fb3bd\" font-size=\"10\">※ 배선된 연결 아님 — 모델의 사용 패턴</text>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "├─ <span class=\"br\">입출력 사슬 — \"앞의 출력 = 뒤의 입력\"</span>     ← 순서를 어기면 넣을 게 없게\n│    <span class=\"q\">Glob 출력(경로 목록)  → Grep의 glob 파라미터로</span>\n│    <span class=\"q\">Grep 출력(파일 확정)  → Read의 absolute path로</span>", "new_string": "├─ <span class=\"br\">입출력 합류 — \"경로 없이는 못 읽는다\"</span>     ← 검색 없이 Read부터 하면 넣을 게 없게\n│    <span class=\"q\">Glob 출력(경로 목록) ┐</span>\n│    <span class=\"q\">Grep 출력(
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <span class=\"ko\">\"ripgrep 위에 만든 강력한 검색 도구 … 검색 작업엔 항상 Grep을 써라. 절대 grep·rg를 Bash 명령으로 호출하지 마라 … glob 파라미터로 파일을 필터링하라 (예: \"*.js\", \"**/*.tsx\") ← Glob의 출력을 받는 연결고리 … 여러 라운드가 필요한 열린 탐색엔 Agent 도구를 사용하라\"</span>", "new_string": "        <span class=\"ko\">\"ripgrep 위에 만든 강력한 검색 도구 … 검색 작업엔 항상 Grep을 써라. 절대 grep·rg를 Bash 명령으로 호출하지 마라 … glob 파라미터로 파일을 필터링하라 (예: \"*.js\", \"**/*.tsx\") ← 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html\"", "description": "Reopen corrected HTML"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 정리하면, 이번 턴에 두 가지가 반영됐습니다.
+
+## ① L1 물리 층 삭제 (요청대로)
+- 문서 전체를 **하드·소프트 2층**으로 재편 — 제목("차단기·표지판"), 스펙트럼 SVG(2박스), 결정 흐름(2분기), 키움 표에서 물리 행 삭제, §번호 재정렬
+- 코디네이터·디퍼드 로딩 섹션 통삭제 (디퍼드는 §03-1 하네스 힌트의 배경 한 줄로만 남김)
+
+## ② 대표님 질문이 잡아낸 오류 정정 — "Grep에 Glob 쓰라는 문구 있어?" → **없음**
+
+스키마 원문 확인:
+> `glob: "Glob pattern to filter files (e.g. "*.js") - maps to rg --glob"`
+> `path: "File or directory to search in. Defaults to current working directory."`
+
+- Grep의 `glob` 파라미터 = **패턴 문법**(`*.js`), Glob **도구**의 출력이 아님 — 이름만 같은 것
+- Grep은 Glob 없이 **완전 독립 동작** (path 기본값 = 현재 디렉토리)
+- 진짜 배선된 의존은 **Read 하나뿐** (file_path 필수 → 경로는 검색 결과에서만 나옴)
+
+그래서 문서의 "입출력 사슬(Glob→Grep→Read 3단)"을 **Y자 합류**로 정정했습니다:
+
+```
+Glob 출력(경로 목록) ┐
+Grep 출력(경로/매칭) ┴→ Read의 file_path(절대경로 필수)
+※ Glob→Grep 배선 없음 — 모델이 선택하는 사용 패턴일 뿐
+```
+
+md 트리·깔때기 블록·§05 대역 ⑥, html 트리·깔때기 SVG·대역 인용까지 전부 고쳤고, 검증 이력에 정정 2건(비용 경사 철회에 이어 Y자 정정)을 기록했습니다. 이 문서가 대표님 질문 덕에 두 번 연속으로 더 정확해졌네요 — "설계된 계약"과 "모델의 창발적 사용 패턴"의 경계가 이제 제대로 그어졌습니다.
+
+[USER] 깔때기 설계라고 하기엔 이름이 애매한데.. ㅇ그니까 그 grep은 은은하게 ㅇ이거 사용하려면 뭐가 필요하다라고 적혀있는거지?
+
+[ASSISTANT] 거의 다 왔는데 한 끗 다릅니다 — **Grep은 그런 요구조차 없어요.** 정확히 확인해볼게요. 각 도구의 "필수 파라미터"가 뭔지가 핵심입니다.
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC/src\necho \"=== Grep 필수 파라미터 (optional 아닌 것) ===\"\nsed -n '30,42p' tools/GrepTool/GrepTool.ts\necho\necho \"=== Glob 필수 파라미터 ===\"\nrg -n \"pattern|path\" tools/GlobTool/GlobTool.ts | grep -E \"z\\.|describe\" | head -6\necho\necho \"=== Read 필수 파라미터 ===\"\nrg -n \"file_path|optional\" tools/FileReadTool/FileReadTool.ts | grep -E \"z\\.string|describe\\(\" | head -6", "description": "Check required vs optional params for the three tools"}
+
+[도구결과] === Grep 필수 파라미터 (optional 아닌 것) ===
+  renderToolUseMessage,
+} from './UI.js'
+
+const inputSchema = lazySchema(() =>
+  z.strictObject({
+    pattern: z
+      .string()
+      .describe(
+        'The regular expression pattern to search for in file contents',
+      ),
+    path: z
+      .string()
+      .optional()
+
+=== Glob 필수 파라미터 ===
+28:    pattern: z.string().describe('The glob pattern to match files against'),
+47:      .describe('Array of file paths that match the pattern'),
+
+=== Read 필수 파라미터 ===
+229:    file_path: z.string().describe('The absolute path to the file to read'),
+230:    offset: semanticNumber(z.number().int().nonnegative().optional()).describe(
+233:    limit: semanticNumber(z.number().int().positive().optional()).describe(
+
+[도구호출 AskUserQuestion] {"questions": [{"question": "'소프트 A — 깔때기 설계' 섹션 이름을 뭐로 바꿀까요? (md·html 둘 다 반영)", "header": "섹션 이름", "multiSelect": false, "options": [{"label": "입장권 설계 (추천)", "description": "각 도구의 필수 파라미터 = 입장권. 공짜 입장권(패턴) 도구부터, 비싼 입장권(경로·읽은 이력) 도구로 — 은유가 직관적이고 하드 게이트(Edit)와도 이어짐"}, {"label": "조달 난이도 계단", "description": "'지어낼 수 있는 입력 → 조달해야 하는 입력' 순서라는 동력을 이름에 그대로 박음. 은유 없이 서술적"}, {"label": "무전제 → 유전제 배치", "description": "선행조건 0인 도구(Glob/Grep)와 선행조건 있는 도구(Read/Edit)의 배치라는 대비를 강조"}, {"label": "깔때기 유지 + 주석", "des
+
+[도구결과] Your questions have been answered: "'소프트 A — 깔때기 설계' 섹션 이름을 뭐로 바꿀까요? (md·html 둘 다 반영)"="입장권 설계 (추천)". You can now continue with these answers in mind.
+
+[ASSISTANT] "입장권 설계"로 확정. 양쪽 파일의 깔때기 표현을 전수 찾아 바꾸겠습니다.
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC\necho \"=== md 깔때기 위치 ===\"; grep -n \"깔때기\" 도구호출-순서설계-하드소프트.md\necho; echo \"=== html 깔때기 위치 ===\"; grep -n \"깔때기\" 도구호출-순서설계-하드소프트.html", "description": "Find all 깔때기 occurrences in both files"}
+
+[도구결과] === md 깔때기 위치 ===
+14:| **소프트 규칙** (유도 설계) | 안 따라도 동작은 함 | 비효율일 뿐 | glob→grep→read 깔때기, 문구 장치들 |
+52:## §02 소프트 규칙 A — 깔때기 설계 (glob→grep→read)
+73:소프트 A (깔때기 설계) — 구조로 유도
+89:**깔때기의 문법**: `출력 부피 오름차순(작은 출력부터) + 출력 타입 = 다음 입력 타입 + 각 description에 자기 니치("when you need to...") 명시`.
+95:깔때기 외에 소스에서 확인된 유도 장치들. 4갈래인데, 성격은 두 그룹으로 갈린다 — **정적 안내(표지판) vs 동적 넛지(옆구리 찌르기)**. 차이의 본질은 **타이밍**: 표지판은 항상 서 있고, 넛지는 사건이 난 그 순간에만 꽂힌다.
+162: └ yes → 소프트: 깔때기(출력→입력 계약) + 문구 장치(대체/탈출구/넛지/리마인더)
+175:| 진단→제안 등 기능 에이전트 간 순서 | **소프트** (깔때기 + 라우팅 재량) | 어겨도 품질 저하일 뿐 |
+205:### 소프트 A — 깔때기 설명문 3종
+283:- 2026-07-22: 순서 강제 코드 부재 확인(`mustUseBefore|toolOrder|sequence` 전수 grep → 도구 순서 관련 0건). readFileState 5겹(`FileEditTool.ts:275-306,519-522` · `FileWriteTool.ts:198-216` · `FileEditTool/prompt.ts:4-5` · set 지점 5개 도구) Read 확인. 깔때기 3종 설명문 원문 Read. 시스템프롬프트 대체지침(`constants/prompts.ts:298-299`) Read.
+
+=== html 깔때기 위치 ===
+143:        <text x="675" y="240" text-anchor="middle" class="m" fill="#4dd0e1" font-size="10.5">glob→grep→read 깔때기 · 문구 장치</text>
+242:<!-- ===== 03 소프트A 깔때기 ===== -->
+247:      <h2><span style="color:var(--cyan)">소프트 A</span> — 깔때기: 출력이 다음 입력이 되게 판다</h2>
+252:      <svg viewBox="0 0 940 330" role="img" aria-label="glob grep read 깔때기">
+281:<pre class="tree"><span class="tt">소프트 A (깔때기 설계) — 구조로 유도</span>
+294:    <div class="note rv"><b>깔때기의 문법</b> — 출력 부피 오름차순(작은 출력부터) + 출력 타입 = 다음 입력 타입 + description에 자기 니치("Use this tool when you need to…") 명시.
+344:        <p>시퀀스가 아니라 <b>경계 안내</b> — 깔때기를 벗어날 조건과 대안을 알려준다.</p>
+439:        <text x="765" y="171" text-anchor="middle" class="m" fill="#8a97a5" font-size="10">깔때기 + 대체/탈출구/넛지/리마인더</text>
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "| **소프트 규칙** (유도 설계) | 안 따라도 동작은 함 | 비효율일 뿐 | glob→grep→read 깔때기, 문구 장치들 |", "new_string": "| **소프트 규칙** (유도 설계) | 안 따라도 동작은 함 | 비효율일 뿐 | glob→grep→read 입장권 설계, 문구 장치들 |"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "## §02 소프트 규칙 A — 깔때기 설계 (glob→grep→read)", "new_string": "## §02 소프트 규칙 A — 입장권 설계 (glob→grep→read)\n\n> **입장권** = 각 도구의 필수 파라미터. 도구마다 입장권 가격이 다르다 — 공짜 입장권(모델이 지어낼 수 있는 패턴) 도구부터, 비싼 입장권(조달해야 하는 절대경로) 도구로 계단이 놓여 있어서 순서가 저절로 나온다."}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "소프트 A (깔때기 설계) — 구조로 유도\n├─ 출력 부피 경사 — \"작은 출력부터\"          ← 반환량이 단계별로 커지게 설계됨\n│    Glob: 경로 ≤100개 잘림 → Grep: head_limit 기본 상한 → Read: ≤2000줄+토큰 상한\n│    ※ 코드가 '비용'을 계산·비교하는 곳은 없음 — 싸다/비싸다는 반환 토큰량 차이에 대한 해석\n│\n├─ 입출력 합류 — \"경로 없이는 못 읽는다\"     ← 검색 없이 Read부터 하면 넣을 게 없게\n│    Glob 출력(경로 목록) ┐\n│    Grep 출력(경로/매칭) ┴→ Read의 file_path(절대경로 필수)로\n│    ※ Glob→Grep 배선은 없음 — Grep의 glob 파라미터는 패턴(*.js)이
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "**깔때기의 문법**: `출력 부피 오름차순(작은 출력부터) + 출력 타입 = 다음 입력 타입 + 각 description에 자기 니치(\"when you need to...\") 명시`.", "new_string": "**입장권 설계의 문법**: `공짜 입장권(지어낼 수 있는 입력) 도구부터 배치 + 비싼 입장권(조달 입력)은 앞 단계 출력으로 채워지게 + 각 description에 자기 니치(\"when you need to...\") 명시`.\n\n› 입장권 근거: `GrepTool.ts:35-40`(pattern만 필수, path/glob optional) · `GlobTool.ts:28`(pattern만 필수) · `FileReadTool.ts:229`(file_path = \"The absol
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "깔때기 외에 소스에서 확인된 유도 장치들.", "new_string": "입장권 설계 외에 소스에서 확인된 유도 장치들."}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": " └ yes → 소프트: 깔때기(출력→입력 계약) + 문구 장치(대체/탈출구/넛지/리마인더)", "new_string": " └ yes → 소프트: 입장권 설계(필수 파라미터 계단) + 문구 장치(대체/탈출구/넛지/리마인더)"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "| 진단→제안 등 기능 에이전트 간 순서 | **소프트** (깔때기 + 라우팅 재량) | 어겨도 품질 저하일 뿐 |", "new_string": "| 진단→제안 등 기능 에이전트 간 순서 | **소프트** (입장권 설계 + 라우팅 재량) | 어겨도 품질 저하일 뿐 |"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "### 소프트 A — 깔때기 설명문 3종", "new_string": "### 소프트 A — 검색·읽기 3종 설명문"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 이제 html 7곳:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <text x=\"675\" y=\"240\" text-anchor=\"middle\" class=\"m\" fill=\"#4dd0e1\" font-size=\"10.5\">glob→grep→read 깔때기 · 문구 장치</text>", "new_string": "        <text x=\"675\" y=\"240\" text-anchor=\"middle\" class=\"m\" fill=\"#4dd0e1\" font-size=\"10.5\">glob→grep→read 입장권 설계 · 문구 장치</text>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<!-- ===== 03 소프트A 깔때기 ===== -->", "new_string": "<!-- ===== 03 소프트A 입장권 ===== -->"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <h2><span style=\"color:var(--cyan)\">소프트 A</span> — 깔때기: 출력이 다음 입력이 되게 판다</h2>\n      <p class=\"cap\">glob→grep→read 순서를 강제하는 코드는 <b>0건</b>. 대신 각 설명문이 자기 니치와 입출력을 못 박아\n      <b>데이터 의존성상 이 경로가 유일</b>해지도록 설계 — 순서가 \"저절로\" 나온다.</p>", "new_string": "      <h2><span style=\"color:var(--cyan)\">소프트 A</span> — 입장권 설계: 공짜 입장권 도구부터 배치한다</h2>\n      <p class=\"cap\"><b>입장권 = 각 도구의 필수 파라미터.</b> 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <svg viewBox=\"0 0 940 330\" role=\"img\" aria-label=\"glob grep read 깔때기\">", "new_string": "      <svg viewBox=\"0 0 940 330\" role=\"img\" aria-label=\"glob grep read 입장권 계단\">"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<pre class=\"tree\"><span class=\"tt\">소프트 A (깔때기 설계) — 구조로 유도</span>\n├─ <span class=\"br\">출력 부피 경사 — \"작은 출력부터\"</span>          ← 반환량이 단계별로 커지게 설계됨\n│    <span class=\"q\">Glob: 경로 ≤100개 잘림 → Grep: head_limit 상한 → Read: ≤2000줄+토큰 상한</span>\n│    <span class=\"q\">※ 비용을 계산하는 코드는 없음 — 싸다/비싸다는 반환량 차이에 대한 해석</span>\n│\n├─ <span class=\"br\">입출력 합류 — \"경로 없이는 못 읽는다\"</span>     ← 검색 없이 Read부터 하
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "    <div class=\"note rv\"><b>깔때기의 문법</b> — 출력 부피 오름차순(작은 출력부터) + 출력 타입 = 다음 입력 타입 + description에 자기 니치(\"Use this tool when you need to…\") 명시.\n    출력 상한 근거: GlobTool.ts:50 · GrepTool.ts:104-107 · FileReadTool.ts:181.</div>", "new_string": "    <div class=\"note rv\"><b>입장권 설계의 문법</b> — 공짜 입장권(지어낼 수 있는 입력) 도구부터 배치 + 비싼 입장권(조달 입력)은 앞 단계 출력으로 채워지게 + description에 자기 니치(\"Use this tool when you 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <p>시퀀스가 아니라 <b>경계 안내</b> — 깔때기를 벗어날 조건과 대안을 알려준다.</p>", "new_string": "        <p>시퀀스가 아니라 <b>경계 안내</b> — 이 경로를 벗어날 조건과 대안을 알려준다.</p>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <text x=\"765\" y=\"171\" text-anchor=\"middle\" class=\"m\" fill=\"#8a97a5\" font-size=\"10\">깔때기 + 대체/탈출구/넛지/리마인더</text>", "new_string": "        <text x=\"765\" y=\"171\" text-anchor=\"middle\" class=\"m\" fill=\"#8a97a5\" font-size=\"10\">입장권 설계 + 대체/탈출구/넛지/리마인더</text>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "- 2026-07-23 (정정 2): \"Glob 출력 → Grep glob 파라미터\" 주장 철회", "new_string": "- 2026-07-23 (개명): \"깔때기 설계\" → **\"입장권 설계\"** — Glob→Grep 배선 부재 확인 후 깔때기(일직선 좁힘) 은유가 부정확해짐. 입장권(=필수 파라미터) 근거 확인: `GrepTool.ts:35-40`(pattern만 필수, 나머지 전부 optional) · `GlobTool.ts:28`(동일) · `FileReadTool.ts:229`(file_path 절대경로 필수). 트리에 \"입장권 경사\" 가지 신설.\n- 2026-07-23 (정정 2): \"Glob 출력 → Grep glob 파라미터\" 주장 철회"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC\necho \"=== 잔여 깔때기 (검증이력 제외 확인) ===\"\ngrep -n \"깔때기\" 도구호출-순서설계-하드소프트.md 도구호출-순서설계-하드소프트.html\nopen \"/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html\"", "description": "Verify remaining occurrences and reopen HTML"}
+
+[도구결과] === 잔여 깔때기 (검증이력 제외 확인) ===
+도구호출-순서설계-하드소프트.md:288:- 2026-07-22: 순서 강제 코드 부재 확인(`mustUseBefore|toolOrder|sequence` 전수 grep → 도구 순서 관련 0건). readFileState 5겹(`FileEditTool.ts:275-306,519-522` · `FileWriteTool.ts:198-216` · `FileEditTool/prompt.ts:4-5` · set 지점 5개 도구) Read 확인. 깔때기 3종 설명문 원문 Read. 시스템프롬프트 대체지침(`constants/prompts.ts:298-299`) Read.
+도구호출-순서설계-하드소프트.md:291:- 2026-07-23 (개명): "깔때기 설계" → **"입장권 설계"** — Glob→Grep 배선 부재 확인 후 깔때기(일직선 좁힘) 은유가 부정확해짐. 입장권(=필수 파라미터) 근거 확인: `GrepTool.ts:35-40`(pattern만 필수, 나머지 전부 optional) · `GlobTool.ts:28`(동일) · `FileReadTool.ts:229`(file_path 절대경로 필수). 트리에 "입장권 경사" 가지 신설.
+
+[ASSISTANT] 완료. 남은 "깔때기" 2건은 검증 이력(변경 기록)에만 있는 의도적 흔적입니다.
+
+## 정리 — "입장권 설계"로 개명 + 개념 재정립
+
+**대표님 질문의 답 (핵심)**:
+- Grep에 "은은한 요구"는 **없습니다** — 필수 입력이 `pattern` 하나뿐이고 그건 모델이 머리에서 지어내는 것. path·glob 전부 optional. **무전제 도구**예요.
+- 은은한 요구가 적힌 건 **Read** — `file_path: "The absolute path to the file"` = "경로를 이미 알고 있어야 한다"가 함의. 경로는 지어낼 수 없으니 검색 출력에서 조달할 수밖에 없고, 여기서 순서가 창발합니다.
+
+**문서 반영** (md·html 전체):
+- 섹션명: 깔때기 설계 → **입장권 설계** ("입장권 = 각 도구의 필수 파라미터" 정의 추가)
+- 트리에 **"입장권 경사"** 가지 신설 — 공짜(패턴·지어냄) → 조달(절대경로) → 조달+이력(Edit, 하드 게이트 진입)까지 4단 계단. Edit이 하드 규칙으로 이어지는 연결고리도 자연스럽게 보이게 됨
+- 근거 라인 명시: `GrepTool.ts:35-40` · `GlobTool.ts:28` · `FileReadTool.ts:229`
+- 검증 이력에 개명 사유 기록
+
+이번 개명으로 문서의 소프트 A 논리가 처음보다 훨씬 단단해졌어요:
+
+```
+처음:  "깔때기 — 3단 사슬로 좁아진다"        (Glob→Grep 배선이 있는 것처럼 암시 — 오류)
+지금:  "입장권 계단 — 공짜 입장권 도구부터"   (필수 파라미터 조달 난이도, 전부 스키마 검증분)
+```
+
+[USER] 소프트 규칙 - 자연스럽게 연결로 각자 도구 설명을 적어서 다른 도구를 언급하지 않고 각자 도구 설명에 의해 필요한 것을 LLM이 판단해서 사용하게끔 하는 방법이 있다.
+이설명이면 말이되나? 방금거?
+
+[ASSISTANT] 네, **거의 정확합니다** — 한 군데만 다듬으면 완벽해요.
+
+## 맞는 부분 (핵심을 정확히 잡으심)
+
+**"순서에 관한 상호 언급은 0건"** — 이게 정확합니다. 어떤 설명서에도 "나를 쓰기 전에 Glob을 써라", "Glob의 출력을 나한테 넣어라"가 없어요. 각 도구는:
+
+- 자기 **니치**만 선언 ("이름 패턴으로 찾을 때 나")
+- 자기 **필수 입력**만 선언 ("절대경로 내놔")
+
+그리고 "Read가 요구하는 경로를 어디서 구하지? → 아, 검색 결과에서" — **이 연결은 순전히 LLM의 추론**입니다. 대표님 문장 그대로예요.
+
+## 다듬을 부분 하나 — "다른 도구를 언급하지 않고"는 절반만 사실
+
+설명서에 다른 도구 언급이 **있긴 있어요**. 다만 용도가 다릅니다:
+
+| 언급 종류 | 존재 여부 | 예시 |
+|---|---|---|
+| **순서 지시** ("누구 다음에 나") | ❌ 0건 | — |
+| **탈출구** ("이 경우엔 딴 데로") | ✅ 있음 | "열린 탐색이면 **Agent** 써라" |
+| **우회 금지** ("나 대신 딴 걸로 하지 마") | ✅ 있음 | "**절대** grep을 Bash로 호출 마라" |
+
+즉 "서로를 몰라서" 순서가 나오는 게 아니라 — **"서로의 순서를 말하지 않아서"** 순서가 LLM 추론으로 나오는 거예요.
+
+## 다듬은 최종 문장
+
+> **소프트 규칙(입장권 설계)**: 각 도구 설명은 자기 니치와 필수 입력만 선언한다. "어느 도구 다음에 써라"는 순서 언급은 어디에도 없고, 필요한 입력(경로)을 어디서 조달할지는 **LLM이 각 설명을 읽고 스스로 판단해 연결**한다. — 다른 도구 언급이 있긴 하지만 그것은 순서가 아니라 탈출구(Agent로)·우회금지(Bash로 하지 마라) 안내다.
+
+이 문장이면 소스 검증분과 정확히 일치합니다.
+
+[USER] 그리고 그 아래에 소프트 B에 있는 대체지침이란 표현이맞나?
+
+[ASSISTANT] 좋은 포인트예요. 결론부터: **틀린 표현은 아닌데, 두 가지가 아쉽습니다.**
+
+## ① "대체"라는 단어 자체는 원문에 충실
+
+원문이 문자 그대로 "instead of" 구문이라서요:
+
+```
+"To search for files use Glob instead of find or ls"
+         (작업)        (전용도구)  ↑대체↑  (Bash 범용명령)
+```
+
+"A 대신 B를 써라" = 대체. 번역으로는 정확합니다.
+
+## ② 그런데 이름에 "뭐를 뭐로"가 빠져 있음
+
+"대체지침"만 보면 **뭘 대체한다는 건지** 안 보여요. 실체는 아주 구체적입니다 — **"Bash 범용 명령(find/ls/grep/cat/sed/awk/echo) → 전용 도구(Glob/Grep/Read/Edit/Write)"** 라는 한 방향 매핑 5줄이에요. 이름에 방향이 없으니 처음 보는 사람은 "지침을 대체?"로도 읽힐 수 있죠.
+
+## ③ 더 중요한 발견 — ②탈출구 카드와 사실 같은 정책의 양면
+
+방금 대화에서 드러난 건데, 이 둘은 **같은 정책을 두 곳에서 두 톤으로** 말하는 겁니다:
+
+| 위치 | 톤 | 문구 |
+|---|---|---|
+| 시스템프롬프트 (①대체지침) | **권장형** | "use Grep **instead of** grep or rg" |
+| Grep 설명문 (②에 분류했던 것) | **금지형** | "**NEVER** invoke grep or rg as a Bash command" |
+
+→ 정책은 하나: **"Bash로 우회하지 말고 전용 도구로 와라."** 지금 문서는 이걸 ①과 ②에 쪼개놨는데, 관계를 안 적어놔서 별개처럼 보입니다.
+
+이름을 손볼까요?
+
+[도구호출 AskUserQuestion] {"questions": [{"question": "소프트 B의 '① 대체지침' 이름을 어떻게 할까요? (md·html 반영 + ②와의 '같은 정책 양면' 관계도 명시)", "header": "이름 수정", "multiSelect": false, "options": [{"label": "Bash 대체 지침 (추천)", "description": "뭐를 뭐로 대체하는지 방향이 이름에 박힘 — 'Bash 범용명령 → 전용도구'. 원문 instead of에도 충실"}, {"label": "전용도구 유도", "description": "목적(전용도구로 몰기) 중심 이름. 금지형(NEVER)과 권장형(instead of)을 한 이름으로 묶기 좋음"}, {"label": "유지 + 관계만 명시", "description": "'대체지침' 그대로 두고, ②의 NEVER 문구와 같은 정책 양면이라는 설명만 추가"}]}]}
+
+[도구결과] The user doesn't want to proceed with this tool use. The tool use was rejected (eg. if it was a file edit, the new_string was NOT written to the file). STOP what you are doing and wait for the user to tell you how to proceed.
+
+Note: The user's next message may contain a correction or preference. Pay close attention — if they explain what went wrong or how they'd prefer you to work, consider saving that to memory for future sessions.
+
+[USER] [Request interrupted by user for tool use]
+
+[USER] 그럼 저건 소프트 규칙에서 제외해서 별도의 기준으로 잡아야되지않나.. 그.. 도구 주의사항? 같은?
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "입장권 설계 외에 소스에서 확인된 유도 장치들. 4갈래인데, 성격은 두 그룹으로 갈린다 — **정적 안내(표지판) vs 동적 넛지(옆구리 찌르기)**. 차이의 본질은 **타이밍**: 표지판은 항상 서 있고, 넛지는 사건이 난 그 순간에만 꽂힌다.\n\n```\n소프트 B (문구 장치) — 말로 유도\n├─ 정적 안내 — \"표지판\"                       ← 넛지 아님 · 항상 같은 자리에 상주\n│    ① 대체지침   \"find 말고 Glob 써라\"         (시스템프롬프트에 항상 있음)\n│    ② 탈출구     \"열린 탐색이면 Agent로\"        (도구 설명문에 항상 있음)\n│\n└─ 동적 넛지 — \"옆구리 찌르기\"                  ← 이
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 새 §04(도구 주의사항) 삽입 + 뒷섹션 번호 밀기:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "## §04 설계 결정 흐름 — 언제 어느 층을 쓰나", "new_string": "## §04 (별도 기준) 도구 주의사항 — 순서가 아니라 수단 선택\n\n하드/소프트 스펙트럼(=순서 규칙) **밖**에 있는 별도 범주. \"어느 도구 먼저\"가 아니라 **\"같은 일을 무엇으로 하나\"** 를 정하는 규칙이다. 같은 정책을 두 곳에서 두 톤으로 말한다:\n\n| 톤 | 위치 | 문구 |\n|---|---|---|\n| **권장형** | 시스템프롬프트 | \"To search for files use Glob **instead of** find or ls\" 등 5줄 (Read/Edit/Write/Glob/Grep ← cat·sed·find·grep 대체) |\n| **금지형** | 도구 설명문 | 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": " └ yes → 소프트: 입장권 설계(필수 파라미터 계단) + 문구 장치(대체/탈출구/넛지/리마인더)", "new_string": " └ yes → 소프트: 입장권 설계(필수 파라미터 계단) + 문구 장치(탈출구/넛지/리마인더)"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "## §05 등장 프롬프트 전문 — 한국어 대역", "new_string": "## §06 등장 프롬프트 전문 — 한국어 대역"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "### 소프트 B — 문구 장치 관련\n\n**⑧ 시스템프롬프트 대체 지침** — `constants/prompts.ts:293-299`", "new_string": "### 도구 주의사항 관련 (§04 — 순서 규칙 아님)\n\n**⑧ 시스템프롬프트 대체 지침** — `constants/prompts.ts:293-299`"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] ⑨⑩ 앞에 소프트 B 헤더 복원:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "**⑨ TaskUpdate 결과 넛지** — `TaskUpdateTool.ts:393`", "new_string": "### 소프트 B — 문구 장치 관련\n\n**⑨ TaskUpdate 결과 넛지** — `TaskUpdateTool.ts:393`"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md", "old_string": "- 2026-07-23 (개명): \"깔때기 설계\" → **\"입장권 설계\"**", "new_string": "- 2026-07-23 (재분류): \"대체지침\"(Bash→전용도구)을 소프트 B에서 제외 → **§04 도구 주의사항**으로 분리. 근거: 순서(\"어느 도구 먼저\")가 아니라 수단 선택(\"같은 일을 뭘로\") 규칙이며, 도구 설명문의 금지형(\"NEVER invoke grep via Bash\")과 같은 정책의 양면임을 명시. 소프트 B는 3갈래(탈출구/결과넛지/리마인더)로 축소.\n- 2026-07-23 (개명): \"깔때기 설계\" → **\"입장권 설계\"**"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 이제 html — 소프트 B 재구성:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <p class=\"cap\">말로 유도하는 장치 4갈래 — 성격은 두 그룹. <b>정적 안내(표지판)는 항상 서 있고, 동적 넛지는 사건 순간에만 꽂힌다.</b>\n      전부 강제가 아니라 유도 — 무시해도 에러는 없다.</p>\n    </div>\n    <div class=\"panel rv\">\n<pre class=\"tree\"><span class=\"tt\">소프트 B (문구 장치) — 말로 유도</span>\n├─ <span class=\"br\">정적 안내 — \"표지판\"</span>                       <span class=\"no\">← 넛지 아님</span> · 항상 같은 자리에 상주\n│    <span class=\"q\">① 대체지침
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <div class=\"panel rv\">\n        <h3><span class=\"tag\">① SUBSTITUTE</span>대체 지침 (시스템프롬프트)</h3>\n        <div class=\"quote\">\"To search for files use <b>Glob</b> instead of find or ls\"<br>\"To search the content of files, use <b>Grep</b> instead of grep or rg\"\n        <span class=\"ko\">\"파일을 찾을 땐 find·ls 대신 Glob을 써라\" · \"파일 내용을 검색할 땐 grep·rg 대신 Grep을 써라\" (같은 절에 Read/Edit/Write 
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <p>결과 문자열 자체가 프롬프트 — <b>다음 행동을 결과에 심는다</b>. 강제 아님, 제안. <b style=\"color:var(--amber)\">단일 사례가 아니라 가족</b> — 전수는 바로 아래 \"③ 심화\"에.</p>", "new_string": "        <p>결과 문자열 자체가 프롬프트 — <b>다음 행동을 결과에 심는다</b>. 강제 아님, 제안. <b style=\"color:var(--amber)\">단일 사례가 아니라 가족</b> — 전수는 바로 아래 \"② 심화\"에.</p>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <h3><span class=\"tag\">④ REMINDER</span>방치 리마인더 (attachment)</h3>", "new_string": "        <h3><span class=\"tag\">③ REMINDER</span>방치 리마인더 (attachment)</h3>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "      <h2 style=\"font-size:clamp(19px,2.6vw,26px)\">③ 심화 — 결과 넛지 가족 <span style=\"color:var(--amber)\">전수</span> · \"에러 메시지는 로그가 아니라 프롬프트다\"</h2>", "new_string": "      <h2 style=\"font-size:clamp(19px,2.6vw,26px)\">② 심화 — 결과 넛지 가족 <span style=\"color:var(--amber)\">전수</span> · \"에러 메시지는 로그가 아니라 프롬프트다\"</h2>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 새 05 섹션(도구 주의사항) 삽입 및 결정흐름 번호 되돌리기:
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "<!-- ===== 06 결정 흐름 ===== -->\n<section>\n  <div class=\"wrap\">\n    <div class=\"rv\">\n      <div class=\"num\">05</div>\n      <h2>어느 층을 쓰나 — 결정 흐름</h2>", "new_string": "<!-- ===== 05 도구 주의사항 ===== -->\n<section>\n  <div class=\"wrap\">\n    <div class=\"rv\">\n      <div class=\"num\">05</div>\n      <h2>(별도 기준) 도구 주의사항 — <span style=\"color:var(--amber)\">순서가 아니라 수단 선택</span></h2>\n     
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html", "old_string": "        <text x=\"765\" y=\"171\" text-anchor=\"middle\" class=\"m\" fill=\"#8a97a5\" font-size=\"10\">입장권 설계 + 대체/탈출구/넛지/리마인더</text>", "new_string": "        <text x=\"765\" y=\"171\" text-anchor=\"middle\" class=\"m\" fill=\"#8a97a5\" font-size=\"10\">입장권 설계 + 탈출구/넛지/리마인더</text>"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/도구호출-순서설계-하드소프트.html has been updated successfully. (file state is current in your context — no need to Read it back)

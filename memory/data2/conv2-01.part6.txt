@@ -1,0 +1,1053 @@
+
+
+[ASSISTANT] 이번 대화에서 검증한 것 전부를 한 장으로 정리합니다.
+
+## Ⅰ. `<system-reminder>`로 들어가는 것들
+
+### 1. 어태치먼트 (전부 — 약 47종 일괄)
+
+messages.ts 렌더러가 일괄 래핑. 목록 델타(스킬·도구·에이전트·MCP지시), rules(nested_memory), 메모리 회상, 훅 출력 4종, 상태 알림(날짜·태스크·토큰예산·todo), IDE/파일 컨텍스트(@멘션·열린 파일·진단), 모드 전환(플랜 모드 등), **미드턴 끼어들기(queued_command)** 까지 — 어태치먼트로 분류되는 건 예외 없이 래핑.
+
+### 2. 어태치먼트가 아닌 것들
+
+| # | 종류 | 형태 | 소스 |
+|---|---|---|---|
+| 1 | **0번 유령 메시지** (claudeMd·currentDate·userEmail) | 매 호출 재생성되는 독립 user 메시지, 템플릿에 태그 내장 | api.ts:463 |
+| 2 | **Read 빈 파일/오프셋 초과 경고** | tool_result **문자열 안**에 인라인 | FileReadTool.ts:706-707 |
+| 3 | **멀웨어 분석 지침** | 파일 읽기 결과마다 뒤에 인라인 ("분석은 하되 개선은 거부") | FileReadTool.ts:730 |
+| 4 | **메모리 신선도 경고** | 회상된 메모리 본문에 인라인 | memoryAge.ts:52 |
+| 5 | **Stop 훅 차단 에러** | 포장된 채로 큐에 삽입 → 드레인 시 진입 | hooks.ts:238 |
+| 6 | **사이드 질문 포장** ("한 응답으로 바로 답하라") | 질문 텍스트 래핑 | sideQuestion.ts:61 |
+| 7 | brief 모드 인라인 랩 | 커맨드 경로 직조립 | brief.ts:108-114 |
+
+**공통 성질**: 전부 모델 전용 — UI·트랜스크립트 검색에서 태그째 제거됨 (transcriptSearch.ts:117 "Claude context, not user-visible").
+
+## Ⅱ. system-reminder 없이 isMeta=true인 것들
+
+| # | 종류 | 왜 안 감싸나 (추론) | 소스 |
+|---|---|---|---|
+| 1 | **스킬 본문** (호출된 SKILL.md 전문) | "참고 방송"이 아니라 **따라야 할 지시문** | SkillTool.ts:1104 |
+| 2 | **Read의 이미지/PDF 동반 메시지** (이미지 블록·메타데이터를 user 메시지로 주입) | 소비해야 할 **데이터** | FileReadTool.ts:887,942,1013 |
+| 3 | **슬래시커맨드 확장 산출물** (+백그라운드 에이전트 결과의 숨은 프롬프트 재진입) | 유저 의도의 **대리 발화** | processSlashCommand.tsx:130,578,861,907 · processUserInput.ts:600 |
+| 4 | 기타 합성 메시지 — 서브에이전트 초기 메시지, 플랜 주입, 대화 복구, teleport, print 경로 | (본문 미검증 — 위치만 확인) | runAgent.ts:642 · plans.ts:386 · conversationRecovery.ts:214 · teleport.tsx:69 · query.ts:1217,1316 · print.ts:1851 |
+
+## Ⅲ. 두 플래그의 독립 축 — 조합 3종
+
+```
+SR ⭕ + isMeta ⭕  "하네스의 방송"        목록·알림·규칙 — 참고용, 주변과 무관
+SR ⭕ + isMeta ✗  "포장된 유저 육성"      미드턴 끼어들기 — 출처는 표시, 화면엔 보임
+SR ✗ + isMeta ⭕  "숨은 정식 입력"        스킬 본문·이미지 — 화면엔 안 보이지만 따르고/소비할 것
+```
+
+- **system-reminder** = 출처 라벨 ("이건 발화가 아니라 시스템 정보") — 모델에게 신뢰 등급을 알려주고, 사람 눈에선 지워짐
+- **isMeta** = UI 숨김 플래그 — 트랜스크립트 표시 여부만 결정
+
+`SR ✗ + isMeta ✗`는 그냥 일반 대화(유저가 친 프롬프트, 모델 응답)라서 표에서 제외. 이 두 비트의 조합이 클로드코드가 컨텍스트에 흘려 넣는 모든 텍스트의 신분증인 셈입니다.
+
+[USER] 대화 텍스트상은 짦을거아냐 md와 /visual-explainer html 두개의 버전으로 잘 넣어줘
+
+[ASSISTANT] md부터 만들고, 이어서 /visual-explainer HTML을 빌드합니다.
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md", "content": "# system-reminder × isMeta — 컨텍스트 텍스트의 신분증 체계 총정리\n\n> 검증일: 2026-07-12 · 대상: `src/utils/messages.ts`(렌더러 전수) + `src/utils/api.ts` + `src/tools/FileReadTool` + `src/utils/hooks.ts` + `src/memdir/memoryAge.ts` + `src/utils/sideQuestion.ts` 등 (구버전 src 스냅샷)\n> 짝꿍 문서: 동명 `.html` (시각화) · 관련: `toolsearch-생애주기-소스분석.md` · `큐웨이크-엔터없는-진입-소스분석.md`\n\n---\n\n## §00 핵심 — 두 개의 비트가 모든 텍스트의 신분증\n\n클로드코드가 컨텍스트에 넣는 모든 텍스트는 두 개의 독립 
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md (file state is current in your context — no need to Read it back)
+
+[도구호출 Skill] {"skill": "visual-explainer", "args": "system-reminder × isMeta 2비트 신분증 체계 — 4분면 매트릭스, SR에 들어가는 것(어태치먼트 일괄 + 비어태치먼트 7종 3층위), isMeta-only 4종, 모델 전용 증명(태그 제거자들) — 시스템리마인더-isMeta-신분증-총정리.md의 HTML 짝꿍"}
+
+[도구결과] Launching skill: visual-explainer
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>system-reminder × isMeta — 텍스트의 신분증</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Song+Myung&family=Goth
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html\"", "description": "HTML 브라우저로 열기"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 두 버전 모두 완성했고 HTML은 브라우저로 열어뒀습니다.
+
+## 산출물 요약
+
+| 파일 | 구성 |
+|---|---|
+| **`시스템리마인더-isMeta-신분증-총정리.md`** | §00 2비트 신분증 개념 + 4분면 표 → §01 SR 구역 (1-A 어태치먼트 일괄 ~47종 6계열 / 1-B 비어태치먼트 7종 3층위 / 1-C 태그 제거자들 = 모델 전용 증명) → §02 isMeta 단독 4종 → §03 한 줄 요약 → 검증 이력 (queued_command 오판 정정 기록 포함) |
+| **`시스템리마인더-isMeta-신분증-총정리.html`** | **"컨텍스트 세관 — 출입증 검문소"** 메타포. Song Myung(공문서 세리프) + Gothic A1 + IBM Plex Mono, 그래파이트 다크 + 황동 배지 팔레트, 회전 검인(檢) 스탬프 |
+
+## HTML 섹션 구성
+
+1. **01 · 4분면 매트릭스** — SR축 × isMeta축 2×2 그리드. 4분면 각각 색상 배지: 🟡 하네스의 방송 / 🔵 포장된 유저 육성(미드턴 끼어들기) / 🟢 숨은 정식 입력(스킬 본문·이미지) / ⚪ 일반 대화(점선 — 신분증 없는 보통 시민)
+2. **02 · SR 구역** — "~47종" 대형 카운터 + 6계열 칩(어태치먼트 일괄), 비어태치먼트 7종은 메시지/인라인/선포장 3층위 계단으로
+3. **03 · isMeta 단독 구역** — 초록 배지 카드 4장 (미검증인 "기타 합성"은 회색 처리로 정직 표기)
+4. **04 · 모델 전용 증명** — 생산자 → 모델 컨텍스트 → 사람 표면(취소선 제거) 3노드 플로우 + transcriptSearch.ts:117 원문 인용 박스
+
+전 섹션에 `› source 파일:line` 근거를 달았습니다. 수정 원하시면 말씀해주세요 — 예: 02의 어태치먼트 47종 전체 명단 펼치기, 4분면에 이 세션 실물 예시 추가 등.
+
+[USER] 인라인레벨, 선포장 , 직조립 이게 뭔말인지 하나~~도모루ㅡ겠어
+
+[ASSISTANT] 죄송해요, 제가 만든 용어를 설명 없이 던졌네요. 셋 다 **"누가, 언제 `
+```
+
+메시지가 새로 생기는 게 아니라, **도구 결과 문자열의 일부**로 태그가 들어있는 것. 책 페이지 귀퉁이에 인쇄된 경고문이지, 책에 동봉된 별도 쪽지가 아니에요.
+
+## ② 선포장 = "보내는 사람이 집에서 미리 싸서 우체통에 넣음"
+
+Stop 훅 차단 에러가 이 케이스인데, 코드를 보면:
+
+```ts
+enqueuePendingNotification({
+  value: wrapInSystemReminder("Stop hook blocking error..."),  // ← 큐에 넣기 전에 이미 포장!
+  ...
+})
+```
+
+큐(우체통)에 들어가는 순간 **이미 포장돼 있습니다.** 나중에 큐가 드레인되면서 배달될 뿐, 포장 기계(렌더러)는 이걸 다시 싸지 않아요. "미리(先) 포장해서 보냈다" = 선포장.
+
+## ③ 직조립 = "그 자리에서 싸서 그 자리에서 바로 끼움"
+
+큐도 안 거치고 파이프라인도 안 거칩니다. 사이드 질문 코드가 **자기 자리에서 직접** 포장 문자열을 만들어 대화에 끼워요:
+
+```ts
+const wrappedQuestion = `<system-reminder>This is a side question...`  // 직접 조립
+```
+
+우체통도 공장도 없이, 손으로 싸서 손으로 전달.
+
+## 한 줄 비교
+
+| | 포장하는 자 | 포장 시점 | 별도 메시지인가 |
+|---|---|---|---|
+| 어태치먼트 (기준) | 렌더러 (공장) | 출고 직전 일괄 | ⭕ |
+| ① 인라인 | — (포장 없음) | — | ✗ 도구 결과 본문의 일부 |
+| ② 선포장 | 보내는 코드 | **큐에 넣기 전** | ⭕ (나중에 배달) |
+| ③ 직조립 | 보내는 코드 | **끼우는 그 순간** | ⭕ (즉시) |
+
+모델 입장에선 넷 다 똑같이 `<system-reminder>...`로 보입니다 — 차이는 순전히 **하네스 내부에서 누가 포장 테이프를 붙였느냐**뿐이에요. 문서의 용어가 불친절했으니, 원하시면 md/html에도 이 택배 비유를 반영해둘게요.
+
+[USER] 반영해
+
+[ASSISTANT] 두 파일 모두에 택배 비유를 반영합니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md", "old_string": "### 1-B. 어태치먼트가 아닌 것 — 7종 · 3층위", "new_string": "### 1-B. 어태치먼트가 아닌 것 — 7종 · 3층위\n\n**용어 안내 (택배 비유)** — 셋 다 \"누가, 언제 `<system-reminder>` 포장을 하느냐\"의 차이일 뿐이다. 모델 입장에선 넷 다 똑같은 태그로 보인다:\n\n| 방식 | 비유 | 포장하는 자 | 포장 시점 | 별도 메시지? |\n|---|---|---|---|---|\n| 어태치먼트 (기준) | **공장 일괄 포장** — 알맹이만 던지면 출고 직전 기계가 쌈 | 렌더러(messages.ts) | 출고 직전 일괄 | ⭕ |\n| 인라인 | **본문에 인쇄된 경고문** — 소포가 아니라 책 페이지 귀퉁이 문구 | (포장 없음
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html", "old_string": "  <div class=\"zone\">\n    <h3>B. 어태치먼트 아닌 7종 — 3개 층위</h3>\n    <div class=\"stair\">", "new_string": "  <div class=\"zone\">\n    <h3>B-0. 용어 안내 — \"누가, 언제 포장 테이프를 붙이나\" (택배 비유)</h3>\n    <div class=\"stair\" style=\"margin-bottom:6px\">\n      <div class=\"step7\"><span class=\"lv\" style=\"color:var(--dim)\">기준 · 어태치먼트</span><span class=\"what\"><b>공장 일괄 포장</b> — 알맹이만 던지면 출고 직전 렌더러(
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html\"", "description": "갱신된 HTML 다시 열기"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 반영 완료했습니다.
+
+**md** — §01 1-B 머리에 "용어 안내 (택배 비유)" 표를 추가했어요: 어태치먼트(공장 일괄 포장) / 인라인(본문에 인쇄된 경고문) / 선포장(집에서 미리 싸서 우체통에) / 직조립(그 자리에서 싸서 그 자리에서 전달) — 각각 포장 주체·시점·별도 메시지 여부 + 실제 코드 예시 3개(Read 빈 파일, Stop 훅 `wrapInSystemReminder` 큐잉, 사이드 질문 문자열 조립)로 감 잡는 문단까지.
+
+**html** — 02 섹션의 7종 계단 위에 "B-0. 용어 안내 — 누가, 언제 포장 테이프를 붙이나" 범례 4행을 삽입했습니다. 기준(어태치먼트) 행은 회색 라벨로 구분했고, 마지막에 "모델 입장에선 넷 다 똑같은 ⟨system-reminder⟩로 보인다 — 차이는 하네스 내부의 포장 주체·시점뿐"이라는 핵심 한 줄을 달았어요. 브라우저 다시 열어뒀습니다.
+
+[USER] 그리고 ReAct 사이클중 한정해서  이제 엔터는 못치는 구간인데 그 시스템리마인더가 보내는것중 어태치먼트 말고 또 보내는 거 있나?  ReAct사이클 전용 설명도 필요해
+
+[ASSISTANT] 네, 있습니다 — **어태치먼트 말고 2개 채널이 더** 있고, 그중 하나는 아예 **ReAct 사이클에서만 존재하는 전용 채널**이에요.
+
+## ReAct 사이클 1바퀴 해부 — system-reminder 등장 지점 전부
+
+```
+사이클 N (유저는 엔터 못 침)
+│
+① 전처리 5단 (압축 — SR 생산 없음)
+│
+② API 호출 직전: 0번 유령 재인쇄            ← SR 채널 A (비어태치먼트)
+│   매 사이클 호출마다 새로 생성. 단 바이트 동일(memoize)이라 캐시는 안 깨짐
+│
+③ 모델 응답 → tool_use 방출
+│
+④ 도구 실행
+│   ├─ PreToolUse 훅 (차단 시 결과가 에러로 대체)
+│   ├─ tool_result 본문 속 인라인 SR         ← SR 채널 B ★ ReAct 전용
+│   │    · 빈 파일/오프셋 초과 경고 (FileReadTool.ts:706)
+│   │    · 멀웨어 분석 지침 — 파일 읽기마다 (FileReadTool.ts:730)
+│   │    · 회상 메모리의 신선도 경고 (memoryAge.ts:52)
+│   └─ PostToolUse 훅
+│
+⑤ 사이클 꼬리 수집                          ← SR 채널 C (어태치먼트 — 아는 것)
+│   ├─ 델타류: 스킬·도구·MCP 목록 변화분
+│   ├─ 알림류: task_status, todo_reminder, 날짜 변경...
+│   ├─ 훅 산출물: hook_blocking_error 등
+│   └─ 'next' 큐 드레인: 미드턴 유저 메시지·태스크 진행 경고
+│        → queued_command 어태치먼트로 변환돼 배달
+▼
+사이클 N+1
+```
+
+## 어태치먼트 밖 2개 채널 정리
+
+**채널 A — 유령 재인쇄 (매 호출)**: `prependUserContext`가 스트리밍 호출부 안에 있어서(query.ts:655) 사이클 2든 50이든 **호출마다** 0번에 다시 찍힙니다. 다만 내용이 동결이라 "새 정보"는 아니고, 존재만 반복되는 SR이에요.
+
+**채널 B — tool_result 인라인 (★ 이게 ReAct 전용)**: tool_result라는 그릇 자체가 **도구를 실행하는 사이클 안에서만 생기니까**, 이 채널은 턴 시작·유휴 상태에는 존재할 수 없습니다. 파일 하나 읽을 때마다 멀웨어 지침이 결과 꼬리에 따라붙고, 빈 파일이면 경고가 본문을 대체하는 식 — **도구 결과에 기생하는 SR**이라 수집 지점도 큐도 안 거칩니다. 어태치먼트 파이프라인과 완전히 무관한, 사이클 한정 배관이에요.
+
+## 헷갈리기 쉬운 경계 2개
+
+1. **미드턴 유저 메시지** ("The user sent a new message while you were working") — 이 구간에 들어오긴 하지만, 큐 → `queued_command` **어태치먼트**로 변환돼 배달되므로 분류상 어태치먼트 채널(C)입니다. 선포장 훅 에러도 마찬가지 — 포장만 미리 했지 배달은 어태치먼트.
+2. **훅 출력** — Pre/PostToolUse 훅이 도구 실행(④)을 감싸며 발동하지만, 그 산출물(hook_blocking_error 등)이 SR 메시지가 되는 건 ⑤ 수집에서 어태치먼트로 렌더링될 때입니다.
+
+## 한 줄 요약
+
+**ReAct 사이클 중 SR 배달로는 3개** — ⓐ 매 호출 재인쇄되는 유령(내용 불변), ⓑ **도구 결과 본문에 기생하는 인라인 SR(사이클 전용 — 경고·멀웨어 지침·메모리 나이)**, ⓒ 사이클 꼬리의 어태치먼트 일괄(델타·알림·큐 드레인 포함). 엔터가 막힌 구간이지만 ⓑ 덕분에 도구를 부를 때마다, ⓒ 덕분에 사이클이 끝날 때마다 하네스가 말을 걸 수 있는 구조입니다.
+
+원하시면 이 "ReAct 사이클 전용 SR 지도"도 신분증 md/html에 섹션으로 반영해둘게요.
+
+[USER] 그리고 ReAct 사이클중에서 시스팀리마인더가 아니더라도 자동으로 보내는 메시지 더 있나? 그것도 알려줘
+
+[ASSISTANT] 사이클 중 SR 없이 자동 주입되는 것들을 확정하기 위해, 아까 census에서 미확인으로 남긴 query.ts의 isMeta 두 곳을 확인할게요.
+
+[도구호출 Bash] {"command": "sed -n '1205,1225p' /Users/seobi/jinsup_space/CC/src/query.ts; echo \"======\"; sed -n '1300,1325p' /Users/seobi/jinsup_space/CC/src/query.ts", "description": "query.ts 사이클 내 isMeta 합성 메시지 2곳 정체 확인"}
+
+[도구결과] turnCount,
+            transition: { reason: 'max_output_tokens_escalate' },
+          }
+          state = next
+          continue
+        }
+
+        if (maxOutputTokensRecoveryCount < MAX_OUTPUT_TOKENS_RECOVERY_LIMIT) {
+          const recoveryMessage = createUserMessage({
+            content:
+              `Output token limit hit. Resume directly — no apology, no recap of what you were doing. ` +
+              `Pick up mid-thought if that is where the cut happened. Break remaining work into smaller pieces.`,
+            isMeta: true,
+          })
+
+          const next: State = {
+            messages: [
+              ...messagesForQuery,
+              ...assistantMessages,
+              recoveryMessage,
+            ],
+======
+          toolUseContext.agentId,
+          getCurrentTurnTokenBudget(),
+          getTurnOutputTokens(),
+        )
+
+        if (decision.action === 'continue') {
+          incrementBudgetContinuationCount()
+          logForDebugging(
+            `Token budget continuation #${decision.continuationCount}: ${decision.pct}% (${decision.turnTokens.toLocaleString()} / ${decision.budget.toLocaleString()})`,
+          )
+          state = {
+            messages: [
+              ...messagesForQuery,
+              ...assistantMessages,
+              createUserMessage({
+                content: decision.nudgeMessage,
+                isMeta: true,
+              }),
+            ],
+            toolUseContext,
+            autoCompactTracking: tracking,
+            maxOutputTokensRecoveryCount: 0,
+            hasAttemptedReactiveCompact: false,
+            maxOutputTokensOverride: undefined,
+            pendingToolUseSummary: undefined,
+            stopHookActive: undefined,
+
+[ASSISTANT] 확인됐습니다 — 있고, 방금 미확인이던 2개도 정체가 밝혀졌어요. **SR 없이 사이클 중 자동 주입되는 것들**은 크게 3계열입니다.
+
+## A. tool_result 채널 — 가장 큰 자동 생산물
+
+사실 사이클의 최대 자동 메시지는 **도구 결과 그 자체**입니다. 모델도 유저도 쓰지 않은, 하네스가 조립하는 user 메시지죠. 여기에 변종들이 있습니다:
+
+| 종류 | 내용 |
+|---|---|
+| 정상 결과 | 도구 실행 산출물 |
+| 합성 에러 결과 | 권한 거부, 훅 차단("blocked by hook: ..."), 타임아웃 — 하네스가 지어낸 텍스트 |
+| 형제 중단 결과 | 배치 중 하나가 abort되면 나머지 형제들에게 자동 생성되는 취소 결과 (배치-세계 도감에서 본 것) |
+| tool_reference 블록 | ToolSearch 결과 — 텍스트가 아닌 기계 화물 |
+
+## B. SR 없는 isMeta user 메시지 — 5종
+
+| # | 종류 | 언제 | 소스 |
+|---|---|---|---|
+| 1 | **스킬 본문** | Skill 툴 호출 직후 — SKILL.md 전문이 user 메시지로 | SkillTool.ts:1104 |
+| 2 | **이미지/PDF 동반 메시지** | Read가 이미지 읽을 때 — 이미지 블록을 user 메시지로 | FileReadTool.ts:887,942 |
+| 3 | **출력 한도 회복 메시지** ★신규 확정 | 모델 출력이 max_output_tokens에 잘리면 — *"Output token limit hit. Resume directly — no apology, no recap... Pick up mid-thought"* 라고 하네스가 유저인 척 재촉 | query.ts:1213-1218 |
+| 4 | **토큰 예산 넛지** ★신규 확정 | "+500k" 같은 예산 지시에서 모델이 일찍 멈추면 — 계속하라는 nudge 메시지 주입 (`budget continuation`) | query.ts:1314-1317 |
+| 5 | 대화 복구 메시지 | API 400 등으로 대화 구조가 깨졌을 때 복구용 합성 | conversationRecovery.ts:214 (위치 확인 수준) |
+
+3·4번이 재미있는데 — **모델이 멈추려 하거나 잘렸을 때 하네스가 "유저 메시지"를 위조해서 다시 굴리는** 자기회복 장치입니다. 제가 긴 작업 중에 갑자기 끊겼다가 사과 없이 이어서 말하는 게 바로 3번이 작동한 순간이에요.
+
+## C. 메시지 "주입"이 아니라 "개조" — 전처리의 자동 변형
+
+새 메시지를 보내는 건 아니지만, 사이클 머리의 전처리 5단이 기존 대화를 자동으로 손댑니다:
+
+- **autocompact** — 임계 초과 시 대화 전체를 인수인계 요약 1개로 교체 (사이클 중 가장 과격한 자동 개입)
+- **microcompact** — 오래된 tool_result 내용을 비움
+- **applyToolResultBudget** — 직전 묶음이 크면 디스크로 치움
+
+## ReAct 사이클 자동 메시지 전체 지도 (SR + 비SR 통합)
+
+```
+① 전처리      : [개조] autocompact·microcompact·budget          (비SR, 변형)
+② API 직전    : 유령 재인쇄                                      (SR)
+③ 모델 응답    : — (잘리면 ④' 회복 메시지 대기)
+④ 도구 실행    : tool_result 본체 + 합성 에러/형제취소            (비SR)
+               + 결과 속 인라인 경고(빈파일·멀웨어·메모리나이)      (SR)
+               + 스킬 본문·이미지 동반 메시지                      (비SR isMeta)
+④' 이상 상황   : 출력한도 회복·예산 넛지·대화 복구                 (비SR isMeta)
+⑤ 사이클 꼬리  : 어태치먼트 일괄 + 큐 드레인                       (SR)
+```
+
+**한 줄 요약**: 엔터가 막힌 ReAct 구간에서도 하네스는 SR(방송) 말고 **도구 결과라는 본체, 유저를 사칭하는 자기회복 메시지(한도 회복·예산 넛지), 지시문/데이터(스킬 본문·이미지), 그리고 대화 자체의 개조(압축)**까지 — 총 4갈래로 자동 개입하고 있습니다. 이것도 문서에 반영해둘까요?
+
+[USER] 위 두개둘다 md/html 반영해주라
+
+[ASSISTANT] 두 파일에 "ReAct 사이클 전용 지도" 섹션을 추가합니다. 먼저 md.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md", "old_string": "---\n\n## §03 한 줄 요약", "new_string": "---\n\n## §03 ReAct 사이클 전용 지도 — 엔터 못 치는 구간의 자동 주입\n\n유저 입력이 불가능한 사이클 구간에서도 하네스는 계속 개입한다. SR 3채널 + 비SR 4갈래.\n\n### 3-A. 사이클 중 system-reminder 배달 3채널\n\n| 채널 | 무엇 | 특징 | 소스 |\n|---|---|---|---|\n| ⓐ 유령 재인쇄 | 0번 claudeMd 메시지 | **매 사이클 API 호출마다** 재생성 — 단 내용 동결(memoize)이라 새 정보는 아님 | query.ts:655 |\n| ⓑ tool_result 인라인 | 빈 파일 경고 · 멀웨어 지침 · 메모리 신선도 | ★ **사이클
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md", "old_string": "## 검증 이력\n\n- 2026-07-12: messages.ts 어태치먼트 스위치 전수 스캔(python 블록 근사) · wrapInSystemReminder/`<system-reminder>` 리터럴 전 파일 grep (생산자/소비자/언급 3분류) · isMeta:true 생성처 messages.ts 외 전수 grep · queued_command 본문 Read(:3745-3795, 초기 오판 정정: 래핑 ⭕ + isMeta 조건부) · FileReadTool/memoryAge/sideQuestion/hooks 라인 확인", "new_string": "## 검증 이력\n\n- 2026-07-12: messages.ts 어태치먼트 스위치 전수 스캔(python 블록 근사) · wrapIn
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.md has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] 이제 HTML에 05 섹션(ReAct 사이클 전용 지도)을 추가합니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html", "old_string": "<footer>", "new_string": "<!-- 05 ReAct cycle map -->\n<section class=\"sec\">\n  <div class=\"shead\"><span class=\"snum\">05</span><h2>ReAct 사이클 전용 지도 — 엔터 못 치는 구간의 자동 개입</h2></div>\n  <p class=\"cap\">유저 입력이 불가능한 사이클 안에서도 하네스는 SR 3채널 + 비SR 4갈래로 계속 말을 건다.</p>\n\n  <div class=\"zone\">\n    <h3>사이클 1바퀴 타임라인 — 자동 주입 지점 전부</h3>\n    <div class=\"stair\">\n      <div class=\"step7\"><span
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "open \"/Users/seobi/jinsup_space/CC/시스템리마인더-isMeta-신분증-총정리.html\"", "description": "갱신된 HTML 다시 열기"}
+
+[도구결과] (Bash completed with no output)
+
+[ASSISTANT] 두 파일 모두 반영 완료했습니다.
+
+**md (`시스템리마인더-isMeta-신분증-총정리.md`)** — 새 **§03 "ReAct 사이클 전용 지도"** 삽입 (기존 한 줄 요약은 §04로):
+- 3-A: 사이클 중 SR 배달 3채널 표 — ⓐ 유령 재인쇄 / ⓑ tool_result 인라인(★사이클 전용, 기생형) / ⓒ 꼬리 어태치먼트 + 경계 주의(미드턴 메시지·훅 산출물은 결국 ⓒ로 배달)
+- 3-B: 비SR 자동 주입 — ① tool_result 본체+합성 변종 ② isMeta 5종 표 (**출력 한도 회복 "no apology, no recap" 원문·예산 넛지** — 이번에 query.ts:1213-1218, :1314-1317로 정체 확정한 것 포함) ③ 전처리 개조 3종
+- 3-C: ①→⑤ 통합 타임라인 코드블록
+- 검증 이력에 후속 확정 기록 추가
+
+**html** — **05 섹션 "ReAct 사이클 전용 지도"** 신설:
+- 사이클 타임라인 7단 계단 (①전처리 개조 → ②유령 → ④도구/인라인/동반 → ④′이상상황 → ⑤꼬리), 인라인 채널은 황금 테두리로 "★ 사이클 전용" 강조, 자기회복 행은 붉은 테두리
+- 하단 요약 배지 2장: "SR 배달 3채널"(황금) + **"자기회복 장치의 정체"**(적색 — "긴 작업이 뚝 끊겼다가 사과 없이 이어지는 현상 = 하네스가 유저 메시지를 위조한 것")
+
+브라우저로 다시 열어뒀습니다. 이로써 신분증 문서가 정적 분류(01-04) + 동적 타임라인(05)까지 갖춘 완결판이 됐어요.
+
+[USER] 생각해보니... Skill 도 도중에 추가되면 마지막 메시지에 메타데이터로 추가됬다고 들어갈탠데 toolSerach에 경우 로스트인더미들로 밀릴 경우.. 키워드검색을했는데 추가된 Skill은 어쩌냐
+
+[ASSISTANT] 핵심을 찌르는 지적이에요 — **ToolSearch는 스킬을 못 찾습니다** (`tools.filter(isDeferredTool)` — 도구 전용). 그럼 스킬 쪽엔 뭐가 있는지, 특히 compact 시 장부가 어떻게 되는지 소스로 확인하겠습니다.
+
+[도구호출 Bash] {"command": "grep -rn \"sentSkillNames\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" | head -8; echo \"---discover---\"; grep -rn \"DISCOVER_SKILLS_TOOL_NAME\\|DiscoverSkills\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l | head -5; echo \"---turnzero---\"; grep -rn \"getTurnZeroSkillDiscovery\" /Users/seobi/jinsup_space/CC/src --include=\"*.ts\" -l | head -4", "description": "스킬 장부 초기화 지점 + DiscoverSkills 도구 + turn-0 검색 탐색"}
+
+[도구결과] /Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2607:const sentSkillNames = new Map<string, Set<string>>()
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2613:  sentSkillNames.clear()
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2622: * `sentSkillNames` is module-scope — process-local. Each `claude -p` spawn
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2700:  let sent = sentSkillNames.get(agentKey)
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts:2703:    sentSkillNames.set(agentKey, sent)
+/Users/seobi/jinsup_space/CC/src/utils/conversationRecovery.ts:396:    // in the transcript the model is about to see. sentSkillNames is
+/Users/seobi/jinsup_space/CC/src/services/compact/compact.ts:524:    // Intentionally NOT resetting sentSkillNames: re-injecting the full
+/Users/seobi/jinsup_space/CC/src/services/compact/compact.ts:922:    // Intentionally NOT resetting sentSkillNames — see compactConversation()
+---discover---
+/Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts
+/Users/seobi/jinsup_space/CC/src/constants/prompts.ts
+---turnzero---
+/Users/seobi/jinsup_space/CC/src/utils/attachments.ts
+
+[도구호출 Bash] {"command": "sed -n '518,535p' /Users/seobi/jinsup_space/CC/src/services/compact/compact.ts; echo \"===recovery===\"; sed -n '390,405p' /Users/seobi/jinsup_space/CC/src/utils/conversationRecovery.ts; echo \"===discover===\"; grep -n \"DISCOVER_SKILLS_TOOL_NAME\\|discoverSkills\\|Discover\" /Users/seobi/jinsup_space/CC/src/tools/SkillTool/SkillTool.ts | head -8", "description": "compact의 스킬 장부 의도적 유지 사유 + DiscoverSkills 도구 확인"}
+
+[도구결과] const preCompactReadFileState = cacheToObject(context.readFileState)
+
+    // Clear the cache
+    context.readFileState.clear()
+    context.loadedNestedMemoryPaths?.clear()
+
+    // Intentionally NOT resetting sentSkillNames: re-injecting the full
+    // skill_listing (~4K tokens) post-compact is pure cache_creation with
+    // marginal benefit. The model still has SkillTool in its schema and
+    // invoked_skills attachment (below) preserves used-skill content. Ants
+    // with EXPERIMENTAL_SKILL_SEARCH already skip re-injection via the
+    // early-return in getSkillListingAttachments.
+
+    // Run async attachment generation in parallel
+    const [fileAttachments, asyncAgentAttachments] = await Promise.all([
+      createPostCompactFileAttachments(
+        preCompactReadFileState,
+        context,
+===recovery===
+          // Resume only happens for the main session, so agentId is null
+          addInvokedSkill(skill.name, skill.path, skill.content, null)
+        }
+      }
+    }
+    // A prior process already injected the skills-available reminder — it's
+    // in the transcript the model is about to see. sentSkillNames is
+    // process-local, so without this every resume re-announces the same
+    // ~600 tokens. Fire-once latch; consumed on the first attachment pass.
+    if (message.attachment.type === 'skill_listing') {
+      suppressNextSkillListing()
+    }
+  }
+}
+
+/**
+===discover===
+139:  const wasDiscoveredField =
+170:    ...wasDiscoveredField,
+385:        const meta = remoteSkillModules!.getDiscoveredRemoteSkill(slug)
+389:            message: `Remote skill ${slug} was not discovered in this session. Use DiscoverSkills to find remote skills first.`,
+393:        // Discovered remote skill — valid. Loading happens in call().
+661:    const wasDiscoveredField =
+693:      ...wasDiscoveredField,
+975:  const { getDiscoveredRemoteSkill, loadRemoteSkill, logRemoteSkillLoaded } =
+
+[ASSISTANT] 대표님 우려가 **실재하고, 심지어 소스에 그 트레이드오프가 주석으로 문서화돼 있습니다.** 스킬은 도구보다 상황이 더 나빠요.
+
+## 확인된 사실 1 — ToolSearch는 스킬 관할 밖
+
+ToolSearch의 검색 대상은 `tools.filter(isDeferredTool)` — **도구뿐**입니다. 스킬은 도구가 아니라 Skill 툴로 호출하는 커맨드라서, 묻힌 스킬 목록에 대한 "키워드 검색" 복구로가 기본 모드엔 **없습니다.**
+
+## 확인된 사실 2 — compact 후 스킬 목록은 "의도적으로" 재고지 안 함
+
+deferred 도구는 compact 후 장부(대화)가 날아가서 전체 재고지가 됐죠. 스킬은 정반대 선택을 했습니다 (compact.ts:524-529 주석 원문):
+
+> "**Intentionally NOT resetting sentSkillNames**: re-injecting the full skill_listing (~4K tokens) post-compact is **pure cache_creation with marginal benefit.** The model still has SkillTool in its schema and invoked_skills attachment preserves used-skill content."
+
+장부(`sentSkillNames`)가 프로세스 메모리라 compact를 살아남고, 하네스는 일부러 안 비웁니다. 결과: **compact 후 미사용 스킬들의 이름은 컨텍스트에서 완전히 증발**하고 다시 안 옵니다. resume도 마찬가지로 억제(`suppressNextSkillListing`, conversationRecovery.ts:395-401).
+
+## 그럼 뭐가 남나 — 기본 모드의 방어선 3개 (구멍 포함)
+
+| 방어선 | 커버 범위 |
+|---|---|
+| **invoked_skills 어태치먼트** — 이미 쓴 스킬은 compact 후에도 본문째 보존 | 사용했던 스킬만 (이 세션 실측: compact 직후 visual-explainer 전문이 재고지된 게 이것) |
+| **유저 명시 호출** — `/이름` 치면 목록 기억과 무관하게 발동 | 유저가 이름을 아는 스킬 |
+| Skill 도구 설명문 표지판 | "목록이 system-reminder에 있다"고만 알림 |
+
+그리고 여기서 대표님이 짚은 구멍이 정확히 벌어집니다: 표지판은 **"목록에 있는 것만 쓰고 추측하지 말라"**(don't guess)고 지시하는데, 그 목록이 증발했다면? 미사용+미언급 스킬은 모델 입장에서 **존재 자체가 소멸**한 거예요. 도구의 "흐릿한 기억 + 검색 복구" 모델이 스킬엔 없습니다. 실질 방어는 "유저가 슬래시로 불러준다"에 크게 의존하는 구조.
+
+## 그런데 — 정확히 이 구멍을 메우는 공사가 진행 중입니다
+
+소스에 실험 플래그로 그 해법이 이미 있어요:
+
+**`EXPERIMENTAL_SKILL_SEARCH`** (attachments.ts:2685-2697): 이 모드에선 상주 목록을 bundled+MCP 스킬만 남기고, 유저/프로젝트/플러그인 스킬은 **discovery 경로**로 보냅니다 — `getTurnZeroSkillDiscovery(input, messages, context)`가 **매 턴 시작에 유저 입력을 스킬들과 매칭해서 관련 스킬만 그때그때 주입.** 그리고 원격 스킬용 **DiscoverSkills 도구**도 존재합니다 (SkillTool.ts:389 — "Use DiscoverSkills to find remote skills first").
+
+흥미로운 건 접근 방식의 차이예요:
+
+```
+도구:  모델이 필요할 때 검색한다        (ToolSearch — 모델 주도, 발상 실패 시 무용)
+스킬:  하네스가 매 턴 알아서 검색해준다  (turn-0 discovery — 유저 입력 기반, 발상 불필요)
+```
+
+스킬 쪽 해법이 오히려 한 세대 진화형입니다 — 대표님이 지난번 지적한 "검색하려는 생각이 안 나면 끝"이라는 ToolSearch의 급소까지 해결하는 방식(하네스가 대신 생각해줌)이거든요.
+
+**정리**: 현재 기본 모드 기준 대표님 시나리오는 맞습니다 — 도중 추가된 스킬이 묻히거나 compact를 넘으면 검색 복구 불가, 유저 명시 호출만이 확실한 길. 그 공백을 turn-0 자동 검색으로 메우는 게 실험 중이고요. 이것도 문서에 반영할까요?
+
+[USER] 그니까 결론은 뭐.. 대처가없다는거야? 무슨말이지? 그리고 컴팩트하면 스킬목록이 날아간다고??? 엥?? 다음 세션에서 첫 메시지보낼때 전체 스킬목록 재갱신시켜주니까 문제없는거안야?
+
+[ASSISTANT] 제가 겁을 과하게 줬네요 — 상황을 셋으로 쪼개면 대표님 직관이 대부분 맞습니다. 정리할게요.
+
+## 세 가지 상황은 완전히 다릅니다
+
+| 상황 | 프로세스 | 스킬 목록의 운명 |
+|---|---|---|
+| **① 새 세션** | 새로 뜸 | **문제없음** — 대표님 말대로. 장부(`sentSkillNames`)가 프로세스 메모리라 새 프로세스면 빈 장부 → 첫 수집 지점에서 **전체 목록 재고지** |
+| **② resume** (`--resume`) | 새로 뜸 | **소실 아님** — 옛 트랜스크립트 안에 목록 메시지가 그대로 살아 있음. 재고지만 억제(중복 방지). 오래된 대화면 "묻혀 있을" 뿐 존재는 함 |
+| **③ 같은 세션 안에서 compact** | **계속 살아있음** ← 여기가 핵심 | 대화는 요약으로 교체돼 목록 메시지가 사라졌는데, 장부는 프로세스 메모리라 "이미 다 보냈음"으로 남아 있음 → 델타 0 → **재고지 안 됨** (구버전 스냅샷 기준) |
+
+"컴팩트하면 날아간다"는 ③ 한정입니다 — compact는 세션 종료가 아니라 **같은 프로세스가 계속 달리는 중에 대화만 갈아끼우는 것**이라, ①의 "새 세션 재갱신"이 발동하지 않아요. 장부가 안 죽었으니까요.
+
+**그런데 실측 반전이 하나 있습니다**: 이 세션에서 대표님이 `/compact` 하신 직후, 제 컨텍스트에 전체 스킬 목록이 **다시 들어왔어요.** 즉 구버전 스냅샷의 "의도적 미재주입"(compact.ts:524 주석) 정책이 **현행 배포판에선 바뀐 것으로 관측**됩니다. 그러니 ③의 공포도 현행 기준으론 상당히 완화된 상태예요.
+
+## "대처가 없다"의 정확한 의미 — 제 표현 정정
+
+"목록이 사라져서 어쩔 수 없다"가 아니라, **"도구에는 있는 검색 복구로가 스킬엔 없다"**는 뜻입니다:
+
+```
+도구: 이름 까먹음 → ToolSearch("jira issue") → 되찾음      ← 능동 복구 가능
+스킬: 목록이 묻힘/증발 → 다시 뒤질 도구가 없음               ← 능동 복구 불가
+       └─ 남는 길: ⑴ 유저가 /이름 명시 호출 (항상 동작)
+                  ⑵ 이미 쓴 스킬은 invoked_skills로 보존
+                  ⑶ (실험 중) turn-0 자동 검색이 이 구멍을 메울 예정
+```
+
+## 결론 한 줄
+
+**새 세션 첫 메시지 재갱신 → 대표님 말이 맞고 문제없음. 위험 구간은 "compact 직후에도 계속 달리는 같은 세션"뿐인데, 그것도 구버전 스냅샷의 정책이고 현행은 재고지가 관측됨. 남는 진짜 차이는 소실이 아니라 "스킬엔 ToolSearch가 없다"는 검색 수단의 비대칭**입니다.
+
+[USER] 그치 compact후 안되는게 너무 이상해 그리고 그 뭐냐..
+
+[ASSISTANT] 맞아요, 이상하죠. 구버전 정책의 계산법을 굳이 변호하자면 — 주석 그대로 "재주입 = 순수 cache_creation 4K 토큰 지출, 이득은 미미"였고, "어차피 ⑴ 쓰던 스킬은 invoked_skills로 살아남고 ⑵ 유저는 /이름으로 부르니까"라는 가정이었어요. 근데 그 가정은 **모델이 스스로 스킬을 골라 쓰는 상황**(superpowers처럼 "1%라도 해당되면 스킬 써라" 류)을 무시한 거라, compact 한 방에 모델의 스킬 인지가 통째로 리셋되는 부작용이 있었죠. 현행 버전에서 재고지가 관측되는 걸 보면 결국 그 4K 토큰이 아깝지 않다고 결론이 뒤집힌 모양이고요.
+
+그리고 "그 뭐냐.." 하시던 거 — 뭐 물어보려셨어요? 이어서 말씀해주세요.
+
+[USER] 어쨋든 compact전에 새로 추가된 스킬이 대화 오래하다가 대화가 밀린경우 로스트인더미들로 못찾게 될확률이 클탠데 그경우는 어떻게 하네스가 대처했는지 다시 이야기해줄래?
+
+[ASSISTANT] 네, 그 케이스만 딱 잘라 다시 정리할게요.
+
+## 시나리오
+
+```
+세션 중반: 플러그인 설치 → skill_listing 델타가 그 지점에 1회 삽입
+    ↓ 대화 100턴 계속...
+델타가 컨텍스트 한복판에 묻힘 (로스트인더미들)
+    ↓
+유저: "이 문서 좀 예쁘게 만들어줘"   ← 묻힌 스킬이 딱 맞는 요청
+모델: ??? (스킬 존재를 기억 못 함)
+```
+
+## 하네스의 대처 — 정직하게 말하면 "소극적 3종"이 전부입니다
+
+**① 표지판 (상시)** — Skill 도구 설명문이 매 요청 tools 배열에 실려서 "스킬 목록이 system-reminder에 있다, 목록에 없는 건 추측하지 말라"고 알려줍니다. 하지만 이건 **"목록이 존재한다"는 사실**만 상기시킬 뿐, 묻힌 목록을 다시 읽어주지도, 검색하게 해주지도 않아요. 모델이 컨텍스트 중간을 뒤져서 스스로 찾아내길 바라는 수밖에.
+
+**② 유저 명시 호출 (완전 우회)** — `/스킬이름` 치면 목록 기억과 무관하게 발동. 사실상 가장 확실한 대처인데, 이건 하네스의 대처라기보다 **유저에게 떠넘긴 것**이죠.
+
+**③ compact 리프레시 (간접적·우연적)** — 대화가 묻힐 만큼 길어지면 결국 compact가 오고, 현행 버전 기준 그때 전체 목록이 새 컨텍스트 앞쪽에 재발행됩니다. 묻힘이 심해질수록 리셋이 가까워지는 자연 순환. 단 이건 설계된 대처가 아니라 부수 효과고, 구버전 스냅샷에선 이마저 없었어요.
+
+**없는 것들**: 주기적 재고지 ✗ · 스킬 검색 도구(ToolSearch 대응물) ✗ · 하네스 측 자동 매칭 ✗ (기본 모드)
+
+## 즉, 결론은 — "이 케이스는 기본 모드의 인정된 구멍"
+
+도구와 나란히 놓으면 비대칭이 선명합니다:
+
+```
+도구가 묻힘 → 모델: "그런 도구 있을 것 같은데" → ToolSearch("figma") → 복구 ⭕
+스킬이 묻힘 → 모델: "그런 스킬 있을 것 같은데" → ...뒤질 방법이 없음 → 복구 ✗
+```
+
+그리고 이 구멍을 하네스 개발진도 알고 있다는 증거가 **EXPERIMENTAL_SKILL_SEARCH**입니다. 이 실험 모드의 해법은 검색 도구를 주는 게 아니라 한 발 더 나가서 — **상주 목록 자체를 줄이고, 매 턴 시작에 하네스가 유저 입력을 스킬들과 매칭해 관련 스킬만 그때그때 주입** (`getTurnZeroSkillDiscovery`). 목록이 묻힐 일 자체를 없애는 방향이죠. 대표님 질문의 시나리오("예쁘게 만들어줘" → 하네스가 알아서 visual 계열 스킬을 그 턴에 꽂아줌)가 정확히 이 기능이 풀려는 문제입니다.
+
+**요약**: 대화 중간에 추가되고 묻힌 스킬 — 기본 모드의 하네스 대처는 표지판·유저 호출·compact 우연 리셋뿐이고, 능동 복구는 없습니다. 그 공백은 소스 주석과 실험 플래그가 스스로 증언하는 "알고 있는 빚"이에요.
+
+[USER] 또 이러한 빚이 뭐가있는지 워크플로우로 전체 소스코드 싹다 스캔해서 찾아줄래? 다 가져와서 md와 /visual-explainer 로 만든 html으로 만들게 전체 크게 돌고와라
+
+[ASSISTANT] 네, 이건 명시적으로 워크플로우 요청이시니 크게 돌리겠습니다. 먼저 src 구조를 파악해서 스캔 샤드를 나눌게요.
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC/src && find . -name \"*.ts\" -o -name \"*.tsx\" | wc -l && du -sh . && for d in */; do printf '%-28s %s files\\n' \"$d\" \"$(find \"$d\" \\( -name '*.ts' -o -name '*.tsx' \\) | wc -l | tr -d ' ')\"; done | sort -t' ' -k2 -rn | head -25", "description": "src 전체 규모와 디렉토리별 파일 수 파악 (샤드 설계용)"}
+
+[도구결과] 1884
+ 33M	.
+utils/                       564 files
+components/                  389 files
+commands/                    189 files
+tools/                       184 files
+services/                    130 files
+hooks/                       104 files
+ink/                         96 files
+bridge/                      31 files
+constants/                   21 files
+skills/                      20 files
+cli/                         19 files
+keybindings/                 14 files
+tasks/                       12 files
+types/                       11 files
+migrations/                  11 files
+context/                     9 files
+memdir/                      8 files
+entrypoints/                 8 files
+state/                       6 files
+buddy/                       6 files
+vim/                         5 files
+remote/                      4 files
+query/                       4 files
+native-ts/                   4 files
+server/                      3 files
+
+[도구호출 Workflow] {"script": "export const meta = {\n  name: 'debt-hunt',\n  description: 'Claude Code src 전체에서 설계자가 인지하고 수용한 빚(트레이드오프·미완공사·알려진 한계) 주석을 전수 수집·검증',\n  phases: [\n    { title: 'Scan', detail: '13개 샤드 병렬 — grep 마커 + 문맥 Read' },\n    { title: 'Verify', detail: '발견 배치별 적대적 판정 + 한국어 요약' },\n  ],\n}\n\nconst ROOT = '/Users/seobi/jinsup_space/CC/src'\n\nconst PATTERNS = String.raw`Intentionally|intentional|TODO|FIXME|HACK\\b|workaround|work around|trade-?off|for now|temporar|stopgap|interim|punt|known (is
+
+[도구결과] Workflow launched in background. Task ID: w6qkc6gs7
+Summary: Claude Code src 전체에서 설계자가 인지하고 수용한 빚(트레이드오프·미완공사·알려진 한계) 주석을 전수 수집·검증
+Transcript dir: /Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/subagents/workflows/wf_89574a3c-93a
+Script file: /Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC-src/c36aeba7-7619-425b-b98f-6585ccf6794d/workflows/scripts/debt-hunt-wf_89574a3c-93a.js
+(Edit this file with Write/Edit and re-invoke Workflow with {scriptPath: "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC-src/c36aeba7-7619-425b-b98f-6585ccf6794d/workflows/scripts/debt-hunt-wf_89574a3c-93a.js"} to iterate without resending the script.)
+Run ID: wf_89574a3c-93a
+To resume after editing the script: Workflow({scriptPath: "/Users/seobi/.claude/projects/-Users-seobi-jinsup-space-CC-src/c36aeba7-7619-425b-b98f-6585ccf6794d/workflows/scripts/debt-hunt-wf_89574a3c-93a.js", resumeFromRunId: "wf_89574a3c-93a"}) — completed agents return cached results.
+
+You will be notified when it completes. Use /workflows to watch live progress.
+
+[ASSISTANT] 네, 맞습니다 — 방금 **Workflow로 백그라운드 발사**했고, 터미널에서 `/workflows` 치시면 실시간 진행 트리를 보실 수 있어요.
+
+## 지금 돌아가는 것
+
+```
+debt-hunt (Run ID: wf_89574a3c-93a)
+├─ Phase 1 · Scan   : 13개 샤드 병렬 (src 1,884파일 전체 분할)
+│    각 샤드: 부채 마커 30여 종 grep (Intentionally / trade-off / stale wins /
+│    marginal benefit / workaround / TOCTOU / silently drop / showed no benefit ...)
+│    → 유망 히트마다 ±15줄 문맥 Read → 자백성 주석만 필터 (샤드당 최대 25건)
+└─ Phase 2 · Verify : 발견 12건씩 배치로 적대적 판정관 투입
+     "진짜 인지된 빚인가?" 기각 기준 적용 + 카테고리 교정 + 한국어 요약 + 흥미도 1~5
+```
+
+동시 실행 슬롯 한도 내에서 스캐너 13 + 검증관 (발견량에 따라 20~30) 정도가 돌 예정이고, 샤드별로 스캔이 끝나는 대로 검증이 바로 따라붙는 파이프라인이라 전체가 끝나길 기다리지 않습니다.
+
+완료 알림이 오면 (아까 배운 그 **큐 웨이크 ①번 — 백그라운드 태스크 완료 알림**으로 제가 자동으로 깨어납니다) 결과를 받아서:
+1. **md** — 카테고리별 빚 대장(臺帳) + 흥미도 상위 하이라이트 + 출처 라인
+2. **/visual-explainer HTML** — 시각화 짝꿍
+
+순서로 만들어드릴게요. 잠시 기다리시면 됩니다.
+
+[USER] <task-notification>
+<task-id>w6qkc6gs7</task-id>
+<tool-use-id>toolu_01YPH3uCrYvKYQWQUMubxeX5</tool-use-id>
+<output-file>/private/tmp/claude-501/-Users-seobi-jinsup-space-CC/dd11fb8a-1577-4c24-87dc-918c64250ce1/tasks/w6qkc6gs7.output</output-file>
+<status>completed</status>
+<summary>Dynamic workflow "Claude Code src 전체에서 설계자가 인지하고 수용한 빚(트레이드오프·미완공사·알려진 한계) 주석을 전수 수집·검증" completed</summary>
+<result>{"total":287,"byCategory":{"캐시절약":19,"알려진버그":42,"보안게이트":19,"플랫폼한계":33,"UX타협":28,"호환성잔재":34,"성능타협":27,"미완공사":63,"기타":22},"findings":[{"file":"src/Tool.ts","line":294,"quote":"Parent's rendered system prompt bytes, frozen at turn start. Used by fork subagents to share the parent's prompt cache — re-calling getSystemPrompt() at fork-spawn time can diverge (GrowthBook cold→warm) and bust the cache. See forkSubagent.ts.","category":"캐시절약","summary":"포크 서브에이전트가 부모의 프롬프트 캐시를 온전히 재활용하기 위해 턴 시작 시점의 시스템 프롬프트 바이트를 동결 재사용 — GrowthBook cold→warm 등으로 갱신된 최신 프롬프트 반영을 의도적으로 포기하고 캐시 히트(비용·지연 절감)를 택함.","impact":"내부 — 포크 에이전트가 턴 중 갱신된 피처 플래그를 반영하지 못한 구식 프롬프트로 돌 수 있으나, 사용자 체감은 오히려 비용·지연 절감 쪽","interest":5,"shard":"core-root"},{"file":"utils/cronTasks.ts","line":336,"quote":"Cron is the primary driver of multi-day sessions (p99 uptime 61min → 53h post-#19931), and unbounded recurrence lets Tier-1 heap leaks compound indefinitely. The default (7 days) covers \"check my PRs every hour this week\" workflows while capping worst-case session lifetime.","category":"알려진버그","summary":"장수 세션의 Tier-1 힙 누수를 고치는 대신, 반복 cron 작업을 기본 7일 후 자동 만료시켜 세션 수명 자체를 캡한다 — cron이 멀티데이 세션의 주범(p99 업타임 61분→53시간)이라 누수가 무한 누적되는 것을 기능 축소로 틀어막았다.","impact":"'이번 주 매시간 PR 확인' 수준을 넘는 장기 반복 예약 작업이 7일 뒤 조용히 사라짐 (permanent 마킹 제외)","interest":5,"shard":"utils-ae"},{"file":"src/utils/file.ts","line":275,"quote":"The padded-arrow format costs 9 bytes/line overhead; at 1.35B Read calls × 132 lines avg this is 2.18% of fleet uncached input (bq-queries/read_line_prefix_overhead_verify.sql). Ant soak validated no Edit error regression (6.29% vs 6.86% baseline). Killswitch pattern: GB can disable if issues surfac","category":"캐시절약","summary":"플릿 전체 미캐시 입력 토큰 2.18%(BQ 실측)를 절약하려고 Read 줄번호를 압축 포맷(N\\t)으로 바꾸면서, Edit 오류율 회귀 가능성을 외부 검증 없이 사내 소크테스트 1회 + 원격 킬스위치(tengu_compact_line_prefix_killswitch)로 수용했다. 정합성 리스크를 '문제 생기면 끈다'는 운영 장치로 대납한 빚.","impact":"평시 체감 없음. 만약 압축 포맷이 모델의 old_string 매칭을 흔들면 Edit 실패율이 미세하게 오를 수 있고, 그 경우 서버 킬스위치로 원복되는 구조","interest":5,"shard":"utils-fm"},{"file":"src/utils/messages.ts","line":5441,"quote":"ensureToolResultPairing: tool_use/tool_result pairing mismatch detected (strict mode). Refusing to repair — would inject synthetic placeholders into model context. Message structure: ${messageTypes.join('; ')}. See inc-4977.","category":"알려진버그","summary":"tool_use/tool_result 짝 불일치의 근본 원인을 고치는 대신, 합성 placeholder를 모델 컨텍스트에 몰래 주입해 세션을 살리는 기본 복구 동작을 유지했다(inc-4977 사고 유발). strict 게이트를 켠 경우에만 거부하도록 하고, 기본 경로는 로그만 남기며 오염된 컨텍스트로 계속 진행하는 빚.","impact":"짝 불일치 발생 시 모델이 가짜 placeholder가 섞인 컨텍스트로 추론해 응답 품질이 조용히 저하될 수 있음 (사고 이력 있음)","interest":5,"shard":"utils-fm"},{"file":"utils/sessionStorage.ts","line":2212,"quote":"Emits tengu_resume_consistency_delta for BigQuery monitoring of write→load round-trip drift — the class of bugs where snip/compact/parallel-TR operations mutate in-memory but the parentUuid walk on disk reconstructs a different set (adamr-20260320-165831: 397K displayed → 1.65M actual on resume).","category":"알려진버그","summary":"snip/compact/병렬-TR이 메모리만 바꾸고 디스크의 parentUuid 워크는 다른 집합을 재구성하는 버그 부류(실제 사고: 표시 397K → resume 시 1.65M 토큰)를 구조적으로 근절하는 대신, 체크포인트 델타를 BigQuery 텔레메트리로 감시하는 탐지 체제로 전환 — 쓰기/읽기 경로 괴리 자체는 남겨둔 수용.","impact":"resume 시 세션 중 보던 것과 다른(훨씬 크거나 잘린) 대화가 로드될 수 있음 — 컨텍스트·비용 급증 또는 히스토리 소실","interest":5,"shard":"utils-ns"},{"file":"utils/bash/ast.ts","line":1860,"quote":"ALLOWLIST, not blocklist. 5 rounds of bypass patches taught us that a value-dependent blocklist is structurally fragile:","category":"보안게이트","summary":"5회의 우회 패치(+= 스코프 갭, \\044 octal 프롬프트 이스케이프, for문 별도 할당 경로)로 값 기반 블록리스트가 구조적으로 취약함을 학습한 뒤, PS4 인젝션 방어를 보수적 allowlist로 전환했다. bash 의미론의 정밀 모델링을 포기하는 대신 미래의 인코딩 우회까지 막는 fail-closed를 얻었고, 일부 정상 PS4 할당이 차단되는 오탐을 수용했다.","impact":"PS4+= 나 특수문자 포함 PS4 값을 쓰는 명령이 too-complex로 분류되어 자동 승인 대신 권한 확인을 받음 — 극히 드묾","interest":5,"shard":"utils-tz-subdirs"},{"file":"utils/toolResultStorage.ts","line":280,"quote":"inc-4586: Empty tool_result content at the prompt tail causes some models (notably capybara) to emit the \\n\\nHuman: stop sequence and end their turn with zero output. ... Inject a short marker so the model always has something to react to.","category":"알려진버그","summary":"서버 렌더러가 tool result 뒤에 Assistant 마커를 넣지 않아 빈 tool_result가 특정 모델(capybara)의 \\n\\nHuman: stop sequence 조기 발화로 이어지는 문제(inc-4586)를, 서버 수정 대신 클라이언트에서 '(toolName completed with no output)' 더미 마커 주입으로 우회했다. 근본 원인을 서버에 남겨둔 채 증상만 덮은 워크어라운드다.","impact":"이 마커가 없으면 조용히 성공하는 도구 실행 후 모델이 무응답으로 턴을 끝냄; 주입 후엔 정상 동작하므로 사용자 체감은 없음 (내부)","interest":5,"shard":"utils-tz-subdirs"},{"file":"tools/FileReadTool/FileReadTool.ts","line":526,"quote":"two full copies waste cache_creation tokens on every subsequent turn. BQ proxy shows ~18% of Read calls are same-file collisions (up to 2.64% of fleet cache_creation) ... Ant soak: 1,734 dedup hits in 2h, no Read error regression. Killswitch pattern: GB can disable if the stub message confuses the m","category":"캐시절약","summary":"동일 파일·동일 범위 재-Read에 전체 내용 대신 'file_unchanged' stub을 반환해 플릿 cache_creation의 최대 2.64%를 절약하는 대신, 모델이 stub 메시지에 혼동할 잔여 리스크를 GrowthBook 킬스위치 하나로 감수했다. Edit/Write 항목(offset=undefined)은 dedup 제외하는 가드까지 두고 소크 테스트로 검증한 뒤 수용한 트레이드오프.","impact":"정상 시 무체감(토큰 절약). 모델이 stub에 혼동하면 불필요한 재시도나 '파일을 못 읽었다'식 오동작 가능 — 이때만 킬스위치로 끈다.","interest":5,"shard":"tools-af"},{"file":"tools/BashTool/bashPermissions.ts","line":81,"quote":"DCE cliff: Bun's feature() evaluator has a per-function complexity budget. bashToolHasPermission is right at the limit. `import { X as Y }` aliases ... push it over the threshold Bun can no longer prove feature('BASH_CLASSIFIER') is a constant and silently evaluates the ternaries to `false`, droppin","category":"플랫폼한계","summary":"Bun 번들러의 함수별 DCE 복잡도 예산 한계 직전에서 동작 — import 블록에 별칭('X as Y') 하나만 추가돼도 feature('BASH_CLASSIFIER')가 상수 증명에 실패해 조용히 false로 평가되며 classifier가 죽는 취약 상태를, 린트 규칙 없이 '별칭 대신 top-level const로 리바인딩하라'는 주석 컨벤션만으로 방어한다.","impact":"내부 — 누군가 컨벤션을 어기면 bash classifier가 소리 없이 비활성화돼 승인 프롬프트 증가·판정 품질 저하가 배포 후에야 드러난다. 현재는 정상 동작.","interest":5,"shard":"tools-af"},{"file":"tools/ScheduleCronTool/prompt.ts","line":105,"quote":"Every user who asks for \"9am\" gets `0 9`, and every user who asks for \"hourly\" gets `0 *` — which means requests from across the planet land on the API at the same instant. ... nudge a few minutes early or late — the user will not notice, and the fleet will.","category":"UX타협","summary":"전 세계 사용자의 '9시 정각' 요청이 같은 순간 API에 몰리는 thundering herd를 피하려고 0/30분을 피한 어긋난 분을 배정하도록 모델에 지시 — 개별 사용자의 시각 정확성을 fleet 건강과 맞바꿨고 'the user will not notice, and the fleet will'이라고 자백한다.","impact":"'아침 9시쯤'이라 하면 8:57이나 9:03에 잡힘 — cron 표현식을 확인하면 눈치챌 수 있고, 그 위에 런타임 지터(주기의 최대 10% 지연)까지 얹힌다","interest":5,"shard":"tools-gz"},{"file":"tools/PowerShellTool/pathValidation.ts","line":276,"quote":"We resolve against CWD (validatePath L930), not -Path — so `New-Item -Path /allowed -Name ../secret/evil` creates /allowed/../secret/evil = /secret/evil, but we resolve cwd/../secret/evil which lands ELSEWHERE and can miss the deny rule. This is a deny→ask downgrade, not fail-safe.","category":"알려진버그","summary":"New-Item의 -Name이 -Path 기준으로 해석되는 PowerShell 의미론을 검증기가 CWD 기준으로 잘못 해석함을 인지한 채 수용 — 올바른 수리(-Name을 -Path에 조인하는 교차 파라미터 추적)는 'out of scope'로 연기하고, 경로 문자가 든 -Name은 ask로 뭉개는 부분 완화만 넣었다.","impact":"deny로 막아둔 경로가 New-Item -Path/-Name 조합 우회 시 자동 차단(deny) 대신 승인 질문(ask)으로 강등될 수 있음","interest":5,"shard":"tools-gz"},{"file":"tools/PowerShellTool/pathValidation.ts","line":587,"quote":"Read-only deny rules are not consulted for write-type cmdlets — that's a known limitation of the operationType→permissionType mapping.","category":"알려진버그","summary":"cmdlet 하나에 operationType 하나라는 매핑 구조를 유지하는 대가로, write형 cmdlet의 읽기 소스 인자(-InFile 등)에 Read deny 규칙이 아예 참조되지 않는 것을 '알려진 한계'로 명시 수용 — Edit deny로만 방어한다.","impact":"Read(~/.ssh/**) deny만 걸어둔 사용자는 iwr -Method POST -InFile ~/.ssh/id_rsa 같은 업로드 exfil에 그 규칙이 적용되지 않음 — Edit deny를 같이 걸어야 막힘","interest":5,"shard":"tools-gz"},{"file":"services/PromptSuggestion/promptSuggestion.
+... (truncated 157217 chars, full result in /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/dd11fb8a-1577-4c24-87dc-918c64250ce1/tasks/w6qkc6gs7.output)</result>
+<usage><agent_count>47</agent_count><subagent_tokens>2631759</subagent_tokens><tool_uses>918</tool_uses><duration_ms>1539682</duration_ms></usage>
+</task-notification>
+
+[ASSISTANT] 워크플로우 완료 — **287건 확정, 47개 에이전트, 918 도구 호출, 26분.** 결과가 잘렸으니 전체 출력 파일을 읽어서 정리하겠습니다.
+
+[도구호출 Bash] {"command": "wc -c /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/dd11fb8a-1577-4c24-87dc-918c64250ce1/tasks/w6qkc6gs7.output; echo \"---\"; head -c 400 /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/dd11fb8a-1577-4c24-87dc-918c64250ce1/tasks/w6qkc6gs7.output", "description": "전체 출력 파일 크기 확인"}
+
+[도구결과] 357603 /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/dd11fb8a-1577-4c24-87dc-918c64250ce1/tasks/w6qkc6gs7.output
+---
+{
+  "summary": "Claude Code src 전체에서 설계자가 인지하고 수용한 빚(트레이드오프·미완공사·알려진 한계) 주석을 전수 수집·검증",
+  "agentCount": 47,
+  "logs": [
+    "utils-fm: 24건 발견 → 검증 시작",
+    "utils-ae: 25건 발견 → 검증 시작",
+    "tools-af: 25건 발견 → 검증 시작",
+    "core-root: 22건 발견 → 검증 시작",
+
+[도구호출 Bash] {"command": "cd /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/dd11fb8a-1577-4c24-87dc-918c64250ce1/tasks/\npython3 << 'PYEOF'\nimport json\nd = json.load(open('w6qkc6gs7.output'))\nres = d['result'] if isinstance(d.get('result'), dict) else json.loads(d['result'])\nprint(\"total:\", res['total'])\nprint(\"byCategory:\", json.dumps(res['byCategory'], ensure_ascii=False))\nfs = res['findings']\nprint(\"findings len:\", len(fs))\n# interest distribution\nfrom collections import Counter\nprin
+
+[도구결과] total: 287
+byCategory: {"캐시절약": 19, "알려진버그": 42, "보안게이트": 19, "플랫폼한계": 33, "UX타협": 28, "호환성잔재": 34, "성능타협": 27, "미완공사": 63, "기타": 22}
+findings len: 287
+interest: {5: 22, 4: 92, 3: 121, 2: 46, 1: 6}
+saved: /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/scratchpad/debt_findings.json
+Shell cwd was reset to /Users/seobi/jinsup_space/CC
+
+[ASSISTANT] interest 5짜리 22건 전체와 카테고리별 대표 항목을 뽑아서 문서에 담겠습니다.
+
+[도구호출 Bash] {"command": "cd /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/scratchpad/\npython3 << 'PYEOF'\nimport json\nres = json.load(open('debt_findings.json'))\nfs = res['findings']\n# top interest 5 all\ntop = [f for f in fs if f['interest']==5]\nprint(f\"=== interest 5: {len(top)}건 ===\")\nfor f in top:\n    print(f\"\\n[{f['category']}] {f['file']}:{f['line']}\")\n    print(f\"  요약: {f['summary'][:200]}\")\n    print(f\"  체감: {f['impact'][:120]}\")\nPYEOF",
+
+[도구결과] === interest 5: 22건 ===
+
+[캐시절약] src/Tool.ts:294
+  요약: 포크 서브에이전트가 부모의 프롬프트 캐시를 온전히 재활용하기 위해 턴 시작 시점의 시스템 프롬프트 바이트를 동결 재사용 — GrowthBook cold→warm 등으로 갱신된 최신 프롬프트 반영을 의도적으로 포기하고 캐시 히트(비용·지연 절감)를 택함.
+  체감: 내부 — 포크 에이전트가 턴 중 갱신된 피처 플래그를 반영하지 못한 구식 프롬프트로 돌 수 있으나, 사용자 체감은 오히려 비용·지연 절감 쪽
+
+[알려진버그] utils/cronTasks.ts:336
+  요약: 장수 세션의 Tier-1 힙 누수를 고치는 대신, 반복 cron 작업을 기본 7일 후 자동 만료시켜 세션 수명 자체를 캡한다 — cron이 멀티데이 세션의 주범(p99 업타임 61분→53시간)이라 누수가 무한 누적되는 것을 기능 축소로 틀어막았다.
+  체감: '이번 주 매시간 PR 확인' 수준을 넘는 장기 반복 예약 작업이 7일 뒤 조용히 사라짐 (permanent 마킹 제외)
+
+[캐시절약] src/utils/file.ts:275
+  요약: 플릿 전체 미캐시 입력 토큰 2.18%(BQ 실측)를 절약하려고 Read 줄번호를 압축 포맷(N\t)으로 바꾸면서, Edit 오류율 회귀 가능성을 외부 검증 없이 사내 소크테스트 1회 + 원격 킬스위치(tengu_compact_line_prefix_killswitch)로 수용했다. 정합성 리스크를 '문제 생기면 끈다'는 운영 장치로 대납한 빚.
+  체감: 평시 체감 없음. 만약 압축 포맷이 모델의 old_string 매칭을 흔들면 Edit 실패율이 미세하게 오를 수 있고, 그 경우 서버 킬스위치로 원복되는 구조
+
+[알려진버그] src/utils/messages.ts:5441
+  요약: tool_use/tool_result 짝 불일치의 근본 원인을 고치는 대신, 합성 placeholder를 모델 컨텍스트에 몰래 주입해 세션을 살리는 기본 복구 동작을 유지했다(inc-4977 사고 유발). strict 게이트를 켠 경우에만 거부하도록 하고, 기본 경로는 로그만 남기며 오염된 컨텍스트로 계속 진행하는 빚.
+  체감: 짝 불일치 발생 시 모델이 가짜 placeholder가 섞인 컨텍스트로 추론해 응답 품질이 조용히 저하될 수 있음 (사고 이력 있음)
+
+[알려진버그] utils/sessionStorage.ts:2212
+  요약: snip/compact/병렬-TR이 메모리만 바꾸고 디스크의 parentUuid 워크는 다른 집합을 재구성하는 버그 부류(실제 사고: 표시 397K → resume 시 1.65M 토큰)를 구조적으로 근절하는 대신, 체크포인트 델타를 BigQuery 텔레메트리로 감시하는 탐지 체제로 전환 — 쓰기/읽기 경로 괴리 자체는 남겨둔 수용.
+  체감: resume 시 세션 중 보던 것과 다른(훨씬 크거나 잘린) 대화가 로드될 수 있음 — 컨텍스트·비용 급증 또는 히스토리 소실
+
+[보안게이트] utils/bash/ast.ts:1860
+  요약: 5회의 우회 패치(+= 스코프 갭, \044 octal 프롬프트 이스케이프, for문 별도 할당 경로)로 값 기반 블록리스트가 구조적으로 취약함을 학습한 뒤, PS4 인젝션 방어를 보수적 allowlist로 전환했다. bash 의미론의 정밀 모델링을 포기하는 대신 미래의 인코딩 우회까지 막는 fail-closed를 얻었고, 일부 정상 PS4 할당이 차단되는
+  체감: PS4+= 나 특수문자 포함 PS4 값을 쓰는 명령이 too-complex로 분류되어 자동 승인 대신 권한 확인을 받음 — 극히 드묾
+
+[알려진버그] utils/toolResultStorage.ts:280
+  요약: 서버 렌더러가 tool result 뒤에 Assistant 마커를 넣지 않아 빈 tool_result가 특정 모델(capybara)의 \n\nHuman: stop sequence 조기 발화로 이어지는 문제(inc-4586)를, 서버 수정 대신 클라이언트에서 '(toolName completed w
+
+[ASSISTANT] 22건 전부 강력하네요. 이제 나머지 카테고리별 대표 항목까지 뽑아서 md를 작성하겠습니다.
+
+[도구호출 Bash] {"command": "cd /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/scratchpad/\npython3 << 'PYEOF'\nimport json\nres = json.load(open('debt_findings.json'))\nfs = res['findings']\n# interest 4, grouped by category, take a few notable each not already in top5\nby={}\nfor f in fs:\n    if f['interest']==4:\n        by.setdefault(f['category'],[]).append(f)\nfor cat, items in sorted(by.items(), key=lambda x:-len(x[1])):\n    print(f\"\\n### {cat} (interest4: {
+
+[도구결과] ### 알려진버그 (interest4: 16건)
+- src/main.tsx:2010 — fire-and-forget 디스크 쓰기 + 동기 스테일 캐시 읽기 구조가 만든 콜드 캐시 별칭 404 크래시 루프를, 구조 수정 대신 명시적 모델 지정 시에만 GrowthBook init을 블로킹하는 조건부 await로 콜사이트에서 봉합 — 덤으로 #22279 이전에
+- utils/config.ts:781 — 설정 파일 동시쓰기·비원자적 폴백이 만드는 손상 레이스를 근본 제거하지 않고, '재읽은 config에 인증이 사라져 보이면 쓰기 거부' 가드로 최악의 결과(인증 영구 소실, GH#3117)만 차단 — 그 대가로 해당 순간의 설정 변경은 조용히 버려진다.
+- src/utils/hooks.ts:1850 — headless 모드에서 structuredInput 소비자가 뜨기 전에 SessionStart/Setup 훅이 실행되어 sandbox ask 콜백이 데드락하는 자사 초기화 순서 문제를, 순서를 고치는 대신 해당 이벤트의 HTTP 훅을 통째로 필터링해 회피했다. 외부 
+- utils/worktree.ts:590 — core.hooksPath 공유 설정이 husky prepare 스크립트에 의해 bun install마다 공유 .git/config째로 되돌려지는 취약성을 근본 해결하지 않고 설정은 그대로 둔 채, 정작 필요한 attribution 훅 하나만 각 worktree의 .h
+
+### 보안게이트 (interest4: 14건)
+- src/setup.ts:419 — Desktop 앱(apps#29127)이 플래그를 무조건 넘기는 동작을 수용하기 위해, ant 사용자용 --dangerously-skip-permissions 샌드박스 검증(도커·인터넷 차단 확인)을 local-agent/claude-desktop 진입점에서 통째로 면
+- utils/doctorDiagnostic.ts:322 — 미래 enum 값 하나가 관리형 정책 파일 전체를 무효화(null out)시키는 사태를 막으려고, 알 수 없는 strictPluginOnlyCustomization 값의 silent drop을 스키마 레벨(settings.ts:101 .catch)에서 수용했다. 전방 
+- utils/subprocessEnv.ts:11 — 스크럽 목록에서 GITHUB_TOKEN/GH_TOKEN을 의도적으로 제외 — gh.sh 래퍼의 GitHub API 호출 기능을 지키는 대가로 유출 리스크를 '잡 종료 시 만료'라는 시간 제한에 기대어 명시적으로 수용한 트레이드오프.
+- utils/bash/parser.ts:61 — tree-sitter 기반 bash 보안 파서를 펜테스트 통과 전까지 Anthropic 내부 빌드 전용으로 잠그고, 외부 빌드는 구식 regex/shell-quote 경로에 묶어뒀다. 안전 검증 시간을 버는 대신 외부 사용자에게 신형 파서의 정밀도 향상을 연기한 명시적
+
+### 플랫폼한계 (interest4: 13건)
+- utils/api.ts:197 — 대용량 도구 입력의 수 분 멈춤을 해결하는 fine-grained tool streaming을 api.anthropic.com 직결에만 켠다 — 프록시(LiteLLM 등)와 Bedrock/Vertex가 이 필드를 400으로 거부하기 때문에, 해당 사용자군은 멈춤 증상을
+- utils/crypto.ts:7 — bun 내부 바이트코드 컴파일러가 re-export 문법의 바인딩을 링크하지 못하는 버그(ReferenceError) 때문에 표준 `export { } from` 문법을 포기하고 import-후-export로 우회했다. 툴체인 수정을 기다리는 대신 비표준 코드 형태를 
+- src/utils/gracefulShutdown.ts:238 — Bun의 removeListener가 커널 sigaction까지 리셋하는 버그를 상류 수정 대신 signal-exit v4에 절대 해지되지 않는 no-op 콜백을 등록해 unload 자체를 막는 핀 고정으로 우회했다. signal-exit 내부 카운터 동작
+
+[ASSISTANT] 풍부한 결과입니다. 이제 이 287건을 md 대장으로 정리하겠습니다.
+
+[도구호출 Bash] {"command": "cd /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/scratchpad/\npython3 << 'PYEOF'\nimport json\nres = json.load(open('debt_findings.json'))\nfs = res['findings']\n# Build markdown tables per category. For each category, list all interest>=4 fully, and count of interest<=3.\nCATS = [\"캐시절약\",\"알려진버그\",\"보안게이트\",\"플랫폼한계\",\"UX타협\",\"호환성잔재\",\"성능타협\",\"미완공사\",\"기타\"]\nout=[]\nfor cat in CATS:\n    items=[f for f in fs if f['category']==cat]\n 
+
+[도구결과] 캐시절약: total 19, hi(>=4) 9, lo 10
+알려진버그: total 42, hi(>=4) 26, lo 16
+보안게이트: total 19, hi(>=4) 15, lo 4
+플랫폼한계: total 33, hi(>=4) 16, lo 17
+UX타협: total 28, hi(>=4) 8, lo 20
+호환성잔재: total 34, hi(>=4) 9, lo 25
+성능타협: total 27, hi(>=4) 11, lo 16
+미완공사: total 63, hi(>=4) 9, lo 54
+기타: total 22, hi(>=4) 11, lo 11
+Shell cwd was reset to /Users/seobi/jinsup_space/CC
+
+[ASSISTANT] Now I'll write the markdown document. Let me build it programmatically from the grouped data to ensure accuracy.
+
+[도구호출 Bash] {"command": "cd /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/scratchpad/\npython3 << 'PYEOF'\nimport json\ngrouped = json.load(open('debt_grouped.json'))\nres = json.load(open('debt_findings.json'))\ntotal = res['total']\nbycat = res['byCategory']\n\nemoji = {\"캐시절약\":\"💰\",\"알려진버그\":\"🐛\",\"보안게이트\":\"🔒\",\"플랫폼한계\":\"🧱\",\"UX타협\":\"🎚️\",\"호환성잔재\":\"🧟\",\"성능타협\":\"⚡\",\"미완공사\":\"🚧\",\"기타\":\"🔧\"}\norder = [\"알려진버그\",\"미완공사\",\"호환성잔재\",\"플랫폼한계\",\"UX타협\
+
+[도구결과] written, lines: 222
+Shell cwd was reset to /Users/seobi/jinsup_space/CC
+
+[ASSISTANT] md 대장이 생성됐습니다. 이제 /visual-explainer로 HTML을 만들겠습니다.
+
+[도구호출 Skill] {"skill": "visual-explainer", "args": "Claude Code 기술 부채 287건 전수 스캔 결과 — 카테고리 9종 분포(미완공사63·알려진버그42·호환성잔재34·플랫폼한계33·UX타협28·성능타협27·캐시절약19·보안게이트19·기타22), 흥미도 5 하이라이트 22건(cron 7일 만료·placeholder 주입·resume 토큰 드리프트·capybara stop-sequence·Windows 스트리밍 비활성·자정 날짜 스테일 등), \"빚마다 BigQuery 실측/인시던트 번호로 이자율이 계량돼 있다\"는 통찰 — 클로드코드-기술부채-대장.md의 HTML 짝꿍"}
+
+[도구결과] Launching skill: visual-explainer
+
+[도구호출 Bash] {"command": "cd /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/scratchpad/\npython3 -c \"\nimport json\ng=json.load(open('debt_grouped.json'))\n# emit compact hi lists for top categories to embed\nfor x in g:\n    if x['cat'] in ('알려진버그','보안게이트','캐시절약'):\n        print('##',x['cat'])\n        for f in x['hi'][:6]:\n            print(f\\\"{f['file'].split('/')[-1]}:{f['line']} | {f['summary'][:90]}\\\")\n\"", "description": "HTML용 대표 항목 텍스트 확인"}
+
+[도구결과] ## 캐시절약
+Tool.ts:294 | 포크 서브에이전트가 부모의 프롬프트 캐시를 온전히 재활용하기 위해 턴 시작 시점의 시스템 프롬프트 바이트를 동결 재사용 — GrowthBook cold→warm 
+file.ts:275 | 플릿 전체 미캐시 입력 토큰 2.18%(BQ 실측)를 절약하려고 Read 줄번호를 압축 포맷(N\t)으로 바꾸면서, Edit 오류율 회귀 가능성을 외부 검증 없이
+FileReadTool.ts:526 | 동일 파일·동일 범위 재-Read에 전체 내용 대신 'file_unchanged' stub을 반환해 플릿 cache_creation의 최대 2.64%를 절약하는 
+promptSuggestion.ts:313 | 메인 스레드의 프롬프트 캐시에 무임승차하기 위해 제안 포크의 저비용 파라미터(effort:'low', maxOutputTokens 등) 절감을 전부 포기했다. P
+prompts.ts:344 | 글로벌 캐시 프리픽스의 단일성을 지키려고 세션 가변 지침을 전부 동적 경계 뒤로 몰아넣는 배치 제약(조건 하나당 Blake2b 변형 2^N)을 수용했고, 유일한 
+memdir.ts:329 | 자정 이후에도 프롬프트 캐시 프리픽스를 유지하려고 user-context의 날짜를 일부러 스테일로 방치하고, 메모리 프롬프트에는 리터럴 날짜 대신 YYYY-MM-
+## 알려진버그
+cronTasks.ts:336 | 장수 세션의 Tier-1 힙 누수를 고치는 대신, 반복 cron 작업을 기본 7일 후 자동 만료시켜 세션 수명 자체를 캡한다 — cron이 멀티데이 세션의 주범(
+messages.ts:5441 | tool_use/tool_result 짝 불일치의 근본 원인을 고치는 대신, 합성 placeholder를 모델 컨텍스트에 몰래 주입해 세션을 살리는 기본 복구 동
+sessionStorage.ts:2212 | snip/compact/병렬-TR이 메모리만 바꾸고 디스크의 parentUuid 워크는 다른 집합을 재구성하는 버그 부류(실제 사고: 표시 397K → resum
+toolResultStorage.ts:280 | 서버 렌더러가 tool result 뒤에 Assistant 마커를 넣지 않아 빈 tool_result가 특정 모델(capybara)의 \n\nHuman: stop
+pathValidation.ts:276 | New-Item의 -Name이 -Path 기준으로 해석되는 PowerShell 의미론을 검증기가 CWD 기준으로 잘못 해석함을 인지한 채 수용 — 올바른 수리(-
+pathValidation.ts:587 | cmdlet 하나에 operationType 하나라는 매핑 구조를 유지하는 대가로, write형 cmdlet의 읽기 소스 인자(-InFile 등)에 Read de
+## 보안게이트
+ast.ts:1860 | 5회의 우회 패치(+= 스코프 갭, \044 octal 프롬프트 이스케이프, for문 별도 할당 경로)로 값 기반 블록리스트가 구조적으로 취약함을 학습한 뒤, P
+setup.ts:419 | Desktop 앱(apps#29127)이 플래그를 무조건 넘기는 동작을 수용하기 위해, ant 사용자용 --dangerously-skip-permissions 샌
+doctorDiagnostic.ts:322 | 미래 enum 값 하나가 관리형 정책 파일 전체를 무효화(null out)시키는 사태를 막으려고, 알 수 없는 strictPluginOnlyCustomizatio
+subprocessEnv.ts:11 | 스크럽 목록에서 GITHUB_TOKEN/GH_TOKEN을 의도적으로 제외 — gh.sh 래퍼의 GitHub API 호출 기능을 지키는 대가로 유출 리스크를 '잡 
+parser.ts:61 | tree-sitter 기반 bash 보안 파서를 펜테스트 통과 전까지 Anthropic 내부 빌드 전용으로 잠그고, 외부 빌드는 구식 regex/shell-quo
+ssrfGuard.ts:12 | 로컬 개발 정책 서버라는 핵심 사용 사례를 살리려고 SSRF 가드에서 루프백(127.0.0.0/8, ::1)을 의도적으로 허용
+
+[도구호출 Write] {"file_path": "/Users/seobi/jinsup_space/CC/클로드코드-기술부채-대장.html", "content": "<!DOCTYPE html>\n<html lang=\"ko\">\n<head>\n<meta charset=\"UTF-8\">\n<meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n<title>Claude Code 기술 부채 대장 — 계량된 빚 287건</title>\n<link rel=\"preconnect\" href=\"https://fonts.googleapis.com\">\n<link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin>\n<link href=\"https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Gothic+A1:wght@
+
+[도구결과] File created successfully at: /Users/seobi/jinsup_space/CC/클로드코드-기술부채-대장.html (file state is current in your context — no need to Read it back)
+
+[ASSISTANT] CSS에 오타(`--pink:#ff7 eb`)가 있어 수정하고 엽니다.
+
+[도구호출 Edit] {"replace_all": false, "file_path": "/Users/seobi/jinsup_space/CC/클로드코드-기술부채-대장.html", "old_string": "  --amber:#e6b45a; --red:#ff5a4d; --grn:#5fcf8a; --cyan:#54c8d6; --violet:#b48cff; --pink:#ff7 eb;", "new_string": "  --amber:#e6b45a; --red:#ff5a4d; --grn:#5fcf8a; --cyan:#54c8d6; --violet:#b48cff;"}
+
+[도구결과] The file /Users/seobi/jinsup_space/CC/클로드코드-기술부채-대장.html has been updated successfully. (file state is current in your context — no need to Read it back)
+
+[도구호출 Bash] {"command": "cp /private/tmp/claude-501/-Users-seobi-jinsup-space-CC/c36aeba7-7619-425b-b98f-6585ccf6794d/scratchpad/debt_findings.json /Users/seobi/jinsup_space/CC/클로드코드-기술부채-대장-전체287건.json && open \"/Users/seobi/jinsup_space/CC/클로드코드-기술부채-대장.html\" && echo \"opened + json copied\"", "description": "전체 JSON 레포에 복사 + HTML 열기"}
+
+[도구결과] opened + json copied
+
+[ASSISTANT] 완료했습니다. 워크플로우가 **src 1,884개 파일 전체를 훑어 287건의 "자백성 부채"를 확정**했고, 세 개의 산출물로 정리했습니다.
+
+## 산출물
+
+| 파일 | 내용 |
+|---|---|
+| `클로드코드-기술부채-대장.md` | 카테고리 9종 × 흥미도 4~5 정제 96건 대장 (위치·트레이드오프·체감 표) |
+| `클로드코드-기술부채-대장.html` | 시각화 짝꿍 (부채 장부 컨셉, 브라우저에 열림) |
+| `클로드코드-기술부채-대장-전체287건.json` | 원본 287건 전량 (영문 quote 포함) |
+
+## 스캔이 밝혀낸 큰 그림
+
+**빚의 지형도** (287건): 🚧미완공사 63 · 🐛알려진버그 42 · 🧟호환성잔재 34 · 🧱플랫폼한계 33 · 🎚️UX타협 28 · ⚡성능타협 27 · 🔒보안게이트 19 · 💰캐시절약 19 · 🔧기타 22.
+
+**핵심 통찰 — 이게 제일 인상적이었습니다**: 이 코드베이스의 빚은 대충 남긴 게 아니라 **거의 다 이자율이 계량돼 있습니다.** 주석마다 BigQuery 실측이나 인시던트 번호로 "무엇을 포기하면 얼마를 아끼는지"가 적혀 있어요 — Read 압축 = fleet 미캐시 2.18%, cron 만료 = p99 61분→53h, resume 드리프트 = 397K→1.65M 토큰, 자정 날짜 스테일 = 세션당 920K 토큰. **"몰라서"가 아니라 "재고 끝에 남긴" 빚**이라는 게 대장 전체를 관통합니다.
+
+**대표님 질문과 직결된 것들** (compact/스킬 논의의 형제들):
+- `memdir.ts:329` — 자정 후 날짜를 일부러 스테일로 방치 (우리가 본 date_change 꼬리 첨부가 이걸 보정하는 그 구조)
+- `Tool.ts:294` — 포크 서브에이전트가 부모 프롬프트 캐시 재활용 위해 최신 프롬프트 반영 포기
+- `attachments.ts:1408` — messages[0] 날짜 안 갱신 (캐시 전체 무효화 방지)
+
+**사용자가 실제로 체감할 만한 것 3개**: cron 예약이 7일 뒤 조용히 증발 / resume 시 다른 크기의 대화 로드 / Windows에서 실시간 스트리밍 전면 비활성.
+
+**반복되는 상환 회피 3패턴**: ① 탐지로 대체(버그 대신 BQ 감시) ② 킬스위치로 담보("문제 생기면 끈다") ③ 기능 축소로 봉합(고치기 어려운 경로 통째 비활성).
+
+한계도 정직히: grep 마커 기반이라 마커 없는 침묵형 빚은 놓쳤을 수 있고, 흥미도·카테고리는 검증관 LLM 판정입니다. 특정 카테고리(예: 보안게이트 19건 전체)를 더 깊게 파보고 싶으시면 말씀해주세요.
+
+[USER] /compact
+
+[USER] 클로드코드의 수퍼바이저 패턴이 있어?
+
+[ASSISTANT] 좋은 질문이에요. "수퍼바이저 패턴"이 코드에 실제로 있는지 소스에서 확인하겠습니다.
+
+[도구호출 Bash] {"command": "cd /Users/seobi/jinsup_space/CC/src && echo \"=== coordinator/supervisor ===\" && grep -rln \"isCoordinator\\|coordinatorMode\\|[Ss]upervisor\\|[Oo]rchestrat\" --include=\"*.ts\" --include=\"*.tsx\" | head -20; echo \"=== swarm/team ===\" && ls -d utils/swarm 2>/dev/null && ls tools/ | grep -iE \"team|swarm|send\"", "description": "supervisor/coordinator/swarm 패턴 파일 탐색"}
+
+[도구결과] === coordinator/supervisor ===
+query.ts
+main.tsx
+QueryEngine.ts
+tools.ts
+upstreamproxy/upstreamproxy.ts
+tasks/RemoteAgentTask/RemoteAgentTask.tsx
+tools/MCPTool/classifyForCollapse.ts
+tools/AgentTool/prompt.ts
+tools/AgentTool/resumeAgent.ts
+tools/AgentTool/AgentTool.tsx
+tools/AgentTool/builtInAgents.ts
+tools/AgentTool/forkSubagent.ts
+tools/ToolSearchTool/prompt.ts
+coordinator/coordinatorMode.ts
+bridge/replBridge.ts
+constants/xml.ts
+bridge/bridgeMain.ts
+constants/spinnerVerbs.ts
+utils/managedEnv.ts
+utils/teleport.tsx
+=== swarm/team ===
+utils/swarm
+SendMessageTool
+TeamCreateTool
+TeamDeleteTool
+
+[ASSISTANT] There's a dedicated `coordinator/` directory. Let me examine it and the swarm infrastructure.
+
+[도구호출 Bash] {"command": "echo \"=== coordinator dir ===\" && ls coordinator/ && echo \"=== coordinatorMode.ts head ===\" && sed -n '1,60p' coordinator/coordinatorMode.ts", "description": "coordinator 모듈 구조와 정의 확인"}
+
+[도구결과] === coordinator dir ===
+coordinatorMode.ts
+=== coordinatorMode.ts head ===
+import { feature } from 'bun:bundle'
+import { ASYNC_AGENT_ALLOWED_TOOLS } from '../constants/tools.js'
+import { checkStatsigFeatureGate_CACHED_MAY_BE_STALE } from '../services/analytics/growthbook.js'
+import {
+  type AnalyticsMetadata_I_VERIFIED_THIS_IS_NOT_CODE_OR_FILEPATHS,
+  logEvent,
+} from '../services/analytics/index.js'
+import { AGENT_TOOL_NAME } from '../tools/AgentTool/constants.js'
+import { BASH_TOOL_NAME } from '../tools/BashTool/toolName.js'
+import { FILE_EDIT_TOOL_NAME } from '../tools/FileEditTool/constants.js'
+import { FILE_READ_TOOL_NAME } from '../tools/FileReadTool/prompt.js'
+import { SEND_MESSAGE_TOOL_NAME } from '../tools/SendMessageTool/constants.js'
+import { SYNTHETIC_OUTPUT_TOOL_NAME } from '../tools/SyntheticOutputTool/SyntheticOutputTool.js'
+import { TASK_STOP_TOOL_NAME } from '../tools/TaskStopTool/prompt.js'
+import { TEAM_CREATE_TOOL_NAME } from '../tools/TeamCreateTool/constants.js'
+import { TEAM_DELETE_TOOL_NAME } from '../tools/TeamDeleteTool/constants.js'
+import { isEnvTruthy } from '../utils/envUtils.js'
+
+// Checks the same gate as isScratchpadEnabled() in
+// utils/permissions/filesystem.ts. Duplicated here because importing
+// filesystem.ts creates a circular dependency (filesystem -> permissions
+// -> ... -> coordinatorMode). The actual scratchpad path is passed in via
+// getCoordinatorUserContext's scratchpadDir parameter (dependency injection
+// from QueryEngine.ts, which lives higher in the dep graph).
+function isScratchpadGateEnabled(): boolean {
+  return checkStatsigFeatureGate_CACHED_MAY_BE_STALE('tengu_scratch')
+}
+
+const INTERNAL_WORKER_TOOLS = new Set([
+  TEAM_CREATE_TOOL_NAME,
+  TEAM_DELETE_TOOL_NAME,
+  SEND_MESSAGE_TOOL_NAME,
+  SYNTHETIC_OUTPUT_TOOL_NAME,
+])
+
+export function isCoordinatorMode(): boolean {
+  if (feature('COORDINATOR_MODE')) {
+    return isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE)
+  }
+  return false
+}
+
+/**
+ * Checks if the c
+
+[도구호출 Bash] {"command": "echo \"=== coordinator system prompt ===\" && grep -n \"getCoordinatorSystemPrompt\\|coordinator\\|worker\\|delegate\\|You are\" coordinator/coordinatorMode.ts | head -25", "description": "코디네이터 시스템 프롬프트 정의 위치 확인"}
+
+[도구결과] === coordinator system prompt ===
+22:// -> ... -> coordinatorMode). The actual scratchpad path is passed in via
+44: * Checks if the current coordinator mode matches the session's stored mode.
+50:  sessionMode: 'coordinator' | 'normal' | undefined,
+58:  const sessionIsCoordinator = sessionMode === 'coordinator'
+71:  logEvent('tengu_coordinator_mode_switched', {
+76:    ? 'Entered coordinator mode to match resumed session.'
+77:    : 'Exited coordinator mode to match resumed session.'
+88:  const workerTools = isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)
+97:  let content = `Workers spawned via the ${AGENT_TOOL_NAME} tool have access to these tools: ${workerTools}`
+105:    content += `\n\nScratchpad directory: ${scratchpadDir}\nWorkers can read and write here without permission prompts. Use this for durable cross-worker knowledge — structure files however fits the work.`
+108:  return { workerToolsContext: content }
+111:export function getCoordinatorSystemPrompt(): string {
+112:  const workerCapabilities = isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)
+114:    : 'Workers have access to standard tools, MCP tools from configured MCP servers, and project skills via the Skill tool. Delegate skill invocations (e.g. /commit, /verify) to workers.'
+116:  return `You are Claude Code, an AI assistant that orchestrates software engineering tasks across multiple workers.
+120:You are a **coordinator**. Your job is to:
+122:- Direct workers to research, implement and verify code changes
+124:- Answer questions directly when possible — don't delegate work that you can handle without tools
+130:- **${AGENT_TOOL_NAME}** - Spawn a new worker
+131:- **${SEND_MESSAGE_TOOL_NAME}** - Continue an existing worker (send a follow-up to its \`to\` agent ID)
+132:- **${TASK_STOP_TOOL_NAME}** - Stop a running worker
+133:- **subscribe_pr_activity / unsubscribe_pr_activity** (if available) - Subscribe to GitHub PR events (review comments, CI results). Events arrive as user messages. Merge conflict transitions do
+
+[도구호출 Bash] {"command": "sed -n '111,175p' coordinator/coordinatorMode.ts", "description": "코디네이터 시스템 프롬프트 전문"}
+
+[도구결과] export function getCoordinatorSystemPrompt(): string {
+  const workerCapabilities = isEnvTruthy(process.env.CLAUDE_CODE_SIMPLE)
+    ? 'Workers have access to Bash, Read, and Edit tools, plus MCP tools from configured MCP servers.'
+    : 'Workers have access to standard tools, MCP tools from configured MCP servers, and project skills via the Skill tool. Delegate skill invocations (e.g. /commit, /verify) to workers.'
+
+  return `You are Claude Code, an AI assistant that orchestrates software engineering tasks across multiple workers.
+
+## 1. Your Role
+
+You are a **coordinator**. Your job is to:
+- Help the user achieve their goal
+- Direct workers to research, implement and verify code changes
+- Synthesize results and communicate with the user
+- Answer questions directly when possible — don't delegate work that you can handle without tools
+
+Every message you send is to the user. Worker results and system notifications are internal signals, not conversation partners — never thank or acknowledge them. Summarize new information for the user as it arrives.
+
+## 2. Your Tools
+
+- **${AGENT_TOOL_NAME}** - Spawn a new worker
+- **${SEND_MESSAGE_TOOL_NAME}** - Continue an existing worker (send a follow-up to its \`to\` agent ID)
+- **${TASK_STOP_TOOL_NAME}** - Stop a running worker
+- **subscribe_pr_activity / unsubscribe_pr_activity** (if available) - Subscribe to GitHub PR events (review comments, CI results). Events arrive as user messages. Merge conflict transitions do NOT arrive — GitHub doesn't webhook \`mergeable_state\` changes, so poll \`gh pr view N --json mergeable\` if tracking conflict status. Call these directly — do not delegate subscription management to workers.
+
+When calling ${AGENT_TOOL_NAME}:
+- Do not use one worker to check on another. Workers will notify you when they are done.
+- Do not use workers to trivially report file contents or run commands. Give them higher-level tasks.
+- Do not set the model parameter. Workers need the default model for the substantive t
+
+[ASSISTANT] 네, **명확하게 있습니다.** 클로드코드에는 정식 **수퍼바이저(코디네이터-워커) 패턴**이 코드에 구현돼 있어요. 다만 두 가지 층위가 있어서 구분해서 설명할게요.
+
+## 층위 1 — 항상 있는 "암묵적 수퍼바이저" (기본 동작)
+
+평소에도 메인 에이전트가 서브에이전트를 부리는 구조는 이미 돌아갑니다:
+- **Agent 툴** — Explore·Plan·general-purpose·커스텀 에이전트 스폰
+- 서브에이전트 결과는 `<task-notification>`으로 메인에게만 돌아오고, 유저에겐 안 보임
+- 이번 세션에서 제가 돌린 debt-hunt **워크플로우**가 바로 이 확장형 (47개 서브에이전트를 결정론적으로 오케스트레이션)
+
+이건 "메인이 곧 수퍼바이저"인 느슨한 형태죠.
+
+## 층위 2 — 전용 "Coordinator Mode" (명시적 수퍼바이저 패턴)
+
+소스에 `src/coordinator/coordinatorMode.ts`라는 **전용 모듈**이 있고, 기능 플래그로 켜는 정식 패턴입니다 (`isCoordinatorMode()` — `COORDINATOR_MODE` 플래그 + `CLAUDE_CODE_COORDINATOR_MODE` 환경변수).
+
+**핵심 — 코디네이터는 시스템 프롬프트부터 갈립니다** (coordinatorMode.ts:116):
+
+> "You are Claude Code, an AI assistant that **orchestrates** software engineering tasks across multiple workers. You are a **coordinator.**"
+
+일반 모드의 "너는 소프트웨어 작업을 하는 에이전트"와 달리, 코디네이터는 **직접 코딩하지 않고 워커를 지휘·종합**하는 역할로 재정의됩니다:
+
+| 코디네이터가 하는 일 | 코디네이터의 도구 |
+|---|---|
+| 워커에게 리서치·구현·검증 지시 | **Agent** — 새 워커 스폰 |
+| 결과 종합 → 유저에게 전달 | **SendMessage** — 기존 워커에게 후속 지시 (로드된 컨텍스트 재활용) |
+| 도구 없이 답할 수 있으면 직접 답 | **TaskStop** — 워커 중단 |
+
+프롬프트에 박힌 지휘 규칙이 흥미롭습니다:
+- "**워커로 다른 워커를 감시하지 마라** — 끝나면 알아서 알린다"
+- "파일 내용 보고·명령 실행 같은 사소한 일에 워커 쓰지 마라 — 더 높은 수준의 태스크를 줘라"
+- "에이전트 띄운 뒤엔 뭘 띄웠는지만 알리고 응답을 끝내라 — **결과를 예측·조작하지 마라** (별도 메시지로 도착한다)"
+- "매 메시지는 유저에게 하는 것. 워커 결과·시스템 알림은 내부 신호지 대화 상대가 아니다 — **감사하거나 아는 척하지 마라**"
+
+## 층위 2의 확장 — Swarm / Team (멀티 워커 협업)
+
+코디네이터 모드는 혼자가 아니라 **swarm 인프라**와 물려 있습니다. `INTERNAL_WORKER_TOOLS` (coordinatorMode.ts:31)에 워커 전용 도구들이 있어요:
+- **TeamCreate / TeamDelete** — 워커 팀 구성·해체
+- **SendMessage** — 워커 간 메시지 (swarm inter-agent communication, `constants/xml.ts`의 `teammate-message` 태그)
+- **SyntheticOutput** — 워커 산출물 합성
+- `utils/swarm/inProcessRunner.ts` — 인프로세스 다중 에이전트 실행기
+
+즉 **코디네이터(수퍼바이저) 1 + 워커 N** 구조로, 워커끼리도 서로 메시지를 주고받는 진짜 멀티에이전트 오케스트레이션입니다.
+
+## 정리
+
+| 형태 | 상태 | 성격 |
+|---|---|---|
+| 메인 → 서브에이전트 (Agent 툴) | **항상 켜짐** | 암묵적 수퍼바이저 — 위임하되 메인도 직접 일함 |
+| Workflow | **요청 시** (이번 debt-hunt) | 결정론적 스크립트 오케스트레이션 |
+| **Coordinator Mode** | **플래그 게이트** (COORDINATOR_MODE) | **명시적 수퍼바이저 — 코디네이터는 지휘만, 워커가 실행** |
+| Swarm / Team | 코디네이터와 연동 | 워커 N + 워커 간 통신 |
+
+**결론**: "수퍼바이저 패턴 있냐"의 답은 **명확히 예**입니다. 그것도 두 종류로 — 평상시의 느슨한 "메인=수퍼바이저"와, 시스템 프롬프트째 역할을 바꾸는 전용 **Coordinator Mode**(순수 지휘자 + 워커 군단). 다만 후자는 기능 플래그 뒤에 있어서 일반 사용자에게 기본 노출되진 않는, 실험/EAP 단계 기능으로 보입니다.
+
+원하시면 이 코디네이터-워커 아키텍처를 md/HTML로 정리해드릴 수 있어요.
+
+[USER] Coordinator Mode 를 쓰더라도 서브에이전트의 하네스가 바뀌진않지? 전체적으로 공통하네스쓰지?
+
+[ASSISTANT] 정확히 짚으셨어요. 결론부터: **네, 하네스는 하나입니다.** 소스로 확인해드릴게요.
+
+[도구호출 Bash] {"command": "echo \"=== worker가 spawn되는 경로 ===\" && grep -n \"isCoordinator\\|coordinator\\|worker\" tools/AgentTool/runAgent.ts | head -15", "description": "워커 스폰이 일반 서브에이전트와 같은 경로인지 확인"}
+
+[도구결과] === worker가 spawn되는 경로 ===
+292:  /** Precomputed tool pool for the worker agent. Computed by the caller
+294:   * Always contains the full tool pool assembled with the worker's own permission
+
+[도구호출 Bash] {"command": "echo \"=== isCoordinatorMode 소비처 (누가 갈리나) ===\" && grep -rn \"isCoordinatorMode\\|getCoordinatorSystemPrompt\\|isCoordinator\\b\" --include=\"*.ts\" --include=\"*.tsx\" | grep -v \"coordinatorMode.ts\" | head -20", "description": "코디네이터 분기가 어디서 소비되는지 전수"}
+
+[도구결과] === isCoordinatorMode 소비처 (누가 갈리나) ===
+tools.ts:281:        coordinatorModeModule?.isCoordinatorMode()
+tools.ts:293:      coordinatorModeModule?.isCoordinatorMode()
+main.tsx:2198:    }).proactive || isEnvTruthy(process.env.CLAUDE_CODE_PROACTIVE)) && !coordinatorModeModule?.isCoordinatorMode()) {
+main.tsx:3768:        saveMode(coordinatorModeModule?.isCoordinatorMode() ? 'coordinator' : 'normal');
+main.tsx:4590:      is_coordinator: feature('COORDINATOR_MODE') && coordinatorModeModule?.isCoordinatorMode() ? true : undefined,
+tools/AgentTool/resumeAgent.ts:4:import { isCoordinatorMode } from '../../coordinator/coordinatorMode.js'
+tools/AgentTool/resumeAgent.ts:251:          isCoordinatorMode() ||
+tools/AgentTool/forkSubagent.ts:9:import { isCoordinatorMode } from '../../coordinator/coordinatorMode.js'
+tools/AgentTool/forkSubagent.ts:34:    if (isCoordinatorMode()) return false
+tools/AgentTool/prompt.ts:68:  isCoordinator?: boolean,
+tools/AgentTool/prompt.ts:216:  if (isCoordinator) {
+tools/AgentTool/AgentTool.tsx:9:import { isCoordinatorMode } from '../../coordinator/coordinatorMode.js';
+tools/AgentTool/AgentTool.tsx:223:    const isCoordinator = feature('COORDINATOR_MODE') ? isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE) : false;
+tools/AgentTool/AgentTool.tsx:224:    return await getPrompt(filteredAgents, isCoordinator, allowedAgentTypes);
+tools/AgentTool/AgentTool.tsx:252:    const model = isCoordinatorMode() ? undefined : modelParam;
+tools/AgentTool/AgentTool.tsx:553:    const isCoordinator = feature('COORDINATOR_MODE') ? isEnvTruthy(process.env.CLAUDE_CODE_COORDINATOR_MODE) : false;
+tools/AgentTool/AgentTool.tsx:567:    const shouldRunAsync = (run_in_background === true || selectedAgent.background === true || isCoordinator || forceAsync || assistantForceAsync || (proactiveModule?.isProactiveActive() ?? false)) && !isBackgroundTasksDisabled;
+tools/AgentTool/AgentTool.tsx:750:        enableSummarization: isCoordinator || isForkSubagentEnabled() || getSdkAgent
+
+[ASSISTANT] 소스가 명확하게 답을 줍니다. **네, 하네스는 전체가 공통 단일 하네스입니다.** 코디네이터 모드가 바꾸는 건 하네스가 아니라 몇 개의 **설정 스위치**뿐이에요.
+
+## `isCoordinatorMode()`가 실제로 갈리는 지점 — 전수
+
+위 grep이 소비처 전부인데, 하나도 "하네스를 교체"하는 게 아닙니다. 전부 같은 하네스 안에서 파라미터만 조정해요:
+
+| 갈리는 것 | 위치 | 무엇이 바뀌나 |
+|---|---|---|
+| **누구의 시스템 프롬프트** | systemPrompt.ts:68-72 | **메인 스레드**만 코디네이터 프롬프트를 받음 |
+| 코디네이터의 도구 풀 | tools.ts:281,293 | 메인이 Team/SendMessage 등 지휘 도구를 가짐 |
+| 실행 모드 | AgentTool.tsx:567 | 워커를 async(백그라운드)로 강제 |
+| model 파라미터 무시 | AgentTool.tsx:252 | 코디네이터는 워커 모델을 못 바꿈 |
+| fork 비활성 | forkSubagent.ts:34 | 코디네이터 모드에선 fork 끔 |
+| proactive 끔 | main.tsx:2198 | |
+
+**결정적인 건 systemPrompt.ts:68** — `getCoordinatorSystemPrompt()`가 적용되는 건 **메인(코디네이터) 한 명뿐**입니다. 워커들은 이 분기를 안 탑니다.
+
+## 워커는 일반 서브에이전트와 완전히 같은 경로
+
+"worker"는 특별한 하네스가 아니라 **그냥 `subagent_type: "worker"`인 서브에이전트**예요. `runAgent.ts`에는 `isCoordinatorMode` 분기가 아예 없습니다 (위 grep에서 runAgent.ts는 worker/coordinator 키워드가 tool pool 주석 2줄뿐). 즉 워커 스폰은 Explore·Plan 스폰과 토씨 하나 다르지 않은 `runAgent` 경로를 탑니다.
+
+## 그림으로
+
+```
+                    ┌─────────── 단일 하네스 (queryLoop) ───────────┐
+                    │  전처리 5단 · SR 주입 · 어태치먼트 · 배치 파티션  │
+                    │  · tool_result 조립 · compact · 큐 웨이크 ...   │
+                    └───────────────────────────────────────────────┘
+                              같은 배관을 모두가 공유
+                                       │
+        ┌──────────────────────────────┼──────────────────────────────┐
+   메인(코디네이터)                  워커 A                         워커 B
+   system prompt만 교체         일반 서브에이전트             일반 서브에이전트
+   + 지휘 도구 추가             (Explore/Plan과 동일 경로)
+```
+
+## 정리
+
+**코디네이터 모드 = 하네스 교체가 아니라 "메인의 배역 변경 + 도구 셋 조정".** 하네스(queryLoop·전처리·SR 주입·배치·compact·큐 등 이 대화에서 우리가 판 모든 배관)는 코디네이터든 워커든 Explore든 **전원이 동일한 것 하나**를 씁니다. 바뀌는 건 (1) 메인이 받는 시스템 프롬프트, (2) 메인의 도구 풀, (3) 워커를 async로 돌리는지 같은 실행 파라미터일 뿐이에요.
+
+이건 사실 이 대화 초반에 봤던 원리의 연장이죠 — 서브에이전트는 **시스템 프롬프트만 갈아끼우고 유령 메시지·어태치먼트 배관은 공유**한다고 했던 것(runAgent.ts:381의 `getUserContext()` 공유). 코디네이터 모드도 정확히 그 틀 안에 있습니다. 하네스는 하나, 배역만 여럿.
+
+[USER] 임베딩 검색 없음
+BM25 없음
+의도 분류 없음
+고정된 에이전트 워크플로우 없음
+
+클로드코드에 위에 4개없는거 맞아? 그리고 유명 기술이지만 없는거 또뭐가있지?
+
+[ASSISTANT] 좋은 질문이에요. 4개를 하나씩 소스로 검증하고, 없는 것들을 더 찾아보겠습니다.
